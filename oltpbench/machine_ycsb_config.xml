@@ -4,11 +4,9 @@
     <!-- Connection details -->
     <dbtype>postgres</dbtype>
     <driver>org.postgresql.Driver</driver>
-    <DBUrl>jdbc:postgresql://localhost:5432/tpcc</DBUrl>
-    <username>tpcc</username>
-    <password>tpcc</password>
+    <DBUrl>jdbc:postgresql://localhost:5432/ycsb</DBUrl>
     <isolation>TRANSACTION_READ_COMMITTED</isolation>
-   
+
     <!-- Scalefactor in YCSB is *1000 the number of rows in the USERTABLE-->
     <scalefactor>10</scalefactor>
 
@@ -16,8 +14,8 @@
     <terminals>50</terminals>
     <works>
         <work>
-          <time>60</time>
-          <rate>10000</rate>
+          <time>300</time>
+          <rate>100000</rate>
           <weights>50,50,0,0,0,0</weights>
         </work>
     </works>

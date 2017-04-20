@@ -4,24 +4,22 @@
     <!-- Connection details -->
     <dbtype>postgres</dbtype>
     <driver>org.postgresql.Driver</driver>
-    <DBUrl>jdbc:postgresql://localhost:5432/tpcc</DBUrl>
-    <username>tpcc</username>
-    <password>tpcc</password>
+    <DBUrl>jdbc:postgresql://localhost:5432/tatp</DBUrl>
     <isolation>TRANSACTION_READ_COMMITTED</isolation>
-        
+
     <!-- Scalefactor increases the number of subscribers -->
-    <scalefactor>100</scalefactor>
-    
+    <scalefactor>10</scalefactor>
+
     <!-- The workload -->
     <terminals>10</terminals>
     <works>
         <work>
-            <time>60</time>
-            <rate>10000</rate>
-            <weights>2, 35, 10, 35, 2, 14, 2</weights>
+            <time>300</time>
+            <rate>100000</rate>
+            <weights>2, 2, 10, 2, 2, 35, 35</weights>
         </work>
     </works>
-  
+
 	<!-- Twitter Procedures declaration -->
     <transactiontypes>
         <transactiontype>

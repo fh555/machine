@@ -16,7 +16,7 @@
     <terminals>32</terminals>
     <works>
         <work>
-          <time>60</time>
+          <time>300</time>
           <rate>10000</rate>
           <ratelimited bench="tpcc">true</ratelimited>
           <weights>45,43,4,4,4</weights>

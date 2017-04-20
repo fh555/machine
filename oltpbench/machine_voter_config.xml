@@ -4,19 +4,17 @@
     <!-- Connection details -->
     <dbtype>postgres</dbtype>
     <driver>org.postgresql.Driver</driver>
-    <DBUrl>jdbc:postgresql://localhost:5432/tpcc</DBUrl>
-    <username>tpcc</username>
-    <password>tpcc</password>
+    <DBUrl>jdbc:postgresql://localhost:5432/voter</DBUrl>
     <isolation>TRANSACTION_READ_COMMITTED</isolation>
-     
+
     <scalefactor>10</scalefactor>
-    
+
     <!-- The workload -->
     <terminals>10</terminals>
     <works>
         <work>
-          <time>60</time>
-          <rate>10000</rate>
+          <time>300</time>
+          <rate>100000</rate>
           <weights>100</weights>
         </work>
     </works>
