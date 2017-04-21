@@ -24,16 +24,16 @@ size_t query_itr;
 
 double total_duration = 0;
 
-static void WriteOutput(double duration) {
+static void WriteOutput(double stat) {
 
   // Write out output in verbose mode
   if (state.verbose == true) {
     printf("----------------------------------------------------------");
     printf("%.2lf s",
-           duration);
+           stat);
   }
 
-  out << std::fixed << std::setprecision(2) << duration << "\n";
+  out << std::fixed << std::setprecision(2) << stat << "\n";
 
   out.flush();
 }
@@ -384,10 +384,10 @@ void MachineHelper() {
 
   }
 
-  auto duration = total_duration/(1000 * 1000);
+  auto throughput = (operation_itr * 1000 * 1000)/total_duration;
 
   std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-  std::cout << "Duration : " << duration << " (s) \n";
+  std::cout << "Throughput : " << throughput << " (ops/s) \n";
   std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 
   // Get machine size
@@ -399,7 +399,7 @@ void MachineHelper() {
   PrintMachine();
 
   // Emit output
-  WriteOutput(duration);
+  WriteOutput(throughput);
 
 }
 
