@@ -71,6 +71,7 @@ size_t GetWriteLatency(std::vector<Device>& devices,
   //}
 
   switch(device_type){
+    case DEVICE_TYPE_CACHE:
     case DEVICE_TYPE_DRAM:
     case DEVICE_TYPE_NVM:
     case DEVICE_TYPE_SSD: {
@@ -103,6 +104,7 @@ size_t GetReadLatency(std::vector<Device>& devices,
   //}
 
   switch(device_type){
+    case DEVICE_TYPE_CACHE:
     case DEVICE_TYPE_DRAM:
     case DEVICE_TYPE_NVM:
     case DEVICE_TYPE_SSD: {
@@ -201,9 +203,20 @@ bool IsSequential(std::vector<Device>& devices,
 DeviceType GetLowerDevice(std::vector<Device>& devices,
                           DeviceType source){
   DeviceType destination = DeviceType::DEVICE_TYPE_INVALID;
+  auto dram_exists = DeviceExists(devices, DeviceType::DEVICE_TYPE_DRAM);
   auto nvm_exists = DeviceExists(devices, DeviceType::DEVICE_TYPE_NVM);
 
   switch(source){
+    case DEVICE_TYPE_CACHE: {
+      if(dram_exists == true) {
+        destination = DEVICE_TYPE_DRAM;
+      }
+      else {
+        destination = DEVICE_TYPE_NVM;
+      }
+      break;
+    }
+
     case DEVICE_TYPE_DRAM: {
       if(nvm_exists == true) {
         destination = DEVICE_TYPE_NVM;
@@ -293,7 +306,8 @@ void MoveVictim(std::vector<Device>& devices,
                 double& total_duration){
 
   bool victim_exists = (block_id != INVALID_KEY);
-  bool memory_device = (source == DeviceType::DEVICE_TYPE_DRAM ||
+  bool memory_device = (source == DeviceType::DEVICE_TYPE_CACHE ||
+      source == DeviceType::DEVICE_TYPE_DRAM ||
       source == DeviceType::DEVICE_TYPE_NVM);
   bool is_dirty = (block_status == DIRTY_BLOCK);
 
@@ -327,7 +341,7 @@ Device DeviceFactory::GetDevice(const DeviceType& device_type,
 
   // SIZES (4K blocks)
 
-  size_t scale_factor = 1000/4;
+  size_t scale_factor = 1;
 
   device_size[DEVICE_TYPE_CACHE] = 8;
   device_size[DEVICE_TYPE_SSD] = 32 * 1024;

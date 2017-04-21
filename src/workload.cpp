@@ -68,6 +68,11 @@ DeviceType LocateInStorageDevices(const size_t& block_id){
   return LocateInDevices(state.storage_devices, block_id);
 }
 
+bool IsVolatileDevice(DeviceType device_type){
+  return (device_type == DeviceType::DEVICE_TYPE_CACHE ||
+      device_type == DeviceType::DEVICE_TYPE_DRAM);
+}
+
 void BringBlockToMemory(const size_t& block_id){
 
   auto memory_device_type = LocateInMemoryDevices(block_id);
@@ -114,12 +119,28 @@ void BringBlockToMemory(const size_t& block_id){
     }
   }
 
+  // DRAM to CACHE migration
+  memory_device_type = LocateInMemoryDevices(block_id);
+
+  if(memory_device_type == DeviceType::DEVICE_TYPE_DRAM){
+    bool migrate_to_cache = (rand() % state.migration_frequency == 0);
+    if(migrate_to_cache == true){
+      Copy(state.devices,
+           DeviceType::DEVICE_TYPE_CACHE,
+           DeviceType::DEVICE_TYPE_DRAM,
+           block_id,
+           CLEAN_BLOCK,
+           total_duration);
+    }
+  }
+
 }
 
 void BringBlockToStorage(const size_t& block_id,
                          const size_t& block_status){
 
   auto source = LocateInMemoryDevices(block_id);
+  auto is_volatile_source = IsVolatileDevice(source);
   auto nvm_exists = DeviceExists(state.devices, DeviceType::DEVICE_TYPE_NVM);
   auto last_device_type = state.devices.back().device_type;
   auto nvm_last = (last_device_type == DeviceType::DEVICE_TYPE_NVM);
@@ -128,8 +149,8 @@ void BringBlockToStorage(const size_t& block_id,
     nvm_status = CLEAN_BLOCK;
   }
 
-  // Check if it is on DRAM
-  if(source == DeviceType::DEVICE_TYPE_DRAM){
+  // Check if it is on DRAM or CACHE
+  if(is_volatile_source){
     // Copy to NVM first if it exists in hierarchy
     if(nvm_exists == true) {
       Copy(state.devices,
@@ -179,26 +200,14 @@ void WriteBlock(const size_t& block_id) {
   // CASE 1: New block
   if(destination == DeviceType::DEVICE_TYPE_INVALID){
     //std::cout << "WRITE " << block_id << "\n";
-    auto dram_exists = DeviceExists(state.devices, DeviceType::DEVICE_TYPE_DRAM);
 
-    // Mark block as dirty if written to DRAM
-    if(dram_exists){
-      Copy(state.devices,
-           DeviceType::DEVICE_TYPE_DRAM,
-           DeviceType::DEVICE_TYPE_INVALID,
-           block_id,
-           DIRTY_BLOCK,
-           total_duration);
-    }
-    // Mark block as clean if written to NVM
-    else {
-      Copy(state.devices,
-           DeviceType::DEVICE_TYPE_NVM,
-           DeviceType::DEVICE_TYPE_INVALID,
-           block_id,
-           CLEAN_BLOCK,
-           total_duration);
-    }
+    // Mark block as dirty
+    Copy(state.devices,
+         DeviceType::DEVICE_TYPE_CACHE,
+         DeviceType::DEVICE_TYPE_INVALID,
+         block_id,
+         DIRTY_BLOCK,
+         total_duration);
 
     return;
   }
@@ -207,7 +216,8 @@ void WriteBlock(const size_t& block_id) {
   //std::cout << "UPDATE " << block_id << "\n";
 
   // Mark block as dirty
-  if(destination == DeviceType::DEVICE_TYPE_DRAM){
+  auto is_volatile_destination = IsVolatileDevice(destination);
+  if(is_volatile_destination){
     auto device_offset = GetDeviceOffset(state.devices, destination);
     auto device_cache = state.devices[device_offset].cache;
     auto victim = device_cache.Put(block_id, DIRTY_BLOCK);
@@ -241,9 +251,10 @@ void ReadBlock(const size_t& block_id){
 void FlushBlock(const size_t& block_id) {
   //std::cout << "FLUSH " << block_id << "\n";
 
-  // Check if dirty in DRAM
+  // Check if dirty in volatile device
   auto memory_device_type = LocateInMemoryDevices(block_id);
-  if(memory_device_type == DeviceType::DEVICE_TYPE_DRAM){
+  auto is_volatile_device = IsVolatileDevice(memory_device_type);
+  if(is_volatile_device == true){
     auto device_offset = GetDeviceOffset(state.devices, memory_device_type);
     auto device_cache = state.devices[device_offset].cache;
     auto block_status = device_cache.Get(block_id, true);
