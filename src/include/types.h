@@ -50,9 +50,10 @@ enum CachingType {
 enum DeviceType {
   DEVICE_TYPE_INVALID = 0,
 
-  DEVICE_TYPE_DRAM = 1,
-  DEVICE_TYPE_NVM = 2,
-  DEVICE_TYPE_SSD = 3
+  DEVICE_TYPE_CACHE = 1,
+  DEVICE_TYPE_DRAM = 2,
+  DEVICE_TYPE_NVM = 3,
+  DEVICE_TYPE_SSD = 4
 
 };
 

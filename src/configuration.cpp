@@ -143,6 +143,10 @@ void SetupNVMLatency(configuration &state){
 void ConstructDeviceList(configuration &state){
 
   auto last_device_type = GetLastDevice(state.hierarchy_type);
+  Device cache_device = DeviceFactory::GetDevice(DEVICE_TYPE_CACHE,
+                                                 state.size_type,
+                                                 state.caching_type,
+                                                 last_device_type);
   Device dram_device = DeviceFactory::GetDevice(DEVICE_TYPE_DRAM,
                                                 state.size_type,
                                                 state.caching_type,
@@ -158,26 +162,26 @@ void ConstructDeviceList(configuration &state){
 
   switch (state.hierarchy_type) {
     case HIERARCHY_TYPE_NVM: {
-      state.devices = {nvm_device};
-      state.memory_devices = {nvm_device};
+      state.devices = {cache_device, nvm_device};
+      state.memory_devices = {cache_device, nvm_device};
       state.storage_devices = {nvm_device};
     }
     break;
     case HIERARCHY_TYPE_DRAM_NVM: {
-      state.devices = {dram_device, nvm_device};
-      state.memory_devices = {dram_device, nvm_device};
+      state.devices = {cache_device, dram_device, nvm_device};
+      state.memory_devices = {cache_device, dram_device, nvm_device};
       state.storage_devices = {nvm_device};
     }
     break;
     case HIERARCHY_TYPE_DRAM_SSD: {
-      state.devices = {dram_device, ssd_device};
-      state.memory_devices = {dram_device};
+      state.devices = {cache_device, dram_device, ssd_device};
+      state.memory_devices = {cache_device, dram_device};
       state.storage_devices = {ssd_device};
     }
     break;
     case HIERARCHY_TYPE_DRAM_NVM_SSD: {
-      state.devices = {dram_device, nvm_device, ssd_device};
-      state.memory_devices = {dram_device, nvm_device};
+      state.devices = {cache_device, dram_device, nvm_device, ssd_device};
+      state.memory_devices = {cache_device, dram_device, nvm_device};
       state.storage_devices = {nvm_device, ssd_device};
     }
     break;

@@ -24,6 +24,8 @@ std::string CachingTypeToString(const CachingType& caching_type){
 std::string DeviceTypeToString(const DeviceType& device_type){
 
   switch (device_type){
+    case DEVICE_TYPE_CACHE:
+      return "CACHE";
     case DEVICE_TYPE_DRAM:
       return "DRAM";
     case DEVICE_TYPE_NVM:
@@ -40,13 +42,13 @@ std::string HierarchyTypeToString(const HierarchyType& hierarchy_type){
 
   switch (hierarchy_type) {
     case HIERARCHY_TYPE_NVM:
-      return "NVM";
+      return "CACHE-NVM";
     case HIERARCHY_TYPE_DRAM_NVM:
-      return "DRAM-NVM";
+      return "CACHE-DRAM-NVM";
     case HIERARCHY_TYPE_DRAM_SSD:
-      return "DRAM-SSD";
+      return "CACHE-DRAM-SSD";
     case HIERARCHY_TYPE_DRAM_NVM_SSD:
-      return "DRAM-NVM-SSD";
+      return "CACHE-DRAM-NVM-SSD";
     default:
       return "INVALID";
   }

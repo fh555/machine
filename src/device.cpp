@@ -14,27 +14,36 @@ std::map<DeviceType, double> rnd_write_latency;
 
 void BootstrapDeviceMetrics(const configuration &state){
 
-  // LATENCIES (us)
+  // LATENCIES (ns)
 
-  seq_read_latency[DEVICE_TYPE_DRAM] = 0.4;
-  seq_read_latency[DEVICE_TYPE_NVM] = seq_read_latency[DEVICE_TYPE_DRAM]
-                                                       * state.nvm_read_latency;
-  seq_read_latency[DEVICE_TYPE_SSD] = 100;
+  // CACHE
+  seq_read_latency[DEVICE_TYPE_CACHE] = 10;
+  seq_write_latency[DEVICE_TYPE_CACHE] = 10;
+  rnd_read_latency[DEVICE_TYPE_CACHE] = 10;
+  rnd_write_latency[DEVICE_TYPE_CACHE] = 10;
 
-  seq_write_latency[DEVICE_TYPE_DRAM] = 0.6;
-  seq_write_latency[DEVICE_TYPE_NVM] = seq_write_latency[DEVICE_TYPE_DRAM]
-                                                         * state.nvm_write_latency;
-  seq_write_latency[DEVICE_TYPE_SSD] = 250;
+  // DRAM
+  seq_read_latency[DEVICE_TYPE_DRAM] = 100;
+  seq_write_latency[DEVICE_TYPE_DRAM] = 100;
+  rnd_read_latency[DEVICE_TYPE_DRAM] = 100;
+  rnd_write_latency[DEVICE_TYPE_DRAM] = 100;
 
-  rnd_read_latency[DEVICE_TYPE_DRAM] = 0.5;
-  rnd_read_latency[DEVICE_TYPE_NVM] = rnd_read_latency[DEVICE_TYPE_DRAM]
-                                                       * state.nvm_read_latency;
-  rnd_read_latency[DEVICE_TYPE_SSD] = 100;
+  // NVM
+  seq_read_latency[DEVICE_TYPE_NVM] = seq_read_latency[DEVICE_TYPE_DRAM];
+  seq_write_latency[DEVICE_TYPE_NVM] = seq_write_latency[DEVICE_TYPE_DRAM];
+  rnd_read_latency[DEVICE_TYPE_NVM] = rnd_read_latency[DEVICE_TYPE_DRAM];
+  rnd_write_latency[DEVICE_TYPE_NVM] = rnd_write_latency[DEVICE_TYPE_DRAM];
 
-  rnd_write_latency[DEVICE_TYPE_DRAM] = 0.7;
-  rnd_write_latency[DEVICE_TYPE_NVM] = rnd_write_latency[DEVICE_TYPE_DRAM]
-                                                         * state.nvm_write_latency;
-  rnd_write_latency[DEVICE_TYPE_SSD] = 400;
+  seq_read_latency[DEVICE_TYPE_NVM] *=  state.nvm_read_latency;
+  seq_write_latency[DEVICE_TYPE_NVM] *= state.nvm_write_latency;
+  rnd_read_latency[DEVICE_TYPE_NVM] *= state.nvm_read_latency;
+  rnd_write_latency[DEVICE_TYPE_NVM] *= state.nvm_write_latency;
+
+  // SSD
+  seq_read_latency[DEVICE_TYPE_SSD] = 100 * 100;
+  seq_write_latency[DEVICE_TYPE_SSD] = 250 * 100;
+  rnd_read_latency[DEVICE_TYPE_SSD] = 100 * 100;
+  rnd_write_latency[DEVICE_TYPE_SSD] = 400 * 100;
 
 }
 
@@ -320,32 +329,31 @@ Device DeviceFactory::GetDevice(const DeviceType& device_type,
 
   size_t scale_factor = 1000/4;
 
+  device_size[DEVICE_TYPE_CACHE] = 8;
+  device_size[DEVICE_TYPE_SSD] = 32 * 1024;
+
   switch(size_type){
     case SIZE_TYPE_1: {
       device_size[DEVICE_TYPE_DRAM] = 16;
       device_size[DEVICE_TYPE_NVM] = 16;
-      device_size[DEVICE_TYPE_SSD] = 32 * 1024;
       break;
     }
 
     case SIZE_TYPE_2: {
       device_size[DEVICE_TYPE_DRAM] = 16;
       device_size[DEVICE_TYPE_NVM] = 128;
-      device_size[DEVICE_TYPE_SSD] = 32 * 1024;
       break;
     }
 
     case SIZE_TYPE_3: {
       device_size[DEVICE_TYPE_DRAM] = 128;
       device_size[DEVICE_TYPE_NVM] = 16;
-      device_size[DEVICE_TYPE_SSD] = 32 * 1024;
       break;
     }
 
     case SIZE_TYPE_4: {
       device_size[DEVICE_TYPE_DRAM] = 128;
       device_size[DEVICE_TYPE_NVM] = 128;
-      device_size[DEVICE_TYPE_SSD] = 32 * 1024;
       break;
     }
 
@@ -356,6 +364,7 @@ Device DeviceFactory::GetDevice(const DeviceType& device_type,
   }
 
   switch (device_type){
+    case DEVICE_TYPE_CACHE:
     case DEVICE_TYPE_DRAM:
     case DEVICE_TYPE_NVM:
     case DEVICE_TYPE_SSD:  {
