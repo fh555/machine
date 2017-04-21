@@ -36,6 +36,9 @@ class configuration {
   // migration frequency
   size_t migration_frequency;
 
+  // operation count
+  size_t operation_count;
+
   // Verbose output
   bool verbose;
 

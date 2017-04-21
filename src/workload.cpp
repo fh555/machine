@@ -298,12 +298,13 @@ void MachineHelper() {
 
   // PREPROCESS
   while(!input->eof()){
+    operation_itr++;
 
     // Get a line from the input stream
     input->getline(buffer, fragment_size);
 
     // Check statement
-    sscanf(buffer, "%c,%lu,%lu",
+    sscanf(buffer, "%c %lu %lu",
            &operation_type,
            &fork_number,
            &block_number);
@@ -314,6 +315,12 @@ void MachineHelper() {
     if(block_list.count(global_block_number) == 0){
       BootstrapBlock(global_block_number);
       block_list.insert(global_block_number);
+    }
+
+    if(state.operation_count != 0){
+      if(operation_itr > state.operation_count){
+        break;
+      }
     }
 
   }
@@ -327,6 +334,7 @@ void MachineHelper() {
 
   // Reinit duration
   total_duration = 0;
+  operation_itr = 0;
 
   // RUN SIMULATION
   while(!input->eof()){
@@ -336,7 +344,7 @@ void MachineHelper() {
     input->getline(buffer, fragment_size);
 
     // Check statement
-    sscanf(buffer, "%c,%lu,%lu",
+    sscanf(buffer, "%c %lu %lu",
            &operation_type,
            &fork_number,
            &block_number);
@@ -365,15 +373,21 @@ void MachineHelper() {
       std::cout << "Operation " << operation_itr << " :: " <<
           operation_type << " " << global_block_number << " "
           << fork_number << " " << block_number << " :: "
-          << total_duration << "\n";
+          << total_duration / (1000 * 1000) << "s \n";
+    }
+
+    if(state.operation_count != 0){
+      if(operation_itr > state.operation_count){
+        break;
+      }
     }
 
   }
 
-  auto duration = total_duration;
+  auto duration = total_duration/(1000 * 1000);
 
   std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-  std::cout << "Duration : " << duration << " (us) \n";
+  std::cout << "Duration : " << duration << " (s) \n";
   std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 
   // Get machine size

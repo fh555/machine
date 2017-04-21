@@ -341,7 +341,7 @@ Device DeviceFactory::GetDevice(const DeviceType& device_type,
 
   // SIZES (4K blocks)
 
-  size_t scale_factor = 1;
+  size_t scale_factor = 1000/4;
 
   device_size[DEVICE_TYPE_CACHE] = 8;
   device_size[DEVICE_TYPE_SSD] = 32 * 1024;

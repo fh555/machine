@@ -97,6 +97,11 @@ static void ValidateNVMWriteLatency(const configuration &state){
   printf("%30s : %lu\n", "nvm_write_latency", state.nvm_write_latency);
 }
 
+static void ValidateOperationCount(const configuration &state){
+  if(state.operation_count > 0) {
+    printf("%30s : %lu\n", "operation_count", state.operation_count);
+  }
+}
 
 void SetupNVMLatency(configuration &state){
 
@@ -203,12 +208,13 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
   state.latency_type = LATENCY_TYPE_1;
   state.migration_frequency = 3;
   state.file_name = "";
+  state.operation_count = 0;
 
   // Parse args
   while (1) {
     int idx = 0;
     int c = getopt_long(argc, argv,
-                        "a:c:f:m:l:s:vh",
+                        "a:c:f:m:l:o:s:vh",
                         opts, &idx);
 
     if (c == -1) break;
@@ -228,6 +234,9 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
         break;
       case 'l':
         state.latency_type = (LatencyType)atoi(optarg);
+        break;
+      case 'o':
+        state.operation_count = atoi(optarg);
         break;
       case 's':
         state.size_type = (SizeType)atoi(optarg);
@@ -259,6 +268,7 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
   SetupNVMLatency(state);
   ValidateNVMReadLatency(state);
   ValidateNVMWriteLatency(state);
+  ValidateOperationCount(state);
 
   printf("//===----------------------------------------------------------------------===//\n");
 
