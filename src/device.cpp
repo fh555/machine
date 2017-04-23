@@ -3,6 +3,7 @@
 #include "macros.h"
 #include "device.h"
 #include "configuration.h"
+#include "stats.h"
 
 namespace machine {
 
@@ -11,6 +12,9 @@ std::map<DeviceType, double> seq_read_latency;
 std::map<DeviceType, double> seq_write_latency;
 std::map<DeviceType, double> rnd_read_latency;
 std::map<DeviceType, double> rnd_write_latency;
+
+// Machine stats
+Stats machine_stats;
 
 void BootstrapDeviceMetrics(const configuration &state){
 
@@ -65,10 +69,12 @@ size_t GetWriteLatency(std::vector<Device>& devices,
                        const size_t& block_id){
 
   DLOG(INFO) << "WRITE :: " << DeviceTypeToString(device_type) << "\n";
+
+  // Increment stats
+  machine_stats.IncrementWriteCount(device_type);
+
+  // Check if sequential or random?
   bool is_sequential = IsSequential(devices, device_type, block_id);
-  //if(is_sequential == true) {
-  //  std::cout << DeviceTypeToString(device_type) << " " << GetPattern(is_sequential) << "\n";
-  //}
 
   switch(device_type){
     case DEVICE_TYPE_CACHE:
@@ -98,10 +104,12 @@ size_t GetReadLatency(std::vector<Device>& devices,
                       const size_t& block_id){
 
   DLOG(INFO) << "READ :: " << DeviceTypeToString(device_type) << "\n";
+
+  // Increment stats
+  machine_stats.IncrementReadCount(device_type);
+
+  // Check if sequential or random?
   bool is_sequential = IsSequential(devices, device_type, block_id);
-  //if(is_sequential == true) {
-  //  std::cout << DeviceTypeToString(device_type) << " " << GetPattern(is_sequential) << "\n";
-  //}
 
   switch(device_type){
     case DEVICE_TYPE_CACHE:

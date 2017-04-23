@@ -14,6 +14,7 @@
 #include "configuration.h"
 #include "device.h"
 #include "cache.h"
+#include "stats.h"
 
 namespace machine {
 
@@ -23,6 +24,9 @@ std::ofstream out(OUTPUT_FILE);
 size_t query_itr;
 
 double total_duration = 0;
+
+// Stats
+extern Stats machine_stats;
 
 static void WriteOutput(double stat) {
 
@@ -57,6 +61,8 @@ void PrintMachine(){
     std::cout << device.cache;
   }
   std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+
+  std::cout << machine_stats;
 
 }
 
@@ -335,6 +341,9 @@ void MachineHelper() {
   // Reinit duration
   total_duration = 0;
   operation_itr = 0;
+
+  // Reset stats
+  machine_stats.Reset();
 
   // RUN SIMULATION
   while(!input->eof()){
