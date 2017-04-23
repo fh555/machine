@@ -355,27 +355,52 @@ Device DeviceFactory::GetDevice(const DeviceType& device_type,
   device_size[DEVICE_TYPE_SSD] = 32 * 1024;
 
   switch(size_type){
+
     case SIZE_TYPE_1: {
-      device_size[DEVICE_TYPE_DRAM] = 16;
-      device_size[DEVICE_TYPE_NVM] = 16;
+      device_size[DEVICE_TYPE_DRAM] = 4;
+      device_size[DEVICE_TYPE_NVM] = 32;
       break;
     }
 
     case SIZE_TYPE_2: {
-      device_size[DEVICE_TYPE_DRAM] = 16;
-      device_size[DEVICE_TYPE_NVM] = 128;
+      device_size[DEVICE_TYPE_DRAM] = 32;
+      device_size[DEVICE_TYPE_NVM] = 32;
       break;
     }
 
     case SIZE_TYPE_3: {
-      device_size[DEVICE_TYPE_DRAM] = 128;
-      device_size[DEVICE_TYPE_NVM] = 16;
+      device_size[DEVICE_TYPE_DRAM] = 32;
+      device_size[DEVICE_TYPE_NVM] = 256;
       break;
     }
 
     case SIZE_TYPE_4: {
-      device_size[DEVICE_TYPE_DRAM] = 128;
-      device_size[DEVICE_TYPE_NVM] = 128;
+      device_size[DEVICE_TYPE_DRAM] = 256;
+      device_size[DEVICE_TYPE_NVM] = 256;
+      break;
+    }
+
+    case SIZE_TYPE_5: {
+      device_size[DEVICE_TYPE_DRAM] = 256;
+      device_size[DEVICE_TYPE_NVM] = 2048;
+      break;
+    }
+
+    case SIZE_TYPE_6: {
+      device_size[DEVICE_TYPE_DRAM] = 2048;
+      device_size[DEVICE_TYPE_NVM] = 2048;
+      break;
+    }
+
+    case SIZE_TYPE_7: {
+      device_size[DEVICE_TYPE_DRAM] = 2048;
+      device_size[DEVICE_TYPE_NVM] = 16384;
+      break;
+    }
+
+    case SIZE_TYPE_8: {
+      device_size[DEVICE_TYPE_DRAM] = 16384;
+      device_size[DEVICE_TYPE_NVM] = 16384;
       break;
     }
 

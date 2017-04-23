@@ -49,7 +49,7 @@ static void ValidateHierarchyType(const configuration &state) {
 }
 
 static void ValidateSizeType(const configuration &state) {
-  if (state.size_type < 1 || state.size_type > 5) {
+  if (state.size_type < 1 || state.size_type > 8) {
     printf("Invalid size_type :: %d\n", state.size_type);
     exit(EXIT_FAILURE);
   }

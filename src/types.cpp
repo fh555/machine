@@ -66,6 +66,14 @@ std::string SizeTypeToString(const SizeType& size_type){
       return "3";
     case SIZE_TYPE_4:
       return "4";
+    case SIZE_TYPE_5:
+      return "5";
+    case SIZE_TYPE_6:
+      return "6";
+    case SIZE_TYPE_7:
+      return "7";
+    case SIZE_TYPE_8:
+      return "8";
     default:
       return "INVALID";
   }

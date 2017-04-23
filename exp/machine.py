@@ -156,12 +156,21 @@ SIZE_TYPE_1 = 1
 SIZE_TYPE_2 = 2
 SIZE_TYPE_3 = 3
 SIZE_TYPE_4 = 4
+SIZE_TYPE_5 = 5
+SIZE_TYPE_6 = 6
+SIZE_TYPE_7 = 7
+SIZE_TYPE_8 = 8
+
 
 SIZE_TYPES = [
     SIZE_TYPE_1,
     SIZE_TYPE_2,
     SIZE_TYPE_3,
-    SIZE_TYPE_4
+    SIZE_TYPE_4,
+    SIZE_TYPE_5,
+    SIZE_TYPE_6,
+    SIZE_TYPE_7,
+    SIZE_TYPE_8
 ]
 
 ## LATENCY TYPES
@@ -456,7 +465,7 @@ def create_size_bar_chart(datasets):
     # X-AXIS
     x_values = [str(i) for i in SIZE_EXP_SIZE_TYPES]
     N = len(x_values)
-    M = len(SIZE_EXP_HIERARCHY_TYPES)
+    M = 1
     ind = np.arange(N)
     margin = 0.1
     width = (1.-2.*margin)/M

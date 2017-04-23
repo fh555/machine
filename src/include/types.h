@@ -22,7 +22,11 @@ enum SizeType {
   SIZE_TYPE_1 = 1,
   SIZE_TYPE_2 = 2,
   SIZE_TYPE_3 = 3,
-  SIZE_TYPE_4 = 4
+  SIZE_TYPE_4 = 4,
+  SIZE_TYPE_5 = 5,
+  SIZE_TYPE_6 = 6,
+  SIZE_TYPE_7 = 7,
+  SIZE_TYPE_8 = 8,
 
 };
 
