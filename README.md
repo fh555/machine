@@ -1,5 +1,4 @@
 # Machine
--------
 
 Multi-tier storage hierarchy simulator.
 
