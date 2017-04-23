@@ -145,9 +145,15 @@ HIERARCHY_TYPES = [
     HIERARCHY_TYPE_DRAM_NVM_SSD
 ]
 
-HIERARCHY_TYPES_NVM = [
+HIERARCHY_TYPES_WITH_NVM = [
     HIERARCHY_TYPE_NVM,
     HIERARCHY_TYPE_DRAM_NVM,
+    HIERARCHY_TYPE_DRAM_NVM_SSD                       
+]
+
+HIERARCHY_TYPES_SKIP_NVM_ONLY = [
+    HIERARCHY_TYPE_DRAM_NVM,
+    HIERARCHY_TYPE_DRAM_SSD,
     HIERARCHY_TYPE_DRAM_NVM_SSD                       
 ]
 
@@ -213,7 +219,7 @@ CACHING_TYPES = [
     CACHING_TYPE_FIFO,
     CACHING_TYPE_LRU,
     CACHING_TYPE_LFU,
-#    CACHING_TYPE_ARC
+    CACHING_TYPE_ARC
 ]
 
 ## TRACE TYPES
@@ -241,7 +247,7 @@ SCALE_FACTOR = 10
 
 DEFAULT_DURATION = 10
 DEFAULT_HIERARCHY_TYPE = HIERARCHY_TYPE_NVM
-DEFAULT_SIZE_TYPE = SIZE_TYPE_4
+DEFAULT_SIZE_TYPE = SIZE_TYPE_2
 DEFAULT_CACHING_TYPE = CACHING_TYPE_LRU
 DEFAULT_LATENCY_TYPE = LATENCY_TYPE_1
 DEFAULT_TRACE_TYPE = TRACE_TYPE_TPCC
@@ -251,20 +257,23 @@ DEFAULT_OPERATION_COUNT = 100000 * SCALE_FACTOR
 ## EXPERIMENTS
 LATENCY_EXPERIMENT = 1
 SIZE_EXPERIMENT = 2
+CACHE_EXPERIMENT = 3
 
 ## EVAL DIRS
 LATENCY_DIR = BASE_DIR + "/results/latency"
 SIZE_DIR = BASE_DIR + "/results/size"
+CACHE_DIR = BASE_DIR + "/results/cache"
 
 ## PLOT DIRS
 LEGEND_PLOT_DIR = BASE_DIR + "/images/legend/"
 LATENCY_PLOT_DIR = BASE_DIR + "/images/latency/"
 SIZE_PLOT_DIR = BASE_DIR + "/images/size/"
+CACHE_PLOT_DIR = BASE_DIR + "/images/cache/"
 
 ## LATENCY EXPERIMENT
 
 LATENCY_EXP_TRACE_TYPES = [DEFAULT_TRACE_TYPE]
-LATENCY_EXP_HIERARCHY_TYPES = HIERARCHY_TYPES_NVM
+LATENCY_EXP_HIERARCHY_TYPES = HIERARCHY_TYPES_WITH_NVM
 LATENCY_EXP_SIZE_TYPES = [DEFAULT_SIZE_TYPE]
 LATENCY_EXP_LATENCY_TYPES = LATENCY_TYPES
 LATENCY_EXP_CACHING_TYPES = [DEFAULT_CACHING_TYPE]
@@ -272,15 +281,24 @@ LATENCY_EXP_CACHING_TYPES = [DEFAULT_CACHING_TYPE]
 ## SIZE EXPERIMENT
 
 SIZE_EXP_TRACE_TYPES = [DEFAULT_TRACE_TYPE]
-SIZE_EXP_HIERARCHY_TYPES = [HIERARCHY_TYPE_DRAM_NVM, HIERARCHY_TYPE_DRAM_SSD, HIERARCHY_TYPE_DRAM_NVM_SSD]
+SIZE_EXP_HIERARCHY_TYPES = HIERARCHY_TYPES_SKIP_NVM_ONLY
 SIZE_EXP_SIZE_TYPES = SIZE_TYPES
 SIZE_EXP_LATENCY_TYPES = [DEFAULT_LATENCY_TYPE]
 SIZE_EXP_CACHING_TYPES = [DEFAULT_CACHING_TYPE]
+
+## CACHE EXPERIMENT
+
+CACHE_EXP_TRACE_TYPES = [DEFAULT_TRACE_TYPE]
+CACHE_EXP_HIERARCHY_TYPES = HIERARCHY_TYPES_SKIP_NVM_ONLY
+CACHE_EXP_SIZE_TYPES = [DEFAULT_SIZE_TYPE]
+CACHE_EXP_LATENCY_TYPES = [DEFAULT_LATENCY_TYPE]
+CACHE_EXP_CACHING_TYPES = CACHING_TYPES
 
 ## CSV FILES
 
 LATENCY_CSV = "latency.csv"
 SIZE_CSV = "size.csv"
+CACHE_CSV = "cache.csv"
 
 ###################################################################################
 # UTILS
@@ -511,6 +529,56 @@ def create_size_bar_chart(datasets):
 
     return fig
 
+def create_cache_line_chart(datasets):
+    fig = plot.figure()
+    ax1 = fig.add_subplot(111)
+
+    # X-AXIS
+    x_values = [CACHING_TYPES_STRINGS[i] for i in CACHE_EXP_CACHING_TYPES]
+    N = len(x_values)
+    ind = np.arange(N)
+
+    idx = 0
+    for group in range(len(datasets)):
+        # GROUP
+        y_values = []
+        for line in  range(len(datasets[group])):
+            for col in  range(len(datasets[group][line])):
+                if col == 1:
+                    y_values.append(datasets[group][line][col])
+        LOG.info("group_data = %s", str(y_values))
+        ax1.plot(ind + 0.5, y_values,
+                 color=OPT_COLORS[idx],
+                 linewidth=OPT_LINE_WIDTH,
+                 marker=OPT_MARKERS[idx],
+                 markersize=OPT_MARKER_SIZE,
+                 label=str(group))
+        idx = idx + 1
+
+    # GRID
+    makeGrid(ax1)
+
+    # Y-AXIS
+    YAXIS_MIN = 1
+    ax1.yaxis.set_major_locator(LinearLocator(YAXIS_TICKS))
+    ax1.minorticks_off()
+    ax1.set_ylabel(get_label('Throughput (ops)'), fontproperties=LABEL_FP)
+    ax1.set_ylim(bottom=YAXIS_MIN)
+    ax1.set_yscale('log', nonposy='clip')
+
+    # X-AXIS
+    ax1.set_xticks(ind + 0.5)
+    ax1.set_xlabel(get_label('Caching Algorithm Types'), fontproperties=LABEL_FP)
+    ax1.set_xticklabels(x_values)
+    #ax1.set_xlim([XAXIS_MIN, XAXIS_MAX])
+
+    for label in ax1.get_yticklabels() :
+        label.set_fontproperties(TICK_FP)
+    for label in ax1.get_xticklabels() :
+        label.set_fontproperties(TICK_FP)
+
+    return fig
+
 ###################################################################################
 # PLOT HELPERS
 ###################################################################################
@@ -588,6 +656,44 @@ def size_plot():
                                 str(latency_type) + ".pdf"
     
                     saveGraph(fig, file_name, width=OPT_GRAPH_WIDTH, height=OPT_GRAPH_HEIGHT)
+
+# CACHE -- PLOT
+def cache_plot():
+
+    # CLEAN UP RESULT DIR
+    clean_up_dir(CACHE_PLOT_DIR)
+
+    for trace_type in CACHE_EXP_TRACE_TYPES:
+        LOG.info(MAJOR_STRING)
+
+        for latency_type in CACHE_EXP_LATENCY_TYPES:
+            LOG.info(MINOR_STRING)
+
+            for size_type in CACHE_EXP_SIZE_TYPES:
+                LOG.info(SUB_MINOR_STRING)
+
+                datasets = []
+                for hierarchy_type in CACHE_EXP_HIERARCHY_TYPES:
+    
+                    # Get result file
+                    result_dir_list = [TRACE_TYPES_STRINGS[trace_type],
+                                       str(size_type),
+                                       str(latency_type),
+                                       HIERARCHY_TYPES_STRINGS[hierarchy_type]]
+                    result_file = get_result_file(CACHE_DIR, result_dir_list, CACHE_CSV)
+    
+                    dataset = loadDataFile(result_file)
+                    datasets.append(dataset)
+    
+                fig = create_cache_line_chart(datasets)
+    
+                file_name = CACHE_PLOT_DIR + "cache" + "-" + \
+                            HIERARCHY_TYPES_STRINGS[hierarchy_type] + "-" + \
+                            str(latency_type) + "-" + \
+                            str(size_type) + ".pdf"
+    
+                saveGraph(fig, file_name, width=OPT_GRAPH_WIDTH, height=OPT_GRAPH_HEIGHT)
+
 
 ###################################################################################
 # UTILITIES
@@ -743,6 +849,59 @@ def size_eval():
                         # Write stat
                         write_stat(result_file, size_type, stat)
 
+# CACHE -- EVAL
+def cache_eval():
+
+    # CLEAN UP RESULT DIR
+    clean_up_dir(CACHE_DIR)
+    LOG.info("CACHE EVAL")
+
+    # ETA
+    l1 = len(CACHE_EXP_TRACE_TYPES)
+    l2 = len(CACHE_EXP_CACHING_TYPES)
+    l3 = len(CACHE_EXP_SIZE_TYPES)
+    l4 = len(CACHE_EXP_LATENCY_TYPES)
+    l5 = len(CACHE_EXP_HIERARCHY_TYPES)
+    print_eta(l1, l2, l3, l4, l5)
+
+    for trace_type in CACHE_EXP_TRACE_TYPES:
+        LOG.info(MAJOR_STRING)
+
+        for size_type in CACHE_EXP_SIZE_TYPES:    
+            LOG.info(MINOR_STRING)
+
+            for latency_type in CACHE_EXP_LATENCY_TYPES:
+                LOG.info(SUB_MINOR_STRING)
+
+                for hierarchy_type in CACHE_EXP_HIERARCHY_TYPES:
+
+                    for caching_type in CACHE_EXP_CACHING_TYPES:
+                        LOG.info(" > trace_type: " + TRACE_TYPES_STRINGS[trace_type] + 
+                              " caching_type: " + CACHING_TYPES_STRINGS[caching_type] +
+                              " size_type: " + str(size_type) +
+                              " latency_type: " + str(latency_type) +
+                              " hierarchy_type: " + HIERARCHY_TYPES_STRINGS[hierarchy_type] +
+                              "\n"
+                        )
+    
+                        # Get result file
+                        result_dir_list = [TRACE_TYPES_STRINGS[trace_type],
+                                           str(size_type),
+                                           str(latency_type),
+                                           HIERARCHY_TYPES_STRINGS[hierarchy_type]]
+                        result_file = get_result_file(CACHE_DIR, result_dir_list, CACHE_CSV)
+    
+                        # Run experiment
+                        stat = run_experiment(stat_offset=THROUGHPUT_OFFSET,
+                                              trace_type=trace_type,
+                                              hierarchy_type=hierarchy_type,
+                                              latency_type=latency_type,
+                                              size_type=size_type,
+                                              caching_type=caching_type)
+    
+                        # Write stat
+                        write_stat(result_file, caching_type, stat)
+
 
 ###################################################################################
 # TEST
@@ -842,11 +1001,13 @@ if __name__ == '__main__':
     evaluation_group = parser.add_argument_group('evaluation_group')
     evaluation_group.add_argument("-a", "--latency_eval", help="eval latency", action='store_true')
     evaluation_group.add_argument("-b", "--size_eval", help="eval size", action='store_true')
+    evaluation_group.add_argument("-c", "--cache_eval", help="eval cache", action='store_true')
 
     ## PLOTTING GROUP
     plotting_group = parser.add_argument_group('plotting_group')
     plotting_group.add_argument("-m", "--latency_plot", help="plot latency", action='store_true')
     plotting_group.add_argument("-n", "--size_plot", help="plot size", action='store_true')
+    plotting_group.add_argument("-o", "--cache_plot", help="plot cache", action='store_true')
 
     args = parser.parse_args()
 
@@ -858,6 +1019,9 @@ if __name__ == '__main__':
     if args.size_eval:
         size_eval()
 
+    if args.cache_eval:
+        cache_eval()
+
     ## PLOTTING GROUP
 
     if args.latency_plot:
@@ -865,6 +1029,9 @@ if __name__ == '__main__':
 
     if args.size_plot:
         size_plot()
+
+    if args.cache_plot:
+        cache_plot()
 
     ## LEGEND GROUP
 
