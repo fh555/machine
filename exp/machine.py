@@ -145,6 +145,12 @@ HIERARCHY_TYPES = [
     HIERARCHY_TYPE_DRAM_NVM_SSD
 ]
 
+HIERARCHY_TYPES_NVM = [
+    HIERARCHY_TYPE_NVM,
+    HIERARCHY_TYPE_DRAM_NVM,
+    HIERARCHY_TYPE_DRAM_NVM_SSD                       
+]
+
 ## SIZE TYPES
 SIZE_TYPE_1 = 1
 SIZE_TYPE_2 = 2
@@ -173,6 +179,14 @@ LATENCY_TYPES = [
     LATENCY_TYPE_5
 ]
 
+LATENCY_TYPES_STRINGS = {
+    1 : "2x-4x",
+    2 : "2x-10x",
+    3 : "4x-4x",
+    4 : "4x-10x",                         
+    5 : "10x-10x",                         
+}
+
 ## CACHING TYPES
 CACHING_TYPE_FIFO = 1
 CACHING_TYPE_LRU = 2
@@ -197,6 +211,10 @@ CACHING_TYPES = [
 TRACE_TYPE_TPCC = 1
 
 TRACE_TYPES_STRINGS = {
+    1 : "tpcc"
+}
+
+TRACE_TYPES_DIRS = {
     1 : TRACE_DIR + "tpcc.txt"
 }
 
@@ -210,34 +228,38 @@ THROUGHPUT_OFFSET = 0
 
 ## DEFAULTS
 
+SCALE_FACTOR = 1
+
 DEFAULT_DURATION = 10
 DEFAULT_HIERARCHY_TYPE = HIERARCHY_TYPE_NVM
-DEFAULT_SIZE_TYPE = SIZE_TYPE_1
-DEFAULT_CACHING_TYPE = CACHING_TYPE_FIFO
+DEFAULT_SIZE_TYPE = SIZE_TYPE_4
+DEFAULT_CACHING_TYPE = CACHING_TYPE_LRU
 DEFAULT_LATENCY_TYPE = LATENCY_TYPE_1
 DEFAULT_TRACE_TYPE = TRACE_TYPE_TPCC
 DEFAULT_MIGRATION_FREQUENCY = 3
+DEFAULT_OPERATION_COUNT = 100000 * SCALE_FACTOR
 
 ## EXPERIMENTS
-BENCHMARK_EXPERIMENT = 1
+LATENCY_EXPERIMENT = 1
 
 ## EVAL DIRS
-BENCHMARK_DIR = BASE_DIR + "/results/benchmark"
+LATENCY_DIR = BASE_DIR + "/results/latency"
 
 ## PLOT DIRS
 LEGEND_PLOT_DIR = BASE_DIR + "/images/legend/"
-BENCHMARK_PLOT_DIR = BASE_DIR + "/images/benchmark/"
+LATENCY_PLOT_DIR = BASE_DIR + "/images/latency/"
 
-## BENCHMARK EXPERIMENT
+## LATENCY EXPERIMENT
 
-BENCHMARK_EXP_HIERARCHY_TYPES = HIERARCHY_TYPES
-BENCHMARK_EXP_SIZE_TYPES = SIZE_TYPES
-BENCHMARK_EXP_LATENCY_TYPES = LATENCY_TYPES
-BENCHMARK_EXP_CACHING_TYPES = CACHING_TYPES
+LATENCY_EXP_TRACE_TYPES = [DEFAULT_TRACE_TYPE]
+LATENCY_EXP_HIERARCHY_TYPES = HIERARCHY_TYPES_NVM
+LATENCY_EXP_SIZE_TYPES = [DEFAULT_SIZE_TYPE]
+LATENCY_EXP_LATENCY_TYPES = LATENCY_TYPES
+LATENCY_EXP_CACHING_TYPES = [DEFAULT_CACHING_TYPE]
 
 ## CSV FILES
 
-BENCHMARK_CSV = "benchmark.csv"
+LATENCY_CSV = "latency.csv"
 
 ###################################################################################
 # UTILS
@@ -366,12 +388,12 @@ def get_label(label):
     bold_label = "\\textbf{" + label + "}"
     return bold_label
 
-def create_benchmark_line_chart(datasets):
+def create_latency_bar_chart(datasets):
     fig = plot.figure()
     ax1 = fig.add_subplot(111)
 
     # X-AXIS
-    x_values = [HIERARCHY_TYPES_STRINGS[i] for i in BENCHMARK_EXP_HIERARCHY_TYPES]
+    x_values = [LATENCY_TYPES_STRINGS[i] for i in LATENCY_EXP_LATENCY_TYPES]
     N = len(x_values)
     ind = np.arange(N)
 
@@ -399,12 +421,12 @@ def create_benchmark_line_chart(datasets):
     YAXIS_MIN = 0
     ax1.yaxis.set_major_locator(LinearLocator(YAXIS_TICKS))
     ax1.minorticks_off()
-    ax1.set_ylabel(get_label('Duration (us)'), fontproperties=LABEL_FP)
+    ax1.set_ylabel(get_label('Throughput (ops)'), fontproperties=LABEL_FP)
     ax1.set_ylim(bottom=YAXIS_MIN)
 
     # X-AXIS
     ax1.set_xticks(ind + 0.5)
-    ax1.set_xlabel(get_label('Hierarchy Types'), fontproperties=LABEL_FP)
+    ax1.set_xlabel(get_label('Latency Types'), fontproperties=LABEL_FP)
     ax1.set_xticklabels(x_values)
     #ax1.set_xlim([XAXIS_MIN, XAXIS_MAX])
 
@@ -420,36 +442,42 @@ def create_benchmark_line_chart(datasets):
 # PLOT HELPERS
 ###################################################################################
 
-# BENCHMARK -- PLOT
-def benchmark_plot():
+# LATENCY -- PLOT
+def latency_plot():
 
     # CLEAN UP RESULT DIR
-    clean_up_dir(BENCHMARK_PLOT_DIR)
+    clean_up_dir(LATENCY_PLOT_DIR)
 
-    for caching_type in BENCHMARK_EXP_CACHING_TYPES:
-        print(MAJOR_STRING)
+    for trace_type in LATENCY_EXP_TRACE_TYPES:
+        LOG.info(MAJOR_STRING)
 
-        for size_type in BENCHMARK_EXP_SIZE_TYPES:
+        for caching_type in LATENCY_EXP_CACHING_TYPES:
+            LOG.info(MINOR_STRING)
 
-            datasets = []
-            for latency_type in BENCHMARK_EXP_LATENCY_TYPES:
+            for size_type in LATENCY_EXP_SIZE_TYPES:
+                LOG.info(SUB_MINOR_STRING)
 
-                # Get result file
-                result_dir_list = [CACHING_TYPES_STRINGS[caching_type],
-                                   str(size_type),
-                                   str(latency_type)]
-                result_file = get_result_file(BENCHMARK_DIR, result_dir_list, BENCHMARK_CSV)
-
-                dataset = loadDataFile(result_file)
-                datasets.append(dataset)
-
-            fig = create_benchmark_line_chart(datasets)
-
-            file_name = BENCHMARK_PLOT_DIR + "benchmark" + "-" + \
-                        CACHING_TYPES_STRINGS[caching_type] + "-" + \
-                        str(size_type) + ".pdf"
-
-            saveGraph(fig, file_name, width=OPT_GRAPH_WIDTH, height=OPT_GRAPH_HEIGHT)
+                datasets = []
+                for hierarchy_type in LATENCY_EXP_HIERARCHY_TYPES:
+    
+                    # Get result file
+                    result_dir_list = [TRACE_TYPES_STRINGS[trace_type],
+                                       CACHING_TYPES_STRINGS[caching_type],
+                                       str(size_type),
+                                       HIERARCHY_TYPES_STRINGS[hierarchy_type]]
+                    result_file = get_result_file(LATENCY_DIR, result_dir_list, LATENCY_CSV)
+    
+                    dataset = loadDataFile(result_file)
+                    datasets.append(dataset)
+    
+                fig = create_latency_bar_chart(datasets)
+    
+                file_name = LATENCY_PLOT_DIR + "latency" + "-" + \
+                            HIERARCHY_TYPES_STRINGS[hierarchy_type] + "-" + \
+                            CACHING_TYPES_STRINGS[caching_type] + "-" + \
+                            str(size_type) + ".pdf"
+    
+                saveGraph(fig, file_name, width=OPT_GRAPH_WIDTH, height=OPT_GRAPH_HEIGHT)
 
 ###################################################################################
 # UTILITIES
@@ -499,52 +527,58 @@ def print_eta(*args):
 # EVAL
 ###################################################################################
 
-# BENCHMARK -- EVAL
-def benchmark_eval():
+# LATENCY -- EVAL
+def latency_eval():
 
     # CLEAN UP RESULT DIR
-    clean_up_dir(BENCHMARK_DIR)
-    LOG.info("BENCHMARK EVAL")
+    clean_up_dir(LATENCY_DIR)
+    LOG.info("LATENCY EVAL")
 
     # ETA
-    l1 = len(BENCHMARK_EXP_CACHING_TYPES)
-    l2 = len(BENCHMARK_EXP_SIZE_TYPES)
-    l3 = len(BENCHMARK_EXP_LATENCY_TYPES)
-    l4 = len(BENCHMARK_EXP_HIERARCHY_TYPES)
-    print_eta(l1, l2, l3, l4)
+    l1 = len(LATENCY_EXP_TRACE_TYPES)
+    l2 = len(LATENCY_EXP_CACHING_TYPES)
+    l3 = len(LATENCY_EXP_SIZE_TYPES)
+    l4 = len(LATENCY_EXP_LATENCY_TYPES)
+    l5 = len(LATENCY_EXP_HIERARCHY_TYPES)
+    print_eta(l1, l2, l3, l4, l5)
 
-    for caching_type in BENCHMARK_EXP_CACHING_TYPES:
+    for trace_type in LATENCY_EXP_TRACE_TYPES:
         LOG.info(MAJOR_STRING)
-
-        for size_type in BENCHMARK_EXP_SIZE_TYPES:
+        
+        for caching_type in LATENCY_EXP_CACHING_TYPES:
             LOG.info(MINOR_STRING)
-
-            for latency_type in BENCHMARK_EXP_LATENCY_TYPES:
+    
+            for size_type in LATENCY_EXP_SIZE_TYPES:
                 LOG.info(SUB_MINOR_STRING)
 
-                for hierarchy_type in BENCHMARK_EXP_HIERARCHY_TYPES:
-                    LOG.info(" > caching_type: " + CACHING_TYPES_STRINGS[caching_type] +
-                          " size_type: " + str(size_type) +
-                          " latency_type: " + str(latency_type) +
-                          " hierarchy_type: " + HIERARCHY_TYPES_STRINGS[hierarchy_type] +
-                          "\n"
-                    )
-
-                    # Get result file
-                    result_dir_list = [CACHING_TYPES_STRINGS[caching_type],
-                                       str(size_type),
-                                       str(latency_type)]
-                    result_file = get_result_file(BENCHMARK_DIR, result_dir_list, BENCHMARK_CSV)
-
-                    # Run experiment
-                    stat = run_experiment(stat_offset=THROUGHPUT_OFFSET,
-                                          hierarchy_type=hierarchy_type,
-                                          latency_type=latency_type,
-                                          size_type=size_type,
-                                          caching_type=caching_type)
-
-                    # Write stat
-                    write_stat(result_file, hierarchy_type, stat)
+                for hierarchy_type in LATENCY_EXP_HIERARCHY_TYPES:
+    
+                    for latency_type in LATENCY_EXP_LATENCY_TYPES:
+                        LOG.info(" > trace_type: " + TRACE_TYPES_STRINGS[trace_type] + 
+                              " caching_type: " + CACHING_TYPES_STRINGS[caching_type] +
+                              " size_type: " + str(size_type) +
+                              " latency_type: " + str(latency_type) +
+                              " hierarchy_type: " + HIERARCHY_TYPES_STRINGS[hierarchy_type] +
+                              "\n"
+                        )
+    
+                        # Get result file
+                        result_dir_list = [TRACE_TYPES_STRINGS[trace_type],
+                                           CACHING_TYPES_STRINGS[caching_type],
+                                           str(size_type),
+                                           HIERARCHY_TYPES_STRINGS[hierarchy_type]]
+                        result_file = get_result_file(LATENCY_DIR, result_dir_list, LATENCY_CSV)
+    
+                        # Run experiment
+                        stat = run_experiment(stat_offset=THROUGHPUT_OFFSET,
+                                              trace_type=trace_type,
+                                              hierarchy_type=hierarchy_type,
+                                              latency_type=latency_type,
+                                              size_type=size_type,
+                                              caching_type=caching_type)
+    
+                        # Write stat
+                        write_stat(result_file, latency_type, stat)
 
 ###################################################################################
 # TEST
@@ -601,8 +635,9 @@ def run_experiment(
                     "-l", str(latency_type),
                     "-s", str(size_type),
                     "-c", str(caching_type),
-                    "-f", TRACE_TYPES_STRINGS[trace_type],
+                    "-f", TRACE_TYPES_DIRS[trace_type],
                     "-m", str(migration_frequency),
+                    "-o", str(DEFAULT_OPERATION_COUNT)
                 ]
     arg_string = ' '.join(arg_list[0:])
     LOG.info(arg_string)
@@ -641,23 +676,23 @@ if __name__ == '__main__':
 
     ## EVALUATION GROUP
     evaluation_group = parser.add_argument_group('evaluation_group')
-    evaluation_group.add_argument("-a", "--benchmark_eval", help="eval benchmark", action='store_true')
+    evaluation_group.add_argument("-a", "--latency_eval", help="eval latency", action='store_true')
 
     ## PLOTTING GROUP
     plotting_group = parser.add_argument_group('plotting_group')
-    plotting_group.add_argument("-m", "--benchmark_plot", help="plot benchmark", action='store_true')
+    plotting_group.add_argument("-m", "--latency_plot", help="plot latency", action='store_true')
 
     args = parser.parse_args()
 
     ## EVALUATION GROUP
 
-    if args.benchmark_eval:
-        benchmark_eval()
+    if args.latency_eval:
+        latency_eval()
 
     ## PLOTTING GROUP
 
-    if args.benchmark_plot:
-        benchmark_plot()
+    if args.latency_plot:
+        latency_plot()
 
     ## LEGEND GROUP
 
