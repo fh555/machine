@@ -241,13 +241,16 @@ DEFAULT_OPERATION_COUNT = 100000 * SCALE_FACTOR
 
 ## EXPERIMENTS
 LATENCY_EXPERIMENT = 1
+SIZE_EXPERIMENT = 2
 
 ## EVAL DIRS
 LATENCY_DIR = BASE_DIR + "/results/latency"
+SIZE_DIR = BASE_DIR + "/results/size"
 
 ## PLOT DIRS
 LEGEND_PLOT_DIR = BASE_DIR + "/images/legend/"
 LATENCY_PLOT_DIR = BASE_DIR + "/images/latency/"
+SIZE_PLOT_DIR = BASE_DIR + "/images/size/"
 
 ## LATENCY EXPERIMENT
 
@@ -257,9 +260,18 @@ LATENCY_EXP_SIZE_TYPES = [DEFAULT_SIZE_TYPE]
 LATENCY_EXP_LATENCY_TYPES = LATENCY_TYPES
 LATENCY_EXP_CACHING_TYPES = [DEFAULT_CACHING_TYPE]
 
+## SIZE EXPERIMENT
+
+SIZE_EXP_TRACE_TYPES = [DEFAULT_TRACE_TYPE]
+SIZE_EXP_HIERARCHY_TYPES = [HIERARCHY_TYPE_DRAM_NVM, HIERARCHY_TYPE_DRAM_SSD, HIERARCHY_TYPE_DRAM_NVM_SSD]
+SIZE_EXP_SIZE_TYPES = SIZE_TYPES
+SIZE_EXP_LATENCY_TYPES = [DEFAULT_LATENCY_TYPE]
+SIZE_EXP_CACHING_TYPES = [DEFAULT_CACHING_TYPE]
+
 ## CSV FILES
 
 LATENCY_CSV = "latency.csv"
+SIZE_CSV = "size.csv"
 
 ###################################################################################
 # UTILS
@@ -388,7 +400,7 @@ def get_label(label):
     bold_label = "\\textbf{" + label + "}"
     return bold_label
 
-def create_latency_bar_chart(datasets):
+def create_latency_line_chart(datasets):
     fig = plot.figure()
     ax1 = fig.add_subplot(111)
 
@@ -437,6 +449,58 @@ def create_latency_bar_chart(datasets):
 
     return fig
 
+def create_size_bar_chart(datasets):
+    fig = plot.figure()
+    ax1 = fig.add_subplot(111)
+
+    # X-AXIS
+    x_values = [str(i) for i in SIZE_EXP_SIZE_TYPES]
+    N = len(x_values)
+    M = len(SIZE_EXP_HIERARCHY_TYPES)
+    ind = np.arange(N)
+    margin = 0.1
+    width = (1.-2.*margin)/M
+    bars = [None] * N
+
+    idx = 0
+    for group in range(len(datasets)):
+        # GROUP
+        y_values = []
+        for line in  range(len(datasets[group])):
+            for col in  range(len(datasets[group][line])):
+                if col == 1:
+                    y_values.append(datasets[group][line][col])
+        LOG.info("group_data = %s", str(y_values))
+        bars[group] =  ax1.bar(ind + margin + (group * width),
+                               y_values, width,
+                               color=OPT_COLORS[group],
+                               hatch=OPT_PATTERNS[group],
+                               linewidth=BAR_LINEWIDTH)
+        idx = idx + 1
+
+    # GRID
+    makeGrid(ax1)
+
+    # Y-AXIS
+    YAXIS_MIN = 0
+    ax1.yaxis.set_major_locator(LinearLocator(YAXIS_TICKS))
+    ax1.minorticks_off()
+    ax1.set_ylabel(get_label('Throughput (ops)'), fontproperties=LABEL_FP)
+    ax1.set_ylim(bottom=YAXIS_MIN)
+    #ax1.set_yscale('log', nonposy='clip')
+
+    # X-AXIS
+    ax1.set_xticks(ind + 0.5)
+    ax1.set_xlabel(get_label('Size Types'), fontproperties=LABEL_FP)
+    ax1.set_xticklabels(x_values)
+    #ax1.set_xlim([XAXIS_MIN, XAXIS_MAX])
+
+    for label in ax1.get_yticklabels() :
+        label.set_fontproperties(TICK_FP)
+    for label in ax1.get_xticklabels() :
+        label.set_fontproperties(TICK_FP)
+
+    return fig
 
 ###################################################################################
 # PLOT HELPERS
@@ -470,7 +534,7 @@ def latency_plot():
                     dataset = loadDataFile(result_file)
                     datasets.append(dataset)
     
-                fig = create_latency_bar_chart(datasets)
+                fig = create_latency_line_chart(datasets)
     
                 file_name = LATENCY_PLOT_DIR + "latency" + "-" + \
                             HIERARCHY_TYPES_STRINGS[hierarchy_type] + "-" + \
@@ -478,6 +542,43 @@ def latency_plot():
                             str(size_type) + ".pdf"
     
                 saveGraph(fig, file_name, width=OPT_GRAPH_WIDTH, height=OPT_GRAPH_HEIGHT)
+
+# SIZE -- PLOT
+def size_plot():
+
+    # CLEAN UP RESULT DIR
+    clean_up_dir(SIZE_PLOT_DIR)
+
+    for trace_type in SIZE_EXP_TRACE_TYPES:
+        LOG.info(MAJOR_STRING)
+
+        for caching_type in SIZE_EXP_CACHING_TYPES:
+            LOG.info(MINOR_STRING)
+
+            for latency_type in SIZE_EXP_LATENCY_TYPES:
+                LOG.info(SUB_MINOR_STRING)
+
+                for hierarchy_type in SIZE_EXP_HIERARCHY_TYPES:
+                    datasets = []
+    
+                    # Get result file
+                    result_dir_list = [TRACE_TYPES_STRINGS[trace_type],
+                                       CACHING_TYPES_STRINGS[caching_type],
+                                       str(latency_type),
+                                       HIERARCHY_TYPES_STRINGS[hierarchy_type]]
+                    result_file = get_result_file(SIZE_DIR, result_dir_list, SIZE_CSV)
+    
+                    dataset = loadDataFile(result_file)
+                    datasets.append(dataset)
+    
+                    fig = create_size_bar_chart(datasets)
+    
+                    file_name = SIZE_PLOT_DIR + "size" + "-" + \
+                                HIERARCHY_TYPES_STRINGS[hierarchy_type] + "-" + \
+                                CACHING_TYPES_STRINGS[caching_type] + "-" + \
+                                str(latency_type) + ".pdf"
+    
+                    saveGraph(fig, file_name, width=OPT_GRAPH_WIDTH, height=OPT_GRAPH_HEIGHT)
 
 ###################################################################################
 # UTILITIES
@@ -580,6 +681,60 @@ def latency_eval():
                         # Write stat
                         write_stat(result_file, latency_type, stat)
 
+# SIZE -- EVAL
+def size_eval():
+
+    # CLEAN UP RESULT DIR
+    clean_up_dir(SIZE_DIR)
+    LOG.info("SIZE EVAL")
+
+    # ETA
+    l1 = len(SIZE_EXP_TRACE_TYPES)
+    l2 = len(SIZE_EXP_CACHING_TYPES)
+    l3 = len(SIZE_EXP_SIZE_TYPES)
+    l4 = len(SIZE_EXP_LATENCY_TYPES)
+    l5 = len(SIZE_EXP_HIERARCHY_TYPES)
+    print_eta(l1, l2, l3, l4, l5)
+
+    for trace_type in SIZE_EXP_TRACE_TYPES:
+        LOG.info(MAJOR_STRING)
+        
+        for caching_type in SIZE_EXP_CACHING_TYPES:
+            LOG.info(MINOR_STRING)
+
+            for latency_type in SIZE_EXP_LATENCY_TYPES:
+                LOG.info(SUB_MINOR_STRING)
+
+                for hierarchy_type in SIZE_EXP_HIERARCHY_TYPES:
+
+                    for size_type in SIZE_EXP_SIZE_TYPES:    
+                        LOG.info(" > trace_type: " + TRACE_TYPES_STRINGS[trace_type] + 
+                              " caching_type: " + CACHING_TYPES_STRINGS[caching_type] +
+                              " size_type: " + str(size_type) +
+                              " latency_type: " + str(latency_type) +
+                              " hierarchy_type: " + HIERARCHY_TYPES_STRINGS[hierarchy_type] +
+                              "\n"
+                        )
+    
+                        # Get result file
+                        result_dir_list = [TRACE_TYPES_STRINGS[trace_type],
+                                           CACHING_TYPES_STRINGS[caching_type],
+                                           str(latency_type),
+                                           HIERARCHY_TYPES_STRINGS[hierarchy_type]]
+                        result_file = get_result_file(SIZE_DIR, result_dir_list, SIZE_CSV)
+    
+                        # Run experiment
+                        stat = run_experiment(stat_offset=THROUGHPUT_OFFSET,
+                                              trace_type=trace_type,
+                                              hierarchy_type=hierarchy_type,
+                                              latency_type=latency_type,
+                                              size_type=size_type,
+                                              caching_type=caching_type)
+    
+                        # Write stat
+                        write_stat(result_file, size_type, stat)
+
+
 ###################################################################################
 # TEST
 ###################################################################################
@@ -677,10 +832,12 @@ if __name__ == '__main__':
     ## EVALUATION GROUP
     evaluation_group = parser.add_argument_group('evaluation_group')
     evaluation_group.add_argument("-a", "--latency_eval", help="eval latency", action='store_true')
+    evaluation_group.add_argument("-b", "--size_eval", help="eval size", action='store_true')
 
     ## PLOTTING GROUP
     plotting_group = parser.add_argument_group('plotting_group')
     plotting_group.add_argument("-m", "--latency_plot", help="plot latency", action='store_true')
+    plotting_group.add_argument("-n", "--size_plot", help="plot size", action='store_true')
 
     args = parser.parse_args()
 
@@ -689,10 +846,16 @@ if __name__ == '__main__':
     if args.latency_eval:
         latency_eval()
 
+    if args.size_eval:
+        size_eval()
+
     ## PLOTTING GROUP
 
     if args.latency_plot:
         latency_plot()
+
+    if args.size_plot:
+        size_plot()
 
     ## LEGEND GROUP
 
