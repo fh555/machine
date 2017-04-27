@@ -57,8 +57,6 @@ class Cache {
 
   mutable Policy cache_policy_;
 
-  mutable std::mutex cache_mutex_;
-
   size_t capacity_;
 
   size_t current_block_;

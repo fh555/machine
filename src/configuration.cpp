@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <iomanip>
-#include <mutex>
 
 #include "configuration.h"
 #include "cache.h"

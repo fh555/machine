@@ -419,6 +419,43 @@ def create_legend_latency_type():
 
     figlegend.savefig(LEGEND_PLOT_DIR + 'legend_latency_type.pdf')
 
+def create_legend_hierarchy_type():
+    fig = pylab.figure()
+    ax1 = fig.add_subplot(111)
+
+    LOG.info("Creating hierarchy type");
+
+    LEGEND_VALUES = LATENCY_TYPES
+
+    figlegend = pylab.figure(figsize=(11, 0.5))
+    idx = 0
+    lines = [None] * (len(LEGEND_VALUES) + 1)
+    data = [1]
+    x_values = [1]
+
+    TITLE = "HIERARCHY TYPES:"
+    LABELS = [TITLE, "NVM", "DRAM-NVM", "DRAM-NVM-SSD"]
+
+    lines[idx], = ax1.plot(x_values, data, linewidth = 0)
+    idx = 1
+
+    for group in range(len(LEGEND_VALUES)):
+        lines[idx], = ax1.plot(x_values, data,
+                               color=OPT_LINE_COLORS[idx - 1],
+                               linewidth=OPT_LINE_WIDTH,
+                               marker=OPT_MARKERS[idx - 1],
+                               markersize=OPT_MARKER_SIZE)
+        idx = idx + 1
+
+    # LEGEND
+    figlegend.legend(lines, LABELS, prop=LEGEND_FP,
+                     loc=1, ncol=6,
+                     mode="expand", shadow=OPT_LEGEND_SHADOW,
+                     frameon=False, borderaxespad=0.0,
+                     handleheight=1, handlelength=3)
+
+    figlegend.savefig(LEGEND_PLOT_DIR + 'legend_hierarchy_type.pdf')
+
 ###################################################################################
 # PLOT
 ###################################################################################
@@ -1036,4 +1073,5 @@ if __name__ == '__main__':
     ## LEGEND GROUP
 
     #create_legend_latency_type()
+    create_legend_hierarchy_type()
 

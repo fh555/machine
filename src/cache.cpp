@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <limits>
 #include <memory>
-#include <mutex>
 #include <unordered_map>
 #include <type_traits>
 
@@ -32,7 +31,6 @@ CACHE_TEMPLATE_ARGUMENT
 Block CACHE_TEMPLATE_TYPE::Put(const Key& key,
                                const Value& value) {
 
-  operation_guard{cache_mutex_};
   auto entry_location = LocateEntry(key);
   Block victim;
   Key victim_key = INVALID_KEY;
@@ -73,7 +71,6 @@ CACHE_TEMPLATE_ARGUMENT
 const Value& CACHE_TEMPLATE_TYPE::Get(const Key& key,
                                       bool touch) const {
 
-  operation_guard{cache_mutex_};
   auto elem_it = LocateEntry(key);
 
   if (elem_it == cache_items_map.end()) {
@@ -89,8 +86,6 @@ const Value& CACHE_TEMPLATE_TYPE::Get(const Key& key,
 
 CACHE_TEMPLATE_ARGUMENT
 size_t CACHE_TEMPLATE_TYPE::CurrentCapacity() const {
-
-  operation_guard{cache_mutex_};
 
   return cache_items_map.size();
 }
