@@ -111,45 +111,43 @@ void PrintFrequency(size_t available_blocks,
 
   auto captured_frequency = (current_total_frequency * 100)/total_frequency;
 
-  std::cout << "AVAILABLE BLOCKS: " << available_blocks
+  std::cout << "AVAILABLE BLOCKS: " << (available_blocks * 4) << " KB "
       << " PERCENT: " << captured_frequency << "%\n";
 }
 
 void PrintWorkload(const std::map<size_t, size_t>& block_map){
   std::map<size_t, size_t> frequency_map;
-  size_t bucket_size = 10;
   size_t total_frequency = 0;
 
   for(auto entry: block_map){
     auto frequency = entry.second;
-    frequency_map[frequency/bucket_size]++;
+    frequency_map[frequency]++;
     total_frequency += frequency;
   }
 
   std::cout << "FREQUENCY DISTRIBUTION \n";
   for(auto frequency : frequency_map){
     std::cout << "Frequency : " << std::setw(5)
-    << (frequency.first) * bucket_size << " - "
-    << (frequency.first + 1) * bucket_size
+    << (frequency.first) << " - "
     << " Block Count: " << frequency.second << "\n";
   }
   std::cout << "\n";
 
   // SPACE REQUIRED TO COVER A FRACTION OF WORKING SET
-  std::vector<size_t> percents = {1, 10, 50, 75, 90};
+  std::vector<size_t> percents = {1, 10, 15, 20, 25, 50, 75, 90};
   for(auto percent: percents){
     PrintRequiredBlocks(percent,
-                        total_frequency/bucket_size,
+                        total_frequency,
                         frequency_map);
   }
 
   std::cout << "\n";
 
   // UTILITY OF CACHE
-  std::vector<size_t> cache_sizes = {64, 256, 1024, 4096, 16384};
+  std::vector<size_t> cache_sizes = {1, 4, 16, 64, 256, 1024, 4096, 16384};
   for(auto cache_size: cache_sizes){
     PrintFrequency(cache_size,
-                   total_frequency/bucket_size,
+                   total_frequency,
                    frequency_map);
   }
 
