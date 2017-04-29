@@ -388,6 +388,9 @@ void MachineHelper() {
   size_t block_number;
   size_t warm_up_ratio = 10; // 10%
 
+  // Figure out warm up operation count
+  auto warm_up_operation_count = (warm_up_ratio * state.operation_count)/100;
+
   if (state.file_name.empty()) {
     return;
   }
@@ -426,7 +429,7 @@ void MachineHelper() {
     block_map[global_block_number]++;
 
     if(state.operation_count != 0){
-      if(operation_itr > state.operation_count){
+      if(operation_itr > state.operation_count + warm_up_operation_count){
         break;
       }
     }
@@ -442,9 +445,6 @@ void MachineHelper() {
   // Reset file pointer
   input->clear();
   input->seekg(0, std::ios::beg);
-
-  // Figure out warm up operation count
-  auto warm_up_operation_count = (warm_up_ratio * operation_itr)/100;
 
   // Reinit duration
   total_duration = 0;
@@ -516,7 +516,7 @@ void MachineHelper() {
     }
 
     if(state.operation_count != 0){
-      if(operation_itr > state.operation_count){
+      if(operation_itr > state.operation_count + warm_up_operation_count){
         break;
       }
     }
