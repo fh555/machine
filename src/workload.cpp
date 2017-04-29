@@ -76,8 +76,8 @@ void PrintWorkload(const std::map<size_t, size_t>& block_map){
 
   std::cout << "FREQUENCY DISTRIBUTION \n";
   for(auto frequency : frequency_distribution){
-    std::cout << "Frequency : " << frequency.first
-        << " Count: " << frequency.second;
+    std::cout << "Frequency : " << std::setw(5) << frequency.first
+        << " Block Count: " << frequency.second << "\n";
   }
   std::cout << "\n";
 
@@ -337,8 +337,8 @@ void MachineHelper() {
     // Block does not exist
     if(block_map.count(global_block_number) == 0){
       BootstrapBlock(global_block_number);
-      block_map[global_block_number]++;
     }
+    block_map[global_block_number]++;
 
     if(state.operation_count != 0){
       if(operation_itr > state.operation_count){
