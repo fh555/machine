@@ -386,6 +386,7 @@ void MachineHelper() {
   char operation_type;
   size_t fork_number;
   size_t block_number;
+  size_t warm_up_ratio = 10; // 10%
 
   if (state.file_name.empty()) {
     return;
@@ -442,12 +443,17 @@ void MachineHelper() {
   input->clear();
   input->seekg(0, std::ios::beg);
 
+  // Figure out warm up operation count
+  auto warm_up_operation_count = (warm_up_ratio * operation_itr)/100;
+
   // Reinit duration
   total_duration = 0;
   operation_itr = 0;
 
   // Reset stats
   machine_stats.Reset();
+
+  bool warmed_up = false;
 
   // RUN SIMULATION
   while(!input->eof()){
@@ -482,6 +488,26 @@ void MachineHelper() {
         break;
     }
 
+    if(warmed_up == false &&
+        operation_itr == warm_up_operation_count){
+
+      auto throughput = (operation_itr * 1000 * 1000)/total_duration;
+      std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+      std::cout << "Warm Up : " << warm_up_operation_count << " ops \n";
+      std::cout << "Warm Up Throughput : " << throughput << " (ops/s) \n";
+      std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+
+      // Reinit duration
+      total_duration = 0;
+      operation_itr = 0;
+
+      // Reset stats
+      machine_stats.Reset();
+
+      // Set warmed up
+      warmed_up = true;
+    }
+
     if(operation_itr % 100000 == 0){
       std::cout << "Operation " << operation_itr << " :: " <<
           operation_type << " " << global_block_number << " "
@@ -500,7 +526,7 @@ void MachineHelper() {
   auto throughput = (operation_itr * 1000 * 1000)/total_duration;
 
   std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-  std::cout << "Throughput : " << throughput << " (ops/s) \n";
+  std::cout << "Overall Throughput : " << throughput << " (ops/s) \n";
   std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 
   // Get machine size
