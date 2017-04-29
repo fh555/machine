@@ -66,23 +66,60 @@ void PrintMachine(){
 
 }
 
+void PrintRequiredBlocks(size_t percent,
+                         size_t total_frequency,
+                         const std::map<size_t, size_t>& frequency_map){
+
+  auto required_frequency = (total_frequency * percent)/100;
+  std::cout << "REQUIRED: " << required_frequency << "\n";
+  size_t current_total_frequency = 0;
+  size_t current_total_blocks = 0;
+
+  for(auto rit = frequency_map.rbegin(); rit!= frequency_map.rend(); ++rit){
+    auto frequency = rit->first;
+    auto blocks = rit->second;
+
+    current_total_frequency += frequency;
+    current_total_blocks += blocks;
+
+    std::cout << "TOTAL: " << current_total_frequency
+        << " BLOCKS NEEDED: " << current_total_blocks << "\n";
+    if(current_total_frequency > required_frequency){
+      break;
+    }
+
+  }
+
+  std::cout << "PERCENT: " << percent << "% BLOCKS NEEDED: " << current_total_blocks << "\n";
+}
+
 void PrintWorkload(const std::map<size_t, size_t>& block_map){
-  std::map<size_t, size_t> frequency_distribution;
-  size_t bucket_size = 10;
+  std::map<size_t, size_t> frequency_map;
+  size_t bucket_size = 1;
+  size_t total_frequency = 0;
 
   for(auto entry: block_map){
     auto frequency = entry.second;
-    frequency_distribution[frequency/bucket_size]++;
+    frequency_map[frequency/bucket_size]++;
+    total_frequency += frequency;
   }
 
   std::cout << "FREQUENCY DISTRIBUTION \n";
-  for(auto frequency : frequency_distribution){
+  for(auto frequency : frequency_map){
     std::cout << "Frequency : " << std::setw(5)
     << (frequency.first) * bucket_size << " - "
     << (frequency.first + 1) * bucket_size
     << " Block Count: " << frequency.second << "\n";
   }
   std::cout << "\n";
+
+  PrintRequiredBlocks(1,
+                      total_frequency/bucket_size,
+                      frequency_map);
+
+  PrintRequiredBlocks(10,
+                      total_frequency/bucket_size,
+                      frequency_map);
 
 }
 
