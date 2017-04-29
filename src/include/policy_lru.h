@@ -33,9 +33,9 @@ class LRUCachePolicy : public ICachePolicy<Key> {
   void Touch(const Key& key) override {
 
     // move the touched element at the beginning of the lru_queue
-    lru_queue.splice(lru_queue.cbegin(),
-                     lru_queue,
-                     key_finder[key]);
+    lru_queue.erase(key_finder[key]);
+    lru_queue.emplace_front(key);
+    key_finder[key] = lru_queue.cbegin();
 
   }
 
