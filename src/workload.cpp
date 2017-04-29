@@ -66,6 +66,23 @@ void PrintMachine(){
 
 }
 
+void PrintWorkload(const std::map<size_t, size_t>& block_map){
+  std::map<size_t, size_t> frequency_distribution;
+
+  for(auto entry: block_map){
+    auto frequency = entry.second;
+    frequency_distribution[frequency]++;
+  }
+
+  std::cout << "FREQUENCY DISTRIBUTION \n";
+  for(auto frequency : frequency_distribution){
+    std::cout << "Frequency : " << frequency.first
+        << " Count: " << frequency.second;
+  }
+  std::cout << "\n";
+
+}
+
 DeviceType LocateInMemoryDevices(const size_t& block_id){
   return LocateInDevices(state.memory_devices, block_id);
 }
@@ -300,7 +317,7 @@ void MachineHelper() {
   size_t operation_itr = 0;
   size_t invalid_operation_itr = 0;
 
-  std::set<size_t> block_list;
+  std::map<size_t, size_t> block_map;
 
   // PREPROCESS
   while(!input->eof()){
@@ -318,9 +335,9 @@ void MachineHelper() {
     auto global_block_number = GetGlobalBlockNumber(fork_number, block_number);
 
     // Block does not exist
-    if(block_list.count(global_block_number) == 0){
+    if(block_map.count(global_block_number) == 0){
       BootstrapBlock(global_block_number);
-      block_list.insert(global_block_number);
+      block_map[global_block_number]++;
     }
 
     if(state.operation_count != 0){
@@ -330,6 +347,9 @@ void MachineHelper() {
     }
 
   }
+
+  // Print Workload
+  PrintWorkload(block_map);
 
   // Print machine caches
   PrintMachine();
