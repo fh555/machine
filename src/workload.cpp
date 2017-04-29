@@ -71,7 +71,6 @@ void PrintRequiredBlocks(size_t percent,
                          const std::map<size_t, size_t>& frequency_map){
 
   auto required_frequency = (total_frequency * percent)/100;
-  std::cout << "REQUIRED: " << required_frequency << "\n";
   size_t current_total_frequency = 0;
   size_t current_total_blocks = 0;
 
@@ -82,8 +81,6 @@ void PrintRequiredBlocks(size_t percent,
     current_total_frequency += frequency;
     current_total_blocks += blocks;
 
-    std::cout << "TOTAL: " << current_total_frequency
-        << " BLOCKS NEEDED: " << current_total_blocks << "\n";
     if(current_total_frequency > required_frequency){
       break;
     }
@@ -95,7 +92,7 @@ void PrintRequiredBlocks(size_t percent,
 
 void PrintWorkload(const std::map<size_t, size_t>& block_map){
   std::map<size_t, size_t> frequency_map;
-  size_t bucket_size = 1;
+  size_t bucket_size = 10;
   size_t total_frequency = 0;
 
   for(auto entry: block_map){
@@ -113,13 +110,12 @@ void PrintWorkload(const std::map<size_t, size_t>& block_map){
   }
   std::cout << "\n";
 
-  PrintRequiredBlocks(1,
-                      total_frequency/bucket_size,
-                      frequency_map);
-
-  PrintRequiredBlocks(10,
-                      total_frequency/bucket_size,
-                      frequency_map);
+  std::vector<size_t> percents = {1, 10, 50, 75, 90};
+  for(auto percent: percents){
+    PrintRequiredBlocks(percent,
+                        total_frequency/bucket_size,
+                        frequency_map);
+  }
 
 }
 
