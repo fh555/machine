@@ -479,6 +479,9 @@ void MachineHelper() {
   machine_stats.Reset();
 
   warmed_up = false;
+  size_t read_operation_itr = 0;
+  size_t write_operation_itr = 0;
+  size_t flush_operation_itr = 0;
 
   // RUN SIMULATION
   while(!input->eof()){
@@ -496,17 +499,23 @@ void MachineHelper() {
     auto global_block_number = GetGlobalBlockNumber(fork_number, block_number);
 
     switch(operation_type){
-      case 'r':
+      case 'r': {
         ReadBlock(global_block_number);
+        read_operation_itr++;
         break;
+      }
 
-      case 'w':
+      case 'w': {
         WriteBlock(global_block_number);
+        write_operation_itr++;
         break;
+      }
 
-      case 'f':
+      case 'f': {
         FlushBlock(global_block_number);
+        flush_operation_itr++;
         break;
+      }
 
       default:
         invalid_operation_itr++;
@@ -525,6 +534,10 @@ void MachineHelper() {
       // Reinit duration
       total_duration = 0;
       operation_itr = 0;
+
+      read_operation_itr = 0;
+      write_operation_itr = 0;
+      flush_operation_itr = 0;
 
       // Print machine caches
       PrintMachine();
@@ -564,6 +577,10 @@ void MachineHelper() {
 
   // Print machine caches
   PrintMachine();
+
+  std::cout << "READS   : " << (read_operation_itr * 100)/operation_itr << " %\n";
+  std::cout << "WRITES  : " << (write_operation_itr * 100)/operation_itr << " %\n";
+  std::cout << "FLUSHES : " << (flush_operation_itr * 100)/operation_itr << " %\n";
 
   // Emit output
   WriteOutput(throughput);
