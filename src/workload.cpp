@@ -78,7 +78,7 @@ void PrintRequiredBlocks(size_t percent,
     auto frequency = rit->first;
     auto blocks = rit->second;
 
-    current_total_frequency += frequency;
+    current_total_frequency += blocks * frequency;
     current_total_blocks += blocks;
 
     if(current_total_frequency > required_frequency){
@@ -87,7 +87,20 @@ void PrintRequiredBlocks(size_t percent,
 
   }
 
-  std::cout << "PERCENT: " << percent << "% BLOCKS NEEDED: " << current_total_blocks << "\n";
+  std::cout << "PERCENT: " << percent << " ";
+  std::cout << "BLOCKS NEEDED: ";
+  auto capacity = (current_total_blocks * 4);
+  if(capacity < 1024) {
+    std::cout << "[" << capacity <<" KB] ";
+  }
+  else if(capacity < 1024 * 1024){
+    std::cout << "[" << capacity/1024 <<" MB] ";
+  }
+  else {
+    std::cout << "[" << capacity/(1024 * 1024) <<" GB] ";
+  }
+  std::cout  << "\n";
+
 }
 
 void PrintFrequency(size_t available_blocks,
@@ -136,6 +149,7 @@ void PrintWorkload(const std::map<size_t, size_t>& block_map){
     total_frequency += frequency;
   }
 
+  /*
   std::cout << "FREQUENCY DISTRIBUTION \n";
   for(auto frequency : frequency_map){
     std::cout << "Frequency : " << std::setw(5)
@@ -143,9 +157,10 @@ void PrintWorkload(const std::map<size_t, size_t>& block_map){
     << " Block Count: " << frequency.second << "\n";
   }
   std::cout << "\n";
+  */
 
   // SPACE REQUIRED TO COVER A FRACTION OF WORKING SET
-  std::vector<size_t> percents = {1, 10, 15, 20, 25, 50, 75, 90};
+  std::vector<size_t> percents = {10, 25, 50, 75, 90};
   for(auto percent: percents){
     PrintRequiredBlocks(percent,
                         total_frequency,
@@ -155,9 +170,8 @@ void PrintWorkload(const std::map<size_t, size_t>& block_map){
   std::cout << "\n";
 
   // UTILITY OF CACHE
-  std::vector<size_t> cache_sizes = {1, 4, 16, 64,
-      256, 1024, 4096, 16384,
-      16384 * 4, 16384 * 16, 16384 * 64, 16384 * 256
+  std::vector<size_t> cache_sizes = {
+      1, 16, 256, 4096, 16384, 65536, 1048576
   };
   for(auto cache_size: cache_sizes){
     PrintFrequency(cache_size,
