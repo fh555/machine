@@ -68,16 +68,19 @@ void PrintMachine(){
 
 void PrintWorkload(const std::map<size_t, size_t>& block_map){
   std::map<size_t, size_t> frequency_distribution;
+  size_t bucket_size = 10;
 
   for(auto entry: block_map){
     auto frequency = entry.second;
-    frequency_distribution[frequency]++;
+    frequency_distribution[frequency/bucket_size]++;
   }
 
   std::cout << "FREQUENCY DISTRIBUTION \n";
   for(auto frequency : frequency_distribution){
-    std::cout << "Frequency : " << std::setw(5) << frequency.first
-        << " Block Count: " << frequency.second << "\n";
+    std::cout << "Frequency : " << std::setw(5)
+    << (frequency.first) * bucket_size << " - "
+    << (frequency.first + 1) * bucket_size
+    << " Block Count: " << frequency.second << "\n";
   }
   std::cout << "\n";
 
