@@ -13,7 +13,7 @@ namespace machine {
 template <typename Key>
 class LRUCachePolicy : public ICachePolicy<Key> {
  public:
-  using lru_iterator = typename std::list<Key>::const_iterator;
+  using lru_iterator = typename std::list<Key>::iterator;
 
   LRUCachePolicy(UNUSED_ATTRIBUTE const size_t& capacity){
     // Nothing to do here!
@@ -26,7 +26,7 @@ class LRUCachePolicy : public ICachePolicy<Key> {
     DLOG(INFO) << "LRU INSERT: " << key << "\n";
 
     lru_queue.emplace_front(key);
-    key_finder[key] = lru_queue.cbegin();
+    key_finder[key] = lru_queue.begin();
 
   }
 
@@ -35,7 +35,7 @@ class LRUCachePolicy : public ICachePolicy<Key> {
     // move the touched element at the beginning of the lru_queue
     lru_queue.erase(key_finder[key]);
     lru_queue.emplace_front(key);
-    key_finder[key] = lru_queue.cbegin();
+    key_finder[key] = lru_queue.begin();
 
   }
 
