@@ -146,13 +146,12 @@ void PrintWorkload(const std::map<size_t, size_t>& block_map){
   std::cout << "\n";
 
   // UTILITY OF CACHE
-  std::vector<size_t> cache_sizes = {1024, 4096};
+  std::vector<size_t> cache_sizes = {64, 256, 1024, 4096, 16384};
   for(auto cache_size: cache_sizes){
     PrintFrequency(cache_size,
                    total_frequency/bucket_size,
                    frequency_map);
   }
-
 
 }
 
