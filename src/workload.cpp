@@ -526,11 +526,11 @@ void MachineHelper() {
       total_duration = 0;
       operation_itr = 0;
 
-      // Reset stats
-      machine_stats.Reset();
-
       // Print machine caches
       PrintMachine();
+
+      // Reset stats
+      machine_stats.Reset();
 
       // Set warmed up
       warmed_up = true;
