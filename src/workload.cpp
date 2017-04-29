@@ -94,8 +94,6 @@ void PrintFrequency(size_t available_blocks,
                     size_t total_frequency,
                     const std::map<size_t, size_t>& frequency_map){
 
-  std::cout << "AVAILABLE BLOCKS: " << available_blocks << "\n";
-
   size_t current_total_frequency = 0;
   size_t current_total_blocks = 0;
 
@@ -106,23 +104,20 @@ void PrintFrequency(size_t available_blocks,
     current_total_frequency += frequency;
     current_total_blocks += blocks;
 
-    std::cout << "CURRENT TOTAL BLOCKS: " << current_total_blocks << " PERCENT: " <<
-        current_total_frequency << "\n";
-
     if(current_total_blocks > available_blocks){
       break;
     }
   }
 
   auto captured_frequency = (current_total_frequency * 100)/total_frequency;
-  std::cout << " CURRENT TOTAL : " << current_total_frequency << "%\n";
 
-  std::cout << "SIZE: " << available_blocks << " PERCENT: " << captured_frequency << "%\n";
+  std::cout << "AVAILABLE BLOCKS: " << available_blocks
+      << " PERCENT: " << captured_frequency << "%\n";
 }
 
 void PrintWorkload(const std::map<size_t, size_t>& block_map){
   std::map<size_t, size_t> frequency_map;
-  size_t bucket_size = 1;
+  size_t bucket_size = 10;
   size_t total_frequency = 0;
 
   for(auto entry: block_map){
@@ -154,7 +149,7 @@ void PrintWorkload(const std::map<size_t, size_t>& block_map){
   std::vector<size_t> cache_sizes = {1024, 4096};
   for(auto cache_size: cache_sizes){
     PrintFrequency(cache_size,
-                   total_frequency,
+                   total_frequency/bucket_size,
                    frequency_map);
   }
 
