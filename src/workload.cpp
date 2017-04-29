@@ -410,6 +410,8 @@ void MachineHelper() {
 
   std::map<size_t, size_t> block_map;
 
+  bool warmed_up = false;
+
   // PREPROCESS
   while(!input->eof()){
     operation_itr++;
@@ -430,6 +432,12 @@ void MachineHelper() {
       BootstrapBlock(global_block_number);
     }
     block_map[global_block_number]++;
+
+    if(warmed_up == false &&
+        operation_itr == warm_up_operation_count){
+      operation_itr = 0;
+      warmed_up = true;
+    }
 
     if(state.operation_count != 0){
       if(operation_itr > state.operation_count){
@@ -456,7 +464,7 @@ void MachineHelper() {
   // Reset stats
   machine_stats.Reset();
 
-  bool warmed_up = false;
+  warmed_up = false;
 
   // RUN SIMULATION
   while(!input->eof()){
