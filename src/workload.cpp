@@ -101,7 +101,7 @@ void PrintFrequency(size_t available_blocks,
     auto frequency = rit->first;
     auto blocks = rit->second;
 
-    current_total_frequency += frequency;
+    current_total_frequency += blocks * frequency;
     current_total_blocks += blocks;
 
     if(current_total_blocks > available_blocks){
@@ -111,8 +111,19 @@ void PrintFrequency(size_t available_blocks,
 
   auto captured_frequency = (current_total_frequency * 100)/total_frequency;
 
-  std::cout << "AVAILABLE BLOCKS: " << (available_blocks * 4) << " KB "
-      << " PERCENT: " << captured_frequency << "%\n";
+  std::cout << "AVAILABLE BLOCKS: ";
+  auto capacity = (available_blocks * 4);
+  if(capacity < 1024) {
+    std::cout << "[" << capacity <<" KB] ";
+  }
+  else if(capacity < 1024 * 1024){
+    std::cout << "[" << capacity/1024 <<" MB] ";
+  }
+  else {
+    std::cout << "[" << capacity/(1024 * 1024) <<" GB] ";
+  }
+
+  std::cout << " PERCENT: " << captured_frequency << "%\n";
 }
 
 void PrintWorkload(const std::map<size_t, size_t>& block_map){
@@ -144,7 +155,10 @@ void PrintWorkload(const std::map<size_t, size_t>& block_map){
   std::cout << "\n";
 
   // UTILITY OF CACHE
-  std::vector<size_t> cache_sizes = {1, 4, 16, 64, 256, 1024, 4096, 16384};
+  std::vector<size_t> cache_sizes = {1, 4, 16, 64,
+      256, 1024, 4096, 16384,
+      16384 * 4, 16384 * 16, 16384 * 64, 16384 * 256
+  };
   for(auto cache_size: cache_sizes){
     PrintFrequency(cache_size,
                    total_frequency,
