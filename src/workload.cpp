@@ -400,11 +400,10 @@ void MachineHelper() {
   char operation_type;
   size_t fork_number;
   size_t block_number;
-  size_t warm_up_ratio = 10; // 10%
+  size_t warm_up_ratio = 50; // 10%
 
   // Figure out warm up operation count
   auto warm_up_operation_count = (warm_up_ratio * state.operation_count)/100;
-  state.operation_count += warm_up_operation_count;
 
   std::cout << "WARM UP OPERATION COUNT: " << warm_up_operation_count << "\n";
 
@@ -465,7 +464,7 @@ void MachineHelper() {
   PrintWorkload(block_map);
 
   // Print machine caches
-  PrintMachine();
+  //PrintMachine();
 
   // Reset file pointer
   input->clear();
@@ -525,6 +524,13 @@ void MachineHelper() {
     if(warmed_up == false &&
         operation_itr == warm_up_operation_count){
 
+      if(operation_itr % 100000 == 0){
+        std::cout << "Operation " << operation_itr << " :: " <<
+            operation_type << " " << global_block_number << " "
+            << fork_number << " " << block_number << " :: "
+            << total_duration / (1000 * 1000) << "s \n";
+      }
+
       auto throughput = (operation_itr * 1000 * 1000)/total_duration;
       std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
       std::cout << "Warm Up : " << warm_up_operation_count << " ops \n";
@@ -540,7 +546,7 @@ void MachineHelper() {
       flush_operation_itr = 0;
 
       // Print machine caches
-      PrintMachine();
+      //PrintMachine();
 
       // Reset stats
       machine_stats.Reset();
@@ -575,12 +581,12 @@ void MachineHelper() {
   std::cout << "Machine size  : " << machine_size << "\n";
   std::cout << "Invalid operation count  : " << invalid_operation_itr << "\n";
 
-  // Print machine caches
-  PrintMachine();
-
   std::cout << "READS   : " << (read_operation_itr * 100)/operation_itr << " %\n";
   std::cout << "WRITES  : " << (write_operation_itr * 100)/operation_itr << " %\n";
   std::cout << "FLUSHES : " << (flush_operation_itr * 100)/operation_itr << " %\n";
+
+  // Print machine caches
+  PrintMachine();
 
   // Emit output
   WriteOutput(throughput);

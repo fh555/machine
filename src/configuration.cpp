@@ -203,7 +203,7 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
 
   state.hierarchy_type = HIERARCHY_TYPE_DRAM_NVM_SSD;
   state.size_type = SIZE_TYPE_1;
-  state.caching_type = CACHING_TYPE_FIFO;
+  state.caching_type = CACHING_TYPE_LRU;
   state.latency_type = LATENCY_TYPE_1;
   state.migration_frequency = 3;
   state.file_name = "";
