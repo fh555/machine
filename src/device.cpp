@@ -45,6 +45,7 @@ void BootstrapDeviceMetrics(const configuration &state){
 
   // HDD
   if(state.hierarchy_type == HierarchyType::HIERARCHY_TYPE_DRAM_HDD ||
+      state.hierarchy_type == HierarchyType::HIERARCHY_TYPE_NVM_HDD ||
       state.hierarchy_type == HierarchyType::HIERARCHY_TYPE_DRAM_NVM_HDD){
     seq_read_latency[DEVICE_TYPE_SSD] = 1 * 1000 * 1000;
     seq_write_latency[DEVICE_TYPE_SSD] = 1 * 1000 * 1000;

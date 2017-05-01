@@ -129,32 +129,49 @@ OUTPUT_FILE = "outputfile.summary"
 HIERARCHY_TYPE_NVM = 1
 HIERARCHY_TYPE_DRAM_NVM = 2
 HIERARCHY_TYPE_DRAM_SSD = 3
-HIERARCHY_TYPE_DRAM_NVM_SSD = 4
+HIERARCHY_TYPE_NVM_SSD = 4
+HIERARCHY_TYPE_DRAM_NVM_SSD = 5
+HIERARCHY_TYPE_DRAM_HDD = 6
+HIERARCHY_TYPE_NVM_HDD = 7
+HIERARCHY_TYPE_DRAM_NVM_HDD = 8
 
 HIERARCHY_TYPES_STRINGS = {
     1 : "nvm",
     2 : "dram-nvm",
     3 : "dram-ssd",
-    4 : "dram-nvm-ssd",
+    4 : "nvm-ssd",
+    5 : "dram-nvm-ssd",
+    6 : "dram-hdd",
+    7 : "nvm-hdd",
+    8 : "dram-nvm-hdd",
 }
 
 HIERARCHY_TYPES = [
     HIERARCHY_TYPE_NVM,
     HIERARCHY_TYPE_DRAM_NVM,
     HIERARCHY_TYPE_DRAM_SSD,
-    HIERARCHY_TYPE_DRAM_NVM_SSD
+    HIERARCHY_TYPE_NVM_SSD,
+    HIERARCHY_TYPE_DRAM_NVM_SSD,
+    HIERARCHY_TYPE_DRAM_HDD,
+    HIERARCHY_TYPE_NVM_HDD,
+    HIERARCHY_TYPE_DRAM_NVM_HDD
 ]
 
 HIERARCHY_TYPES_WITH_NVM = [
     HIERARCHY_TYPE_NVM,
     HIERARCHY_TYPE_DRAM_NVM,
-    HIERARCHY_TYPE_DRAM_NVM_SSD                       
+    HIERARCHY_TYPE_DRAM_NVM_SSD,                       
+    HIERARCHY_TYPE_NVM_HDD,
+    HIERARCHY_TYPE_DRAM_NVM_HDD
 ]
 
 HIERARCHY_TYPES_SKIP_NVM_ONLY = [
     HIERARCHY_TYPE_DRAM_NVM,
     HIERARCHY_TYPE_DRAM_SSD,
-    HIERARCHY_TYPE_DRAM_NVM_SSD                       
+    HIERARCHY_TYPE_DRAM_NVM_SSD,                       
+    HIERARCHY_TYPE_DRAM_HDD,
+    HIERARCHY_TYPE_NVM_HDD,
+    HIERARCHY_TYPE_DRAM_NVM_HDD
 ]
 
 ## SIZE TYPES
@@ -185,21 +202,24 @@ LATENCY_TYPE_2 = 2
 LATENCY_TYPE_3 = 3
 LATENCY_TYPE_4 = 4
 LATENCY_TYPE_5 = 5
+LATENCY_TYPE_6 = 6
 
 LATENCY_TYPES = [
     LATENCY_TYPE_1,
     LATENCY_TYPE_2,
     LATENCY_TYPE_3,
     LATENCY_TYPE_4,
-    LATENCY_TYPE_5
+    LATENCY_TYPE_5,
+    LATENCY_TYPE_6
 ]
 
 LATENCY_TYPES_STRINGS = {
-    1 : "2x-4x",
-    2 : "2x-10x",
-    3 : "4x-4x",
-    4 : "4x-10x",                         
-    5 : "10x-10x",                         
+    1 : "2x-10x",
+    2 : "4x-4x",
+    3 : "4x-10x",
+    4 : "10x-20x",                         
+    5 : "20x-40x",                         
+    6 : "100x-200x",                         
 }
 
 ## CACHING TYPES
@@ -230,7 +250,7 @@ TRACE_TYPES_STRINGS = {
 }
 
 TRACE_TYPES_DIRS = {
-    1 : TRACE_DIR + "tpcc.txt"
+    1 : TRACE_DIR + "example.txt"
 }
 
 TRACE_TYPES = [
@@ -243,7 +263,7 @@ THROUGHPUT_OFFSET = 0
 
 ## DEFAULTS
 
-SCALE_FACTOR = 10
+SCALE_FACTOR = 50
 
 DEFAULT_DURATION = 10
 DEFAULT_HIERARCHY_TYPE = HIERARCHY_TYPE_NVM
