@@ -531,11 +531,11 @@ void MachineHelper() {
             << total_duration / (1000 * 1000) << "s \n";
       }
 
-      auto throughput = (operation_itr * 1000 * 1000)/total_duration;
-      std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+      //auto throughput = (operation_itr * 1000 * 1000)/total_duration;
+      //std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
       std::cout << "Warm Up : " << warm_up_operation_count << " ops \n";
-      std::cout << "Warm Up Throughput : " << throughput << " (ops/s) \n";
-      std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+      //std::cout << "Warm Up Throughput : " << throughput << " (ops/s) \n";
+      //std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 
       // Reinit duration
       total_duration = 0;

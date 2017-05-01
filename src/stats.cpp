@@ -34,12 +34,12 @@ std::ostream& operator<< (std::ostream& os, const Stats& stats){
 
   os << "READ OPS: \n";
   for(auto entry: stats.read_ops){
-    os << std::setw(10) << DeviceTypeToString(entry.first) << " :: " << entry.second << "\n";
+    os << std::setw(10) << DeviceTypeToString(entry.first) << " :: " << entry.second/1000 << " K ops\n";
   }
 
   os << "WRITE OPS: \n";
   for(auto entry: stats.write_ops){
-    os << std::setw(10) << DeviceTypeToString(entry.first) << " :: " << entry.second << "\n";
+    os << std::setw(10) << DeviceTypeToString(entry.first) << " :: " << entry.second/1000 << " K ops\n";
   }
 
   return os;
