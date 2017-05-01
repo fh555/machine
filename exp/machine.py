@@ -491,7 +491,7 @@ def create_latency_line_chart(datasets):
 
     return fig
 
-def create_size_bar_chart(datasets):
+def create_size_bar_chart(datasets, hierarchy_type):
     fig = plot.figure()
     ax1 = fig.add_subplot(111)
 
@@ -525,10 +525,14 @@ def create_size_bar_chart(datasets):
 
     # Y-AXIS
     YAXIS_MIN = 0
+    YAXIS_MAX = 20000
+    if hierarchy_type != HIERARCHY_TYPE_DRAM_NVM:
+        YAXIS_MAX = 7500
+        
     ax1.yaxis.set_major_locator(LinearLocator(YAXIS_TICKS))
     ax1.minorticks_off()
     ax1.set_ylabel(get_label('Throughput (ops)'), fontproperties=LABEL_FP)
-    ax1.set_ylim(bottom=YAXIS_MIN)
+    ax1.set_ylim(bottom=YAXIS_MIN, top=YAXIS_MAX)
     #ax1.set_yscale('log', nonposy='clip')
 
     # X-AXIS
@@ -663,7 +667,7 @@ def size_plot():
                     dataset = loadDataFile(result_file)
                     datasets.append(dataset)
 
-                    fig = create_size_bar_chart(datasets)
+                    fig = create_size_bar_chart(datasets, hierarchy_type)
 
                     file_name = SIZE_PLOT_DIR + "size" + "-" + \
                                 TRACE_TYPES_STRINGS[trace_type] + "-" + \
