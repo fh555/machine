@@ -227,9 +227,9 @@ void BringBlockToMemory(const size_t& block_id){
 
   if(memory_device_type == DeviceType::DEVICE_TYPE_NVM){
     auto dram_exists = DeviceExists(state.devices, DeviceType::DEVICE_TYPE_DRAM);
-    bool migrate_to_dram = (rand() % state.migration_frequency == 0);
-    if(dram_exists == true){
-      if(migrate_to_dram == true){
+    bool migrate_upwards = (rand() % state.migration_frequency == 0);
+    if(migrate_upwards == true){
+      if(dram_exists == true){
         Copy(state.devices,
              DeviceType::DEVICE_TYPE_DRAM,
              DeviceType::DEVICE_TYPE_NVM,
@@ -240,15 +240,16 @@ void BringBlockToMemory(const size_t& block_id){
     }
   }
 
-  // DRAM to CACHE migration
+  // DRAM to CACHE migration or NVM to CACHE migration
   memory_device_type = LocateInMemoryDevices(block_id);
 
-  if(memory_device_type == DeviceType::DEVICE_TYPE_DRAM){
-    bool migrate_to_cache = (rand() % state.migration_frequency == 0);
-    if(migrate_to_cache == true){
+  if(memory_device_type == DeviceType::DEVICE_TYPE_DRAM ||
+      memory_device_type == DeviceType::DEVICE_TYPE_NVM){
+    bool migrate_upwards = (rand() % state.migration_frequency == 0);
+    if(migrate_upwards == true){
       Copy(state.devices,
            DeviceType::DEVICE_TYPE_CACHE,
-           DeviceType::DEVICE_TYPE_DRAM,
+           memory_device_type,
            block_id,
            CLEAN_BLOCK,
            total_duration);
