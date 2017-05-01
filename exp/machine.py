@@ -231,20 +231,24 @@ CACHING_TYPES = [
 ## TRACE TYPES
 TRACE_TYPE_TPCC = 1
 TRACE_TYPE_YCSB = 2
+TRACE_TYPE_VOTER = 3
 
 TRACE_TYPES_STRINGS = {
     1 : "tpcc",
-    2 : "ycsb"
+    2 : "ycsb",
+    3 : "voter"
 }
 
 TRACE_TYPES_DIRS = {
     1 : TRACE_DIR + "tpcc.txt",
-    2 : TRACE_DIR + "ycsb.txt"
+    2 : TRACE_DIR + "ycsb.txt",
+    3 : TRACE_DIR + "voter.txt"
 }
 
 TRACE_TYPES = [
     TRACE_TYPE_YCSB,
     TRACE_TYPE_TPCC,
+    TRACE_TYPE_VOTER,
 ]
 
 ## OUTPUT
