@@ -160,7 +160,7 @@ HIERARCHY_TYPES = [
 HIERARCHY_TYPES_WITH_NVM = [
     HIERARCHY_TYPE_NVM,
     HIERARCHY_TYPE_DRAM_NVM,
-    HIERARCHY_TYPE_DRAM_NVM_SSD,                       
+    HIERARCHY_TYPE_DRAM_NVM_SSD,
     HIERARCHY_TYPE_NVM_HDD,
     HIERARCHY_TYPE_DRAM_NVM_HDD
 ]
@@ -168,7 +168,7 @@ HIERARCHY_TYPES_WITH_NVM = [
 HIERARCHY_TYPES_SKIP_NVM_ONLY = [
     HIERARCHY_TYPE_DRAM_NVM,
     HIERARCHY_TYPE_DRAM_SSD,
-    HIERARCHY_TYPE_DRAM_NVM_SSD,                       
+    HIERARCHY_TYPE_DRAM_NVM_SSD,
     HIERARCHY_TYPE_DRAM_HDD,
     HIERARCHY_TYPE_NVM_HDD,
     HIERARCHY_TYPE_DRAM_NVM_HDD
@@ -217,9 +217,9 @@ LATENCY_TYPES_STRINGS = {
     1 : "2x-10x",
     2 : "4x-4x",
     3 : "4x-10x",
-    4 : "10x-20x",                         
-    5 : "20x-40x",                         
-    6 : "100x-200x",                         
+    4 : "10x-20x",
+    5 : "20x-40x",
+    6 : "100x-200x",
 }
 
 ## CACHING TYPES
@@ -250,7 +250,7 @@ TRACE_TYPES_STRINGS = {
 }
 
 TRACE_TYPES_DIRS = {
-    1 : TRACE_DIR + "example.txt"
+    1 : TRACE_DIR + "tpcc.txt"
 }
 
 TRACE_TYPES = [
@@ -263,7 +263,7 @@ THROUGHPUT_OFFSET = 0
 
 ## DEFAULTS
 
-SCALE_FACTOR = 50
+SCALE_FACTOR = 10
 
 DEFAULT_DURATION = 10
 DEFAULT_HIERARCHY_TYPE = HIERARCHY_TYPE_NVM
@@ -657,24 +657,24 @@ def latency_plot():
 
                 datasets = []
                 for hierarchy_type in LATENCY_EXP_HIERARCHY_TYPES:
-    
+
                     # Get result file
                     result_dir_list = [TRACE_TYPES_STRINGS[trace_type],
                                        CACHING_TYPES_STRINGS[caching_type],
                                        str(size_type),
                                        HIERARCHY_TYPES_STRINGS[hierarchy_type]]
                     result_file = get_result_file(LATENCY_DIR, result_dir_list, LATENCY_CSV)
-    
+
                     dataset = loadDataFile(result_file)
                     datasets.append(dataset)
-    
+
                 fig = create_latency_line_chart(datasets)
-    
+
                 file_name = LATENCY_PLOT_DIR + "latency" + "-" + \
                             HIERARCHY_TYPES_STRINGS[hierarchy_type] + "-" + \
                             CACHING_TYPES_STRINGS[caching_type] + "-" + \
                             str(size_type) + ".pdf"
-    
+
                 saveGraph(fig, file_name, width=OPT_GRAPH_WIDTH, height=OPT_GRAPH_HEIGHT)
 
 # SIZE -- PLOT
@@ -694,24 +694,24 @@ def size_plot():
 
                 for hierarchy_type in SIZE_EXP_HIERARCHY_TYPES:
                     datasets = []
-    
+
                     # Get result file
                     result_dir_list = [TRACE_TYPES_STRINGS[trace_type],
                                        CACHING_TYPES_STRINGS[caching_type],
                                        str(latency_type),
                                        HIERARCHY_TYPES_STRINGS[hierarchy_type]]
                     result_file = get_result_file(SIZE_DIR, result_dir_list, SIZE_CSV)
-    
+
                     dataset = loadDataFile(result_file)
                     datasets.append(dataset)
-    
+
                     fig = create_size_bar_chart(datasets)
-    
+
                     file_name = SIZE_PLOT_DIR + "size" + "-" + \
                                 HIERARCHY_TYPES_STRINGS[hierarchy_type] + "-" + \
                                 CACHING_TYPES_STRINGS[caching_type] + "-" + \
                                 str(latency_type) + ".pdf"
-    
+
                     saveGraph(fig, file_name, width=OPT_GRAPH_WIDTH, height=OPT_GRAPH_HEIGHT)
 
 # CACHE -- PLOT
@@ -731,24 +731,24 @@ def cache_plot():
 
                 datasets = []
                 for hierarchy_type in CACHE_EXP_HIERARCHY_TYPES:
-    
+
                     # Get result file
                     result_dir_list = [TRACE_TYPES_STRINGS[trace_type],
                                        str(size_type),
                                        str(latency_type),
                                        HIERARCHY_TYPES_STRINGS[hierarchy_type]]
                     result_file = get_result_file(CACHE_DIR, result_dir_list, CACHE_CSV)
-    
+
                     dataset = loadDataFile(result_file)
                     datasets.append(dataset)
-    
+
                 fig = create_cache_line_chart(datasets)
-    
+
                 file_name = CACHE_PLOT_DIR + "cache" + "-" + \
                             HIERARCHY_TYPES_STRINGS[hierarchy_type] + "-" + \
                             str(latency_type) + "-" + \
                             str(size_type) + ".pdf"
-    
+
                 saveGraph(fig, file_name, width=OPT_GRAPH_WIDTH, height=OPT_GRAPH_HEIGHT)
 
 
@@ -817,31 +817,31 @@ def latency_eval():
 
     for trace_type in LATENCY_EXP_TRACE_TYPES:
         LOG.info(MAJOR_STRING)
-        
+
         for caching_type in LATENCY_EXP_CACHING_TYPES:
             LOG.info(MINOR_STRING)
-    
+
             for size_type in LATENCY_EXP_SIZE_TYPES:
                 LOG.info(SUB_MINOR_STRING)
 
                 for hierarchy_type in LATENCY_EXP_HIERARCHY_TYPES:
-    
+
                     for latency_type in LATENCY_EXP_LATENCY_TYPES:
-                        LOG.info(" > trace_type: " + TRACE_TYPES_STRINGS[trace_type] + 
+                        LOG.info(" > trace_type: " + TRACE_TYPES_STRINGS[trace_type] +
                               " caching_type: " + CACHING_TYPES_STRINGS[caching_type] +
                               " size_type: " + str(size_type) +
                               " latency_type: " + str(latency_type) +
                               " hierarchy_type: " + HIERARCHY_TYPES_STRINGS[hierarchy_type] +
                               "\n"
                         )
-    
+
                         # Get result file
                         result_dir_list = [TRACE_TYPES_STRINGS[trace_type],
                                            CACHING_TYPES_STRINGS[caching_type],
                                            str(size_type),
                                            HIERARCHY_TYPES_STRINGS[hierarchy_type]]
                         result_file = get_result_file(LATENCY_DIR, result_dir_list, LATENCY_CSV)
-    
+
                         # Run experiment
                         stat = run_experiment(stat_offset=THROUGHPUT_OFFSET,
                                               trace_type=trace_type,
@@ -849,7 +849,7 @@ def latency_eval():
                                               latency_type=latency_type,
                                               size_type=size_type,
                                               caching_type=caching_type)
-    
+
                         # Write stat
                         write_stat(result_file, latency_type, stat)
 
@@ -870,7 +870,7 @@ def size_eval():
 
     for trace_type in SIZE_EXP_TRACE_TYPES:
         LOG.info(MAJOR_STRING)
-        
+
         for caching_type in SIZE_EXP_CACHING_TYPES:
             LOG.info(MINOR_STRING)
 
@@ -879,22 +879,22 @@ def size_eval():
 
                 for hierarchy_type in SIZE_EXP_HIERARCHY_TYPES:
 
-                    for size_type in SIZE_EXP_SIZE_TYPES:    
-                        LOG.info(" > trace_type: " + TRACE_TYPES_STRINGS[trace_type] + 
+                    for size_type in SIZE_EXP_SIZE_TYPES:
+                        LOG.info(" > trace_type: " + TRACE_TYPES_STRINGS[trace_type] +
                               " caching_type: " + CACHING_TYPES_STRINGS[caching_type] +
                               " size_type: " + str(size_type) +
                               " latency_type: " + str(latency_type) +
                               " hierarchy_type: " + HIERARCHY_TYPES_STRINGS[hierarchy_type] +
                               "\n"
                         )
-    
+
                         # Get result file
                         result_dir_list = [TRACE_TYPES_STRINGS[trace_type],
                                            CACHING_TYPES_STRINGS[caching_type],
                                            str(latency_type),
                                            HIERARCHY_TYPES_STRINGS[hierarchy_type]]
                         result_file = get_result_file(SIZE_DIR, result_dir_list, SIZE_CSV)
-    
+
                         # Run experiment
                         stat = run_experiment(stat_offset=THROUGHPUT_OFFSET,
                                               trace_type=trace_type,
@@ -902,7 +902,7 @@ def size_eval():
                                               latency_type=latency_type,
                                               size_type=size_type,
                                               caching_type=caching_type)
-    
+
                         # Write stat
                         write_stat(result_file, size_type, stat)
 
@@ -924,7 +924,7 @@ def cache_eval():
     for trace_type in CACHE_EXP_TRACE_TYPES:
         LOG.info(MAJOR_STRING)
 
-        for size_type in CACHE_EXP_SIZE_TYPES:    
+        for size_type in CACHE_EXP_SIZE_TYPES:
             LOG.info(MINOR_STRING)
 
             for latency_type in CACHE_EXP_LATENCY_TYPES:
@@ -933,21 +933,21 @@ def cache_eval():
                 for hierarchy_type in CACHE_EXP_HIERARCHY_TYPES:
 
                     for caching_type in CACHE_EXP_CACHING_TYPES:
-                        LOG.info(" > trace_type: " + TRACE_TYPES_STRINGS[trace_type] + 
+                        LOG.info(" > trace_type: " + TRACE_TYPES_STRINGS[trace_type] +
                               " caching_type: " + CACHING_TYPES_STRINGS[caching_type] +
                               " size_type: " + str(size_type) +
                               " latency_type: " + str(latency_type) +
                               " hierarchy_type: " + HIERARCHY_TYPES_STRINGS[hierarchy_type] +
                               "\n"
                         )
-    
+
                         # Get result file
                         result_dir_list = [TRACE_TYPES_STRINGS[trace_type],
                                            str(size_type),
                                            str(latency_type),
                                            HIERARCHY_TYPES_STRINGS[hierarchy_type]]
                         result_file = get_result_file(CACHE_DIR, result_dir_list, CACHE_CSV)
-    
+
                         # Run experiment
                         stat = run_experiment(stat_offset=THROUGHPUT_OFFSET,
                                               trace_type=trace_type,
@@ -955,7 +955,7 @@ def cache_eval():
                                               latency_type=latency_type,
                                               size_type=size_type,
                                               caching_type=caching_type)
-    
+
                         # Write stat
                         write_stat(result_file, caching_type, stat)
 
@@ -1093,5 +1093,5 @@ if __name__ == '__main__':
     ## LEGEND GROUP
 
     #create_legend_latency_type()
-    create_legend_hierarchy_type()
+    #create_legend_hierarchy_type()
 
