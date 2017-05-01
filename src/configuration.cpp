@@ -74,7 +74,7 @@ static void ValidateFileName(const configuration &state){
 }
 
 static void ValidateLatencyType(const configuration &state) {
-  if (state.latency_type < 1 || state.latency_type > 5) {
+  if (state.latency_type < 1 || state.latency_type > 6) {
     printf("Invalid latency_type :: %d\n", state.latency_type);
     exit(EXIT_FAILURE);
   }
@@ -107,31 +107,37 @@ void SetupNVMLatency(configuration &state){
   switch(state.latency_type){
     case LATENCY_TYPE_1: {
       state.nvm_read_latency = 2;
-      state.nvm_write_latency = 4;
+      state.nvm_write_latency = 10;
       break;
     }
 
     case LATENCY_TYPE_2: {
-      state.nvm_read_latency = 2;
-      state.nvm_write_latency = 10;
+      state.nvm_read_latency = 4;
+      state.nvm_write_latency = 4;
       break;
     }
 
     case LATENCY_TYPE_3: {
       state.nvm_read_latency = 4;
-      state.nvm_write_latency = 4;
+      state.nvm_write_latency = 10;
       break;
     }
 
     case LATENCY_TYPE_4: {
-      state.nvm_read_latency = 4;
-      state.nvm_write_latency = 10;
+      state.nvm_read_latency = 10;
+      state.nvm_write_latency = 20;
       break;
     }
 
     case LATENCY_TYPE_5: {
-      state.nvm_read_latency = 10;
-      state.nvm_write_latency = 10;
+      state.nvm_read_latency = 20;
+      state.nvm_write_latency = 40;
+      break;
+    }
+
+    case LATENCY_TYPE_6: {
+      state.nvm_read_latency = 100;
+      state.nvm_write_latency = 200;
       break;
     }
 

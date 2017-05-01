@@ -41,7 +41,8 @@ enum LatencyType {
   LATENCY_TYPE_2 = 2,
   LATENCY_TYPE_3 = 3,
   LATENCY_TYPE_4 = 4,
-  LATENCY_TYPE_5 = 5
+  LATENCY_TYPE_5 = 5,
+  LATENCY_TYPE_6 = 6
 
 };
 

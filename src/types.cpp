@@ -101,6 +101,8 @@ std::string LatencyTypeToString(const LatencyType& latency_type){
       return "4";
     case LATENCY_TYPE_5:
       return "5";
+    case LATENCY_TYPE_6:
+      return "6";
     default:
       return "INVALID";
   }
