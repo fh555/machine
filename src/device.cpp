@@ -43,11 +43,21 @@ void BootstrapDeviceMetrics(const configuration &state){
   rnd_read_latency[DEVICE_TYPE_NVM] *= state.nvm_read_latency;
   rnd_write_latency[DEVICE_TYPE_NVM] *= state.nvm_write_latency;
 
+  // HDD
+  if(state.hierarchy_type == HierarchyType::HIERARCHY_TYPE_DRAM_HDD ||
+      state.hierarchy_type == HierarchyType::HIERARCHY_TYPE_DRAM_NVM_HDD){
+    seq_read_latency[DEVICE_TYPE_SSD] = 1 * 1000 * 1000;
+    seq_write_latency[DEVICE_TYPE_SSD] = 1 * 1000 * 1000;
+    rnd_read_latency[DEVICE_TYPE_SSD] = 4 * 1000 * 1000;
+    rnd_write_latency[DEVICE_TYPE_SSD] = 10 * 1000 * 1000;
+  }
   // SSD
-  seq_read_latency[DEVICE_TYPE_SSD] = 100 * 100;
-  seq_write_latency[DEVICE_TYPE_SSD] = 250 * 100;
-  rnd_read_latency[DEVICE_TYPE_SSD] = 100 * 100;
-  rnd_write_latency[DEVICE_TYPE_SSD] = 400 * 100;
+  else {
+    seq_read_latency[DEVICE_TYPE_SSD] = 100 * 100;
+    seq_write_latency[DEVICE_TYPE_SSD] = 250 * 100;
+    rnd_read_latency[DEVICE_TYPE_SSD] = 100 * 100;
+    rnd_write_latency[DEVICE_TYPE_SSD] = 400 * 100;
+  }
 
 }
 

@@ -47,8 +47,16 @@ std::string HierarchyTypeToString(const HierarchyType& hierarchy_type){
       return "CACHE-DRAM-NVM";
     case HIERARCHY_TYPE_DRAM_SSD:
       return "CACHE-DRAM-SSD";
+    case HIERARCHY_TYPE_NVM_SSD:
+      return "CACHE-NVM-SSD";
     case HIERARCHY_TYPE_DRAM_NVM_SSD:
       return "CACHE-DRAM-NVM-SSD";
+    case HIERARCHY_TYPE_DRAM_HDD:
+      return "CACHE-DRAM-HDD";
+    case HIERARCHY_TYPE_NVM_HDD:
+      return "CACHE-NVM-HDD";
+    case HIERARCHY_TYPE_DRAM_NVM_HDD:
+      return "CACHE-DRAM-NVM-HDD";
     default:
       return "INVALID";
   }
