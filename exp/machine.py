@@ -392,13 +392,13 @@ def get_result_file(base_result_dir, result_dir_list, result_file_name):
 # LEGEND
 ###################################################################################
 
-def create_legend_latency_type():
+def create_legend_hierarchy_type():
     fig = pylab.figure()
     ax1 = fig.add_subplot(111)
 
-    LOG.info("Creating latency type");
+    LOG.info("Creating hierarchy type");
 
-    LEGEND_VALUES = LATENCY_TYPES
+    LEGEND_VALUES = HIERARCHY_TYPES
 
     figlegend = pylab.figure(figsize=(15, 0.5))
     idx = 0
@@ -406,45 +406,8 @@ def create_legend_latency_type():
     data = [1]
     x_values = [1]
 
-    TITLE = "LATENCIES:"
-    LABELS = [TITLE, "2x-4x", "2x-10x", "4x-4x", "4x-10x", "10x-10x"]
-
-    lines[idx], = ax1.plot(x_values, data, linewidth = 0)
-    idx = 1
-
-    for group in range(len(LEGEND_VALUES)):
-        lines[idx], = ax1.plot(x_values, data,
-                               color=OPT_LINE_COLORS[idx - 1],
-                               linewidth=OPT_LINE_WIDTH,
-                               marker=OPT_MARKERS[idx - 1],
-                               markersize=OPT_MARKER_SIZE)
-        idx = idx + 1
-
-    # LEGEND
-    figlegend.legend(lines, LABELS, prop=LEGEND_FP,
-                     loc=1, ncol=6,
-                     mode="expand", shadow=OPT_LEGEND_SHADOW,
-                     frameon=False, borderaxespad=0.0,
-                     handleheight=1, handlelength=3)
-
-    figlegend.savefig(LEGEND_PLOT_DIR + 'legend_latency_type.pdf')
-
-def create_legend_hierarchy_type():
-    fig = pylab.figure()
-    ax1 = fig.add_subplot(111)
-
-    LOG.info("Creating hierarchy type");
-
-    LEGEND_VALUES = LATENCY_TYPES
-
-    figlegend = pylab.figure(figsize=(11, 0.5))
-    idx = 0
-    lines = [None] * (len(LEGEND_VALUES) + 1)
-    data = [1]
-    x_values = [1]
-
     TITLE = "HIERARCHY TYPES:"
-    LABELS = [TITLE, "NVM", "DRAM-NVM", "DRAM-NVM-SSD"]
+    LABELS = [TITLE, "NVM", "DRAM-NVM", "DRAM-SSD", "NVM-SSD", "DRAM-NVM-SSD"]
 
     lines[idx], = ax1.plot(x_values, data, linewidth = 0)
     idx = 1
@@ -459,7 +422,7 @@ def create_legend_hierarchy_type():
 
     # LEGEND
     figlegend.legend(lines, LABELS, prop=LEGEND_FP,
-                     loc=1, ncol=6,
+                     loc=1, ncol=7,
                      mode="expand", shadow=OPT_LEGEND_SHADOW,
                      frameon=False, borderaxespad=0.0,
                      handleheight=1, handlelength=3)
@@ -509,6 +472,7 @@ def create_latency_line_chart(datasets):
     ax1.minorticks_off()
     ax1.set_ylabel(get_label('Throughput (ops)'), fontproperties=LABEL_FP)
     ax1.set_ylim(bottom=YAXIS_MIN)
+    #ax1.set_yscale('log', nonposy='clip')
 
     # X-AXIS
     ax1.set_xticks(ind + 0.5)
@@ -661,7 +625,7 @@ def latency_plot():
                 fig = create_latency_line_chart(datasets)
 
                 file_name = LATENCY_PLOT_DIR + "latency" + "-" + \
-                            HIERARCHY_TYPES_STRINGS[hierarchy_type] + "-" + \
+                            TRACE_TYPES_STRINGS[trace_type] + "-" + \
                             CACHING_TYPES_STRINGS[caching_type] + "-" + \
                             str(size_type) + ".pdf"
 
@@ -698,6 +662,7 @@ def size_plot():
                     fig = create_size_bar_chart(datasets)
 
                     file_name = SIZE_PLOT_DIR + "size" + "-" + \
+                                TRACE_TYPES_STRINGS[trace_type] + "-" + \
                                 HIERARCHY_TYPES_STRINGS[hierarchy_type] + "-" + \
                                 CACHING_TYPES_STRINGS[caching_type] + "-" + \
                                 str(latency_type) + ".pdf"
@@ -735,7 +700,7 @@ def cache_plot():
                 fig = create_cache_line_chart(datasets)
 
                 file_name = CACHE_PLOT_DIR + "cache" + "-" + \
-                            HIERARCHY_TYPES_STRINGS[hierarchy_type] + "-" + \
+                            TRACE_TYPES_STRINGS[trace_type] + "-" + \
                             str(latency_type) + "-" + \
                             str(size_type) + ".pdf"
 
@@ -1082,6 +1047,5 @@ if __name__ == '__main__':
 
     ## LEGEND GROUP
 
-    #create_legend_latency_type()
-    #create_legend_hierarchy_type()
+    create_legend_hierarchy_type()
 
