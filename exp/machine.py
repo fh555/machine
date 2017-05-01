@@ -289,7 +289,7 @@ SIZE_EXP_CACHING_TYPES = [DEFAULT_CACHING_TYPE]
 ## CACHE EXPERIMENT
 
 CACHE_EXP_TRACE_TYPES = [DEFAULT_TRACE_TYPE]
-CACHE_EXP_HIERARCHY_TYPES = HIERARCHY_TYPES_SKIP_NVM_ONLY
+CACHE_EXP_HIERARCHY_TYPES = [HIERARCHY_TYPE_DRAM_NVM_SSD]
 CACHE_EXP_SIZE_TYPES = [DEFAULT_SIZE_TYPE]
 CACHE_EXP_LATENCY_TYPES = [DEFAULT_LATENCY_TYPE]
 CACHE_EXP_CACHING_TYPES = CACHING_TYPES
@@ -571,7 +571,7 @@ def create_cache_line_chart(datasets):
     ax1 = fig.add_subplot(111)
 
     # X-AXIS
-    x_values = [CACHING_TYPES_STRINGS[i] for i in CACHE_EXP_CACHING_TYPES]
+    x_values = [str(CACHING_TYPES_STRINGS[i]).upper() for i in CACHE_EXP_CACHING_TYPES]
     N = len(x_values)
     ind = np.arange(N)
 
@@ -596,12 +596,12 @@ def create_cache_line_chart(datasets):
     makeGrid(ax1)
 
     # Y-AXIS
-    YAXIS_MIN = 1
+    YAXIS_MIN = 0
     ax1.yaxis.set_major_locator(LinearLocator(YAXIS_TICKS))
     ax1.minorticks_off()
     ax1.set_ylabel(get_label('Throughput (ops)'), fontproperties=LABEL_FP)
     ax1.set_ylim(bottom=YAXIS_MIN)
-    ax1.set_yscale('log', nonposy='clip')
+    #ax1.set_yscale('log', nonposy='clip')
 
     # X-AXIS
     ax1.set_xticks(ind + 0.5)
