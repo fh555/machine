@@ -433,6 +433,45 @@ def create_legend_hierarchy_type():
 
     figlegend.savefig(LEGEND_PLOT_DIR + 'legend_hierarchy_type.pdf')
 
+def create_legend_hierarchy_skip_nvm_only_type():
+    fig = pylab.figure()
+    ax1 = fig.add_subplot(111)
+
+    LOG.info("Creating hierarchy type skip nvm only");
+
+    LEGEND_VALUES = HIERARCHY_TYPES_SKIP_NVM_ONLY
+
+    figlegend = pylab.figure(figsize=(15, 0.5))
+    idx = 0
+    lines = [None] * (len(LEGEND_VALUES) + 1)
+    data = [1]
+    x_values = [1]
+
+    TITLE = "HIERARCHY TYPES:"
+    LABELS = [TITLE, "DRAM-NVM", "DRAM-SSD", "NVM-SSD", "DRAM-NVM-SSD"]
+
+    lines[idx], = ax1.plot(x_values, data, linewidth = 0)
+    idx = 1
+
+    for group in range(len(LEGEND_VALUES)):
+        color_idx = idx
+        lines[idx], = ax1.plot(x_values, data,
+                               color=OPT_LINE_COLORS[color_idx],
+                               linewidth=OPT_LINE_WIDTH,
+                               marker=OPT_MARKERS[color_idx],
+                               markersize=OPT_MARKER_SIZE)
+        idx = idx + 1
+
+    # LEGEND
+    figlegend.legend(lines, LABELS, prop=LEGEND_FP,
+                     loc=1, ncol=6,
+                     mode="expand", shadow=OPT_LEGEND_SHADOW,
+                     frameon=False, borderaxespad=0.0,
+                     handleheight=1, handlelength=3)
+
+    figlegend.savefig(LEGEND_PLOT_DIR + 'legend_hierarchy_type_skip_nvm_only.pdf')
+
+
 ###################################################################################
 # PLOT
 ###################################################################################
@@ -496,14 +535,14 @@ def create_size_bar_chart(datasets, hierarchy_type):
     ax1 = fig.add_subplot(111)
 
     # X-AXIS
-    x_values = [str(i) for i in SIZE_EXP_SIZE_TYPES]
+    x_values = [str(chr(ord('A') + i - 1)) for i in SIZE_EXP_SIZE_TYPES]
     N = len(x_values)
     M = 1
     ind = np.arange(N)
     margin = 0.1
     width = (1.-2.*margin)/M
     bars = [None] * N
-
+    
     idx = 0
     for group in range(len(datasets)):
         # GROUP
@@ -559,6 +598,7 @@ def create_cache_line_chart(datasets):
 
     idx = 0
     for group in range(len(datasets)):
+        color_idx = idx + 1
         # GROUP
         y_values = []
         for line in  range(len(datasets[group])):
@@ -567,9 +607,9 @@ def create_cache_line_chart(datasets):
                     y_values.append(datasets[group][line][col])
         LOG.info("group_data = %s", str(y_values))
         ax1.plot(ind + 0.5, y_values,
-                 color=OPT_COLORS[idx],
+                 color=OPT_COLORS[color_idx],
                  linewidth=OPT_LINE_WIDTH,
-                 marker=OPT_MARKERS[idx],
+                 marker=OPT_MARKERS[color_idx],
                  markersize=OPT_MARKER_SIZE,
                  label=str(group))
         idx = idx + 1
@@ -579,17 +619,20 @@ def create_cache_line_chart(datasets):
 
     # Y-AXIS
     YAXIS_MIN = 0
+    YAXIS_MAX = 16000
     ax1.yaxis.set_major_locator(LinearLocator(YAXIS_TICKS))
     ax1.minorticks_off()
     ax1.set_ylabel(get_label('Throughput (ops)'), fontproperties=LABEL_FP)
-    ax1.set_ylim(bottom=YAXIS_MIN)
+    ax1.set_ylim(bottom=YAXIS_MIN, top=YAXIS_MAX)
     #ax1.set_yscale('log', nonposy='clip')
 
     # X-AXIS
+    XAXIS_MIN = 0.25
+    XAXIS_MAX = 2.75
     ax1.set_xticks(ind + 0.5)
     ax1.set_xlabel(get_label('Caching Algorithm Types'), fontproperties=LABEL_FP)
     ax1.set_xticklabels(x_values)
-    #ax1.set_xlim([XAXIS_MIN, XAXIS_MAX])
+    ax1.set_xlim([XAXIS_MIN, XAXIS_MAX])
 
     for label in ax1.get_yticklabels() :
         label.set_fontproperties(TICK_FP)
@@ -1056,4 +1099,5 @@ if __name__ == '__main__':
     ## LEGEND GROUP
 
     #create_legend_hierarchy_type()
+    #create_legend_hierarchy_skip_nvm_only_type()
 
