@@ -228,23 +228,31 @@ CACHING_TYPES = [
 TRACE_TYPE_TPCC = 1
 TRACE_TYPE_YCSB = 2
 TRACE_TYPE_VOTER = 3
+TRACE_TYPE_YCSB_READ = 4
+TRACE_TYPE_YCSB_INSERT = 5
 
 TRACE_TYPES_STRINGS = {
     1 : "tpcc",
     2 : "ycsb",
-    3 : "voter"
+    3 : "voter",
+    4 : "ycsb-read",
+    5 : "ycsb-insert",
 }
 
 TRACE_TYPES_DIRS = {
     1 : TRACE_DIR + "tpcc.txt",
     2 : TRACE_DIR + "ycsb.txt",
-    3 : TRACE_DIR + "voter.txt"
+    3 : TRACE_DIR + "voter.txt",
+    4 : TRACE_DIR + "ycsb-read.txt",
+    5 : TRACE_DIR + "ycsb-insert.txt",
 }
 
 TRACE_TYPES = [
     TRACE_TYPE_YCSB,
     TRACE_TYPE_TPCC,
     TRACE_TYPE_VOTER,
+    TRACE_TYPE_YCSB_READ,
+    TRACE_TYPE_YCSB_INSERT,
 ]
 
 ## OUTPUT
@@ -253,7 +261,7 @@ THROUGHPUT_OFFSET = 0
 
 ## DEFAULTS
 
-SCALE_FACTOR = 20
+SCALE_FACTOR = 40
 
 DEFAULT_DURATION = 10
 DEFAULT_HIERARCHY_TYPE = HIERARCHY_TYPE_NVM
@@ -538,7 +546,7 @@ def create_size_bar_chart(datasets, hierarchy_type):
     margin = 0.1
     width = (1.-2.*margin)/M
     bars = [None] * N
-    
+
     idx = 0
     for group in range(len(datasets)):
         # GROUP
@@ -563,7 +571,7 @@ def create_size_bar_chart(datasets, hierarchy_type):
     YAXIS_MAX = 20000
     if hierarchy_type != HIERARCHY_TYPE_DRAM_NVM:
         YAXIS_MAX = 7500
-        
+
     ax1.yaxis.set_major_locator(LinearLocator(YAXIS_TICKS))
     ax1.minorticks_off()
     ax1.set_ylabel(get_label('Throughput (ops)'), fontproperties=LABEL_FP)
