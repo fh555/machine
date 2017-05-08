@@ -168,8 +168,6 @@ SIZE_TYPE_3 = 3
 SIZE_TYPE_4 = 4
 SIZE_TYPE_5 = 5
 SIZE_TYPE_6 = 6
-SIZE_TYPE_7 = 7
-SIZE_TYPE_8 = 8
 
 
 SIZE_TYPES = [
@@ -179,8 +177,6 @@ SIZE_TYPES = [
     SIZE_TYPE_4,
     SIZE_TYPE_5,
     SIZE_TYPE_6,
-    SIZE_TYPE_7,
-    SIZE_TYPE_8
 ]
 
 ## LATENCY TYPES
@@ -201,12 +197,12 @@ LATENCY_TYPES = [
 ]
 
 LATENCY_TYPES_STRINGS = {
-    1 : "2x-10x",
-    2 : "4x-4x",
-    3 : "4x-10x",
-    4 : "10x-20x",
-    5 : "20x-40x",
-    6 : "100x-200x",
+    1 : "1x-1x",
+    2 : "2x-4x",
+    3 : "2x-10x",
+    4 : "4x-4x",
+    5 : "4x-10x",
+    6 : "10x-20x"
 }
 
 ## CACHING TYPES

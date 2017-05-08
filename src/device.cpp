@@ -369,49 +369,37 @@ Device DeviceFactory::GetDevice(const DeviceType& device_type,
 
     case SIZE_TYPE_1: {
       device_size[DEVICE_TYPE_DRAM] = 16;
-      device_size[DEVICE_TYPE_NVM] = 128;
+      device_size[DEVICE_TYPE_NVM] = 16;
       break;
     }
 
     case SIZE_TYPE_2: {
       device_size[DEVICE_TYPE_DRAM] = 16;
-      device_size[DEVICE_TYPE_NVM] = 256;
+      device_size[DEVICE_TYPE_NVM] = 64;
       break;
     }
 
     case SIZE_TYPE_3: {
-      device_size[DEVICE_TYPE_DRAM] = 64;
-      device_size[DEVICE_TYPE_NVM] = 512;
+      device_size[DEVICE_TYPE_DRAM] = 16;
+      device_size[DEVICE_TYPE_NVM] = 256;
       break;
     }
 
     case SIZE_TYPE_4: {
       device_size[DEVICE_TYPE_DRAM] = 64;
-      device_size[DEVICE_TYPE_NVM] = 1024;
+      device_size[DEVICE_TYPE_NVM] = 64;
       break;
     }
 
     case SIZE_TYPE_5: {
-      device_size[DEVICE_TYPE_DRAM] = 256;
-      device_size[DEVICE_TYPE_NVM] = 2048;
+      device_size[DEVICE_TYPE_DRAM] = 64;
+      device_size[DEVICE_TYPE_NVM] = 256;
       break;
     }
 
     case SIZE_TYPE_6: {
-      device_size[DEVICE_TYPE_DRAM] = 256;
-      device_size[DEVICE_TYPE_NVM] = 4096;
-      break;
-    }
-
-    case SIZE_TYPE_7: {
-      device_size[DEVICE_TYPE_DRAM] = 1024;
-      device_size[DEVICE_TYPE_NVM] = 8192;
-      break;
-    }
-
-    case SIZE_TYPE_8: {
-      device_size[DEVICE_TYPE_DRAM] = 1024;
-      device_size[DEVICE_TYPE_NVM] = 16384;
+      device_size[DEVICE_TYPE_DRAM] = 64;
+      device_size[DEVICE_TYPE_NVM] = 1024;
       break;
     }
 
