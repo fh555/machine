@@ -623,7 +623,7 @@ def create_cache_line_chart(datasets):
 
     # Y-AXIS
     YAXIS_MIN = 0
-    YAXIS_MAX = 16000
+    YAXIS_MAX = 24000
     ax1.yaxis.set_major_locator(LinearLocator(YAXIS_TICKS))
     ax1.minorticks_off()
     ax1.set_ylabel(get_label('Throughput (ops)'), fontproperties=LABEL_FP)
