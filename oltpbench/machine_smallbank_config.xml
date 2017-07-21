@@ -2,11 +2,9 @@
 <parameters>
 
     <!-- Connection details -->
-    <dbtype>mysql</dbtype>
-    <driver>com.mysql.jdbc.Driver</driver>
-    <DBUrl>jdbc:mysql://localhost:3306/smallbank</DBUrl>
-    <username>user</username>
-    <password>pass</password>    
+    <dbtype>postgres</dbtype>
+    <driver>org.postgresql.Driver</driver>
+    <DBUrl>jdbc:postgresql://localhost:5432/tatp</DBUrl>
     <isolation>TRANSACTION_READ_COMMITTED</isolation>
     
     <scalefactor>1</scalefactor>

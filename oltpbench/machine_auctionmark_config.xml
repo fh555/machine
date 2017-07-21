@@ -2,12 +2,10 @@
 <parameters>
 	
     <!-- Connection details -->
-    <dbtype>mysql</dbtype>
-    <driver>com.mysql.jdbc.Driver</driver>
-    <DBUrl>jdbc:mysql://server:3306/auctionmark</DBUrl>
-    <username>user</username>
-    <password>password</password>
-    <isolation>TRANSACTION_SERIALIZABLE</isolation>
+    <dbtype>postgres</dbtype>
+    <driver>org.postgresql.Driver</driver>
+    <DBUrl>jdbc:postgresql://localhost:5432/tatp</DBUrl>
+    <isolation>TRANSACTION_READ_COMMITTED</isolation>
     
     <!-- Scalefactor in AuctionMark scales by *1000 the number of customers-->
     <scalefactor>10</scalefactor>
