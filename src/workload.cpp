@@ -379,9 +379,16 @@ void FlushBlock(const size_t& block_id) {
   if(is_volatile_device == true){
     auto device_offset = GetDeviceOffset(state.devices, memory_device_type);
     auto device_cache = state.devices[device_offset].cache;
-    auto block_status = device_cache.Get(block_id, true);
-    if(block_status != CLEAN_BLOCK){
-      BringBlockToStorage(block_id, block_status);
+    // Check device cache
+    try{
+      auto block_status = device_cache.Get(block_id, true);
+      if(block_status != CLEAN_BLOCK){
+        BringBlockToStorage(block_id, block_status);
+      }
+    }
+    catch(const std::range_error& not_found){
+      std::cout << "Did not find the to be flushed block: " << block_id;
+      // Nothing to do here!
     }
   }
 
