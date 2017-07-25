@@ -42,8 +42,15 @@ Block CACHE_TEMPLATE_TYPE::Put(const Key& key,
     if (CurrentCapacity() + 1 > capacity_) {
       victim_key = cache_policy_.Victim(key);
       DLOG(INFO) << "Victim: " << victim_key;
-      victim_value = Get(victim_key, false);
-      Erase(victim_key);
+
+      try{
+        victim_value = Get(victim_key, false);
+        Erase(victim_key);
+      }
+      catch(const std::range_error& not_found){
+        std::cout << "Did not find the victim: " << (int)victim_key;
+        // Nothing to do here!
+      }
     }
 
     Insert(key, value);
