@@ -333,6 +333,6 @@ third_party/gflags/
 stats_log
 test.txt
 machine.txt
-outputfile.summary
+*.summary
 tmp*
 *.txt
