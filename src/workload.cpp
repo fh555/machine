@@ -18,9 +18,6 @@
 
 namespace machine {
 
-const static std::string OUTPUT_FILE = "outputfile.summary";
-std::ofstream out(OUTPUT_FILE);
-
 size_t query_itr;
 
 double total_duration = 0;
@@ -29,6 +26,9 @@ double total_duration = 0;
 extern Stats machine_stats;
 
 static void WriteOutput(double stat) {
+
+  std::string OUTPUT_FILE = state.summary_file;
+  std::ofstream out(OUTPUT_FILE);
 
   // Write out output in verbose mode
   if (state.verbose == true) {

@@ -20,6 +20,7 @@ void Usage() {
       "   -f --file_name                      :  file name\n"
       "   -m --migration_frequency            :  migration frequency\n"
       "   -o --operation_count                :  operation count\n"
+      "   -z --summary_file                   :  summary file\n"
       "   -v --verbose                        :  verbose\n";
   exit(EXIT_FAILURE);
 }
@@ -33,6 +34,7 @@ static struct option opts[] = {
     {"migration_frequency", optional_argument, NULL, 'm'},
     {"operation_count", optional_argument, NULL, 'o'},
     {"verbose", optional_argument, NULL, 'v'},
+    {"summary_file", optional_argument, NULL, 'z'},
     {NULL, 0, NULL, 0}
 };
 
@@ -71,6 +73,10 @@ static void ValidateCachingType(const configuration &state) {
 
 static void ValidateFileName(const configuration &state){
   printf("%30s : %s\n", "file_name", state.file_name.c_str());
+}
+
+static void ValidateSummaryFile(const configuration &state){
+  printf("%30s : %s\n", "summary_file", state.summary_file.c_str());
 }
 
 static void ValidateLatencyType(const configuration &state) {
@@ -228,7 +234,7 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
   while (1) {
     int idx = 0;
     int c = getopt_long(argc, argv,
-                        "a:c:f:m:l:o:s:vh",
+                        "a:c:f:m:l:o:s:vz:h",
                         opts, &idx);
 
     if (c == -1) break;
@@ -258,6 +264,9 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
       case 'v':
         state.verbose = atoi(optarg);
         break;
+      case 'z':
+        state.summary_file = optarg;
+        break;
       case 'h':
         Usage();
         break;
@@ -278,6 +287,7 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
   ValidateLatencyType(state);
   ValidateCachingType(state);
   ValidateFileName(state);
+  ValidateSummaryFile(state);
   ValidateMigrationFrequency(state);
   SetupNVMLatency(state);
   ValidateNVMReadLatency(state);

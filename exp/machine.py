@@ -123,8 +123,6 @@ BUILD_DIR = BASE_DIR + "/../build/test/"
 BENCHMARK_DIR = BASE_DIR + "/../traces/"
 PROGRAM_NAME = BUILD_DIR + "machine"
 
-OUTPUT_FILE = "outputfile.summary"
-
 ## HIERARCHY TYPES
 HIERARCHY_TYPE_NVM = 1
 HIERARCHY_TYPE_DRAM_NVM = 2
@@ -284,11 +282,17 @@ DEFAULT_LATENCY_TYPE = LATENCY_TYPE_3
 DEFAULT_BENCHMARK_TYPE = BENCHMARK_TYPE_TPCC
 DEFAULT_MIGRATION_FREQUENCY = 3
 DEFAULT_OPERATION_COUNT = 100000 * SCALE_FACTOR
+DEFAULT_SUMMARY_FILE = "outputfile.summary"
 
 ## EXPERIMENTS
 LATENCY_EXPERIMENT = 1
 SIZE_EXPERIMENT = 2
 CACHE_EXPERIMENT = 3
+
+## SUMMARY FILES
+LATENCY_EXPERIMENT_SUMMARY = "latency.summary"
+SIZE_EXPERIMENT_SUMMARY = "size.summary"
+CACHE_EXPERIMENT_SUMMARY = "cache.summary"
 
 ## EVAL DIRS
 LATENCY_DIR = BASE_DIR + "/results/latency"
@@ -782,10 +786,10 @@ def cache_plot():
 # COLLECT STATS
 
 # Collect stat
-def collect_stat(stat_offset):
+def collect_stat(summary_file, stat_offset):
 
     # Collect stats
-    with open(OUTPUT_FILE) as fp:
+    with open(summary_file) as fp:
         for line in fp:
             line = line.strip()
             line_data = line.split(" ")
@@ -871,7 +875,8 @@ def latency_eval():
                                               hierarchy_type=hierarchy_type,
                                               latency_type=latency_type,
                                               size_type=size_type,
-                                              caching_type=caching_type)
+                                              caching_type=caching_type,
+                                              summary_file=LATENCY_EXPERIMENT_SUMMARY)
 
                         # Write stat
                         write_stat(result_file, latency_type, stat)
@@ -924,7 +929,8 @@ def size_eval():
                                               hierarchy_type=hierarchy_type,
                                               latency_type=latency_type,
                                               size_type=size_type,
-                                              caching_type=caching_type)
+                                              caching_type=caching_type,
+                                              summary_file=SIZE_EXPERIMENT_SUMMARY)
 
                         # Write stat
                         write_stat(result_file, size_type, stat)
@@ -977,7 +983,8 @@ def cache_eval():
                                               hierarchy_type=hierarchy_type,
                                               latency_type=latency_type,
                                               size_type=size_type,
-                                              caching_type=caching_type)
+                                              caching_type=caching_type,
+                                              summary_file=CACHE_EXPERIMENT_SUMMARY)
 
                         # Write stat
                         write_stat(result_file, caching_type, stat)
@@ -1028,7 +1035,8 @@ def run_experiment(
     size_type=DEFAULT_SIZE_TYPE,
     caching_type=DEFAULT_CACHING_TYPE,
     trace_type=DEFAULT_BENCHMARK_TYPE,
-    migration_frequency=DEFAULT_MIGRATION_FREQUENCY):
+    migration_frequency=DEFAULT_MIGRATION_FREQUENCY,
+    summary_file=DEFAULT_SUMMARY_FILE):
 
     # subprocess.call(["rm -f " + OUTPUT_FILE], shell=True)
     PROGRAM_OUTPUT_FILE_NAME = "machine.txt"
@@ -1040,7 +1048,8 @@ def run_experiment(
                     "-c", str(caching_type),
                     "-f", BENCHMARK_TYPES_DIRS[trace_type],
                     "-m", str(migration_frequency),
-                    "-o", str(DEFAULT_OPERATION_COUNT)
+                    "-o", str(DEFAULT_OPERATION_COUNT),
+                    "-z", str(summary_file)
                 ]
     arg_string = ' '.join(arg_list[0:])
     LOG.info(arg_string)
@@ -1066,7 +1075,7 @@ def run_experiment(
               run_status = False
 
     # Collect stat
-    stat = collect_stat(stat_offset)
+    stat = collect_stat(summary_file, stat_offset)
     return stat
 
 

@@ -33,6 +33,9 @@ class configuration {
   // file name
   std::string file_name;
 
+  // summary file
+  std::string summary_file;
+
   // migration frequency
   size_t migration_frequency;
 
