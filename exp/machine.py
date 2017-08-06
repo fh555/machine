@@ -649,7 +649,7 @@ def create_cache_line_chart(datasets):
 
     # X-AXIS
     XAXIS_MIN = 0.25
-    XAXIS_MAX = 2.75
+    XAXIS_MAX = 3.75
     ax1.set_xticks(ind + 0.5)
     ax1.set_xlabel(get_label('Caching Algorithm Types'), fontproperties=LABEL_FP)
     ax1.set_xticklabels(x_values)
