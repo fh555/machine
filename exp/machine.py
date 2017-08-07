@@ -39,9 +39,9 @@ LOG_handler.setFormatter(LOG_formatter)
 LOG.addHandler(LOG_handler)
 LOG.setLevel(logging.INFO)
 
-MAJOR_STRING = "++++++++++++++++++++++++++++\n\n\n"
-MINOR_STRING = "----------------\n\n"
-SUB_MINOR_STRING = "******\n"
+MAJOR_STRING = "++++++++++++++++++++++++++++\n"
+MINOR_STRING = "----------------"
+SUB_MINOR_STRING = "******"
 
 ###################################################################################
 # OUTPUT CONFIGURATION
@@ -162,6 +162,17 @@ HIERARCHY_TYPES = [
 
 HIERARCHY_TYPES_SKIP_NVM_ONLY = [
     HIERARCHY_TYPE_DRAM_NVM,
+    HIERARCHY_TYPE_DRAM_SSD,
+    HIERARCHY_TYPE_NVM_SSD,
+    HIERARCHY_TYPE_DRAM_NVM_SSD
+]
+
+HIERARCHY_TYPES_WITHOUT_SSD = [
+    HIERARCHY_TYPE_NVM,
+    HIERARCHY_TYPE_DRAM_NVM,  
+]
+
+HIERARCHY_TYPES_WITH_SSD = [
     HIERARCHY_TYPE_DRAM_SSD,
     HIERARCHY_TYPE_NVM_SSD,
     HIERARCHY_TYPE_DRAM_NVM_SSD
@@ -507,7 +518,16 @@ def get_label(label):
     bold_label = "\\textbf{" + label + "}"
     return bold_label
 
-def create_latency_line_chart(datasets):
+# GET HIERARCHY TYPE COLOR ID OFFSET
+def get_color_idx_offset(hierarchy_types):
+    if hierarchy_types == HIERARCHY_TYPES_WITHOUT_SSD:
+        return 0
+    elif hierarchy_types == HIERARCHY_TYPES_WITH_SSD:
+        return 2
+    else:
+        LOG.error("Invalid hierarchy types")
+
+def create_latency_line_chart(datasets,hierarchy_types):
     fig = plot.figure()
     ax1 = fig.add_subplot(111)
 
@@ -515,6 +535,8 @@ def create_latency_line_chart(datasets):
     x_values = [LATENCY_TYPES_STRINGS[i] for i in LATENCY_EXP_LATENCY_TYPES]
     N = len(x_values)
     ind = np.arange(N)
+
+    color_idx_offset = get_color_idx_offset(hierarchy_types)
 
     idx = 0
     for group in range(len(datasets)):
@@ -526,9 +548,9 @@ def create_latency_line_chart(datasets):
                     y_values.append(datasets[group][line][col])
         LOG.info("group_data = %s", str(y_values))
         ax1.plot(ind + 0.5, y_values,
-                 color=OPT_COLORS[idx],
+                 color=OPT_COLORS[idx + color_idx_offset],
                  linewidth=OPT_LINE_WIDTH,
-                 marker=OPT_MARKERS[idx],
+                 marker=OPT_MARKERS[idx + color_idx_offset],
                  markersize=OPT_MARKER_SIZE,
                  label=str(group))
         idx = idx + 1
@@ -672,11 +694,17 @@ def create_cache_line_chart(datasets):
 # PLOT HELPERS
 ###################################################################################
 
-# LATENCY -- PLOT
-def latency_plot():
+# GET HIERARCHY TYPE
+def get_hierarchy_types(hierarchy_types):
+    if hierarchy_types == HIERARCHY_TYPES_WITHOUT_SSD:
+        return "without_ssd"
+    elif hierarchy_types == HIERARCHY_TYPES_WITH_SSD:
+        return "with_ssd"
+    else: 
+        LOG.error("Invalid hierarchy types")
 
-    # CLEAN UP RESULT DIR
-    clean_up_dir(LATENCY_PLOT_DIR)
+# LATENCY -- PLOT
+def latency_plot(hierarchy_types):
 
     for trace_type in LATENCY_EXP_BENCHMARK_TYPES:
         LOG.info(MAJOR_STRING)
@@ -685,10 +713,9 @@ def latency_plot():
             LOG.info(MINOR_STRING)
 
             for size_type in LATENCY_EXP_SIZE_TYPES:
-                LOG.info(SUB_MINOR_STRING)
 
                 datasets = []
-                for hierarchy_type in LATENCY_EXP_HIERARCHY_TYPES:
+                for hierarchy_type in hierarchy_types:
 
                     # Get result file
                     result_dir_list = [BENCHMARK_TYPES_STRINGS[trace_type],
@@ -700,12 +727,13 @@ def latency_plot():
                     dataset = loadDataFile(result_file)
                     datasets.append(dataset)
 
-                fig = create_latency_line_chart(datasets)
+                fig = create_latency_line_chart(datasets,hierarchy_types)
 
                 file_name = LATENCY_PLOT_DIR + "latency" + "-" + \
                             BENCHMARK_TYPES_STRINGS[trace_type] + "-" + \
                             CACHING_TYPES_STRINGS[caching_type] + "-" + \
-                            str(size_type) + ".pdf"
+                            str(size_type) + "-" + \
+                            get_hierarchy_types(hierarchy_types) + ".pdf"
 
                 saveGraph(fig, file_name, width=OPT_GRAPH_WIDTH, height=OPT_GRAPH_HEIGHT)
 
@@ -722,7 +750,6 @@ def size_plot():
             LOG.info(MINOR_STRING)
 
             for latency_type in SIZE_EXP_LATENCY_TYPES:
-                LOG.info(SUB_MINOR_STRING)
 
                 for hierarchy_type in SIZE_EXP_HIERARCHY_TYPES:
                     datasets = []
@@ -760,7 +787,6 @@ def cache_plot():
             LOG.info(MINOR_STRING)
 
             for size_type in CACHE_EXP_SIZE_TYPES:
-                LOG.info(SUB_MINOR_STRING)
 
                 datasets = []
                 for hierarchy_type in CACHE_EXP_HIERARCHY_TYPES:
@@ -1120,7 +1146,9 @@ if __name__ == '__main__':
     ## PLOTTING GROUP
 
     if args.latency_plot:
-        latency_plot()
+        clean_up_dir(LATENCY_PLOT_DIR)
+        latency_plot(HIERARCHY_TYPES_WITHOUT_SSD)
+        latency_plot(HIERARCHY_TYPES_WITH_SSD)
 
     if args.size_plot:
         size_plot()
