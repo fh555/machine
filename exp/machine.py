@@ -379,9 +379,6 @@ def get_upper_bound(n):
 
 ## MAKE GRID
 def makeGrid(ax):
-    axes = ax.get_axes()
-    axes.yaxis.grid(linestyle='dashed')
-    axes.xaxis.grid(linestyle='dashed')
     for axis in ['top','bottom','left','right']:
             ax.spines[axis].set_linewidth(AXIS_LINEWIDTH)
     ax.set_axisbelow(True)
@@ -399,7 +396,7 @@ def saveGraph(fig, output, width, height):
     LOG.debug("New Size Inches: %s, DPI: %d" % (str(new_size), new_dpi))
 
     pp = PdfPages(output)
-    fig.savefig(pp, facecolor=OPT_GRID_COLOR, format='pdf', bbox_inches='tight')
+    fig.savefig(pp, format='pdf', bbox_inches='tight')
     pp.close()
     LOG.info("OUTPUT: %s", output)
 
