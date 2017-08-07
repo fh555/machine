@@ -48,7 +48,6 @@ SUB_MINOR_STRING = "******\n"
 ###################################################################################
 
 BASE_DIR = os.path.dirname(__file__)
-OPT_FONT_NAME = 'Helvetica'
 OPT_GRAPH_HEIGHT = 150
 OPT_GRAPH_WIDTH = 400
 
@@ -60,7 +59,7 @@ COLOR_MAP_2 = ( '#262626', '#FECEA8', '#67abb8', '#f15b40')
 
 OPT_COLORS = COLOR_MAP
 
-OPT_GRID_COLOR = 'gray'
+OPT_GRID_COLOR = '#EEEEEE' # gray
 OPT_LEGEND_SHADOW = False
 OPT_MARKERS = (['o', 's', 'v', "^", "h", "v", ">", "x", "d", "<", "|", "", "|", "_"])
 OPT_PATTERNS = ([ "////", "o", "\\\\" , ".", "\\\\\\"])
@@ -68,12 +67,16 @@ OPT_PATTERNS = ([ "////", "o", "\\\\" , ".", "\\\\\\"])
 OPT_STACK_COLORS = ('#2b3742', '#c9b385', '#610606', '#1f1501')
 OPT_LINE_STYLES= ('-', ':', '--', '-.')
 
-# SET FONT
+# SET STYLE AND FONT
+
+# bmh, ggplot, fivethirtyeight
+# seaborn-deep, seaborn-pastel and seaborn-white
+OPT_STYLE = 'bmh' 
 
 OPT_LABEL_WEIGHT = 'bold'
 OPT_LINE_COLORS = COLOR_MAP
-OPT_LINE_WIDTH = 6.0
-OPT_MARKER_SIZE = 10.0
+OPT_LINE_WIDTH = 4.0
+OPT_MARKER_SIZE = 5.0
 
 AXIS_LINEWIDTH = 1.3
 BAR_LINEWIDTH = 1.2
@@ -89,6 +92,9 @@ SMALL_LEGEND_FONT_SIZE = 10
 XAXIS_MIN = 0.25
 XAXIS_MAX = 3.75
 
+# SET STYLE
+plot.style.use(OPT_STYLE)
+
 # SET TYPE1 FONTS
 matplotlib.rcParams['ps.useafm'] = True
 matplotlib.rcParams['pdf.use14corefonts'] = True
@@ -98,6 +104,8 @@ matplotlib.rcParams['text.latex.preamble']= [
     r'\usepackage{sansmath}',  # load up the sansmath so that math -> helvet
     r'\sansmath'               # <- tricky! -- gotta actually tell tex to use!
 ]
+matplotlib.rcParams['font.serif'] = 'Ubuntu'
+matplotlib.rcParams['font.monospace'] = 'Ubuntu Mono'
 
 LABEL_FP = FontProperties(style='normal', size=LABEL_FONT_SIZE, weight='bold')
 TICK_FP = FontProperties(style='normal', size=TICK_FONT_SIZE)
@@ -257,13 +265,13 @@ BENCHMARK_TYPES_DIRS = {
 
 BENCHMARK_TYPES = [
     BENCHMARK_TYPE_TPCC,
-    BENCHMARK_TYPE_VOTER,
-    BENCHMARK_TYPE_YCSB,
-    BENCHMARK_TYPE_YCSB_READ,
-    BENCHMARK_TYPE_YCSB_INSERT,
-    BENCHMARK_TYPE_CHBENCHMARK,
-    BENCHMARK_TYPE_AUCTIONMARK,
-    BENCHMARK_TYPE_SMALLBANK
+#    BENCHMARK_TYPE_VOTER,
+#    BENCHMARK_TYPE_YCSB,
+#    BENCHMARK_TYPE_YCSB_READ,
+#    BENCHMARK_TYPE_YCSB_INSERT,
+#    BENCHMARK_TYPE_CHBENCHMARK,
+#    BENCHMARK_TYPE_AUCTIONMARK,
+#    BENCHMARK_TYPE_SMALLBANK
 ]
 
 ## OUTPUT
@@ -372,7 +380,8 @@ def get_upper_bound(n):
 ## MAKE GRID
 def makeGrid(ax):
     axes = ax.get_axes()
-    axes.yaxis.grid(True, color=OPT_GRID_COLOR)
+    axes.yaxis.grid(linestyle='dashed')
+    axes.xaxis.grid(linestyle='dashed')
     for axis in ['top','bottom','left','right']:
             ax.spines[axis].set_linewidth(AXIS_LINEWIDTH)
     ax.set_axisbelow(True)
@@ -390,7 +399,7 @@ def saveGraph(fig, output, width, height):
     LOG.debug("New Size Inches: %s, DPI: %d" % (str(new_size), new_dpi))
 
     pp = PdfPages(output)
-    fig.savefig(pp, format='pdf', bbox_inches='tight')
+    fig.savefig(pp, facecolor=OPT_GRID_COLOR, format='pdf', bbox_inches='tight')
     pp.close()
     LOG.info("OUTPUT: %s", output)
 
@@ -1121,6 +1130,8 @@ if __name__ == '__main__':
 
     if args.cache_plot:
         cache_plot()
+
+    plot.style.available
 
     ## LEGEND GROUP
 
