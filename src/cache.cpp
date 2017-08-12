@@ -138,14 +138,17 @@ void CACHE_TEMPLATE_TYPE::Print() const {
   std::cout << "OCCUPIED: " << (current_size * 100)/capacity_ << " %\n";
 
   size_t block_itr = 0;
+  size_t print_block_count = 0;
   for(auto& cache_item : cache_items_map){
-    std::cout << cache_item.first << CleanStatus(cache_item.second) << " ";
-    if(block_itr++ > 100){
+    if(block_itr++ >= print_block_count){
       break;
     }
+    std::cout << cache_item.first << CleanStatus(cache_item.second) << " ";
   }
 
-  std::cout << "\n-------------------------------\n";
+  if(print_block_count > 0) {
+    std::cout << "-------------------------------\n";
+  }
 
 }
 

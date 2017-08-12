@@ -318,6 +318,27 @@ void Copy(std::vector<Device>& devices,
 
 }
 
+size_t GetSizeRatio(const SizeRatioType& size_ratio){
+
+  switch (size_ratio) {
+     case SIZE_RATIO_TYPE_1:
+       return 1;
+     case SIZE_RATIO_TYPE_2:
+       return 4;
+     case SIZE_RATIO_TYPE_3:
+       return 16;
+     case SIZE_RATIO_TYPE_4:
+       return 64;
+     case SIZE_RATIO_TYPE_5:
+       return 256;
+     case SIZE_RATIO_TYPE_6:
+       return 1024;
+     default:
+       return -1;
+   }
+
+}
+
 void MoveVictim(std::vector<Device>& devices,
                 DeviceType source,
                 const size_t& block_id,
@@ -404,7 +425,7 @@ Device DeviceFactory::GetDevice(const DeviceType& device_type,
 
   // Setup size of NVM device
   device_size[DEVICE_TYPE_NVM] = device_size[DEVICE_TYPE_DRAM];
-  device_size[DEVICE_TYPE_NVM] *= state.size_ratio_type;
+  device_size[DEVICE_TYPE_NVM] *= GetSizeRatio(state.size_ratio_type);
 
   switch (device_type){
     case DEVICE_TYPE_CACHE:

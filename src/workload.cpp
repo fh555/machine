@@ -179,6 +179,8 @@ void PrintWorkload(const std::map<size_t, size_t>& block_map){
                    frequency_map);
   }
 
+  std::cout << "\n";
+
 }
 
 DeviceType LocateInMemoryDevices(const size_t& block_id){
