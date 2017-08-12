@@ -24,6 +24,9 @@ class configuration {
   // size type
   SizeType size_type;
 
+  // size ratio type
+  SizeRatioType size_ratio_type;
+
   // latency type
   LatencyType latency_type;
 

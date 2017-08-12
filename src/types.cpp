@@ -67,21 +67,38 @@ std::string SizeTypeToString(const SizeType& size_type){
 
   switch (size_type) {
     case SIZE_TYPE_1:
-      return "1";
+      return "SIZE-1";
     case SIZE_TYPE_2:
-      return "2";
+      return "SIZE-2";
     case SIZE_TYPE_3:
-      return "3";
+      return "SIZE-3";
     case SIZE_TYPE_4:
-      return "4";
+      return "SIZE-4";
     case SIZE_TYPE_5:
-      return "5";
+      return "SIZE-5";
     case SIZE_TYPE_6:
-      return "6";
-    case SIZE_TYPE_7:
-      return "7";
-    case SIZE_TYPE_8:
-      return "8";
+      return "SIZE-6";
+    default:
+      return "INVALID";
+  }
+
+}
+
+std::string SizeRatioTypeToString(const SizeRatioType& size_ratio_type){
+
+  switch (size_ratio_type) {
+    case SIZE_RATIO_TYPE_1:
+      return "RATIO-1";
+    case SIZE_RATIO_TYPE_2:
+      return "RATIO-2";
+    case SIZE_RATIO_TYPE_3:
+      return "RATIO-3";
+    case SIZE_RATIO_TYPE_4:
+      return "RATIO-4";
+    case SIZE_RATIO_TYPE_5:
+      return "RATIO-5";
+    case SIZE_RATIO_TYPE_6:
+      return "RATIO-6";
     default:
       return "INVALID";
   }

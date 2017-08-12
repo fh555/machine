@@ -354,8 +354,7 @@ void MoveVictim(std::vector<Device>& devices,
 // DEVICE FACTORY
 
 Device DeviceFactory::GetDevice(const DeviceType& device_type,
-                                const SizeType& size_type,
-                                const CachingType& caching_type,
+                                const configuration& state,
                                 const DeviceType& last_device_type){
 
   // SIZES (4K blocks)
@@ -365,49 +364,47 @@ Device DeviceFactory::GetDevice(const DeviceType& device_type,
   device_size[DEVICE_TYPE_CACHE] = 8;
   device_size[DEVICE_TYPE_SSD] = 32 * 1024;
 
-  switch(size_type){
+  switch(state.size_type){
 
     case SIZE_TYPE_1: {
       device_size[DEVICE_TYPE_DRAM] = 4;
-      device_size[DEVICE_TYPE_NVM] = 16;
       break;
     }
 
     case SIZE_TYPE_2: {
       device_size[DEVICE_TYPE_DRAM] = 16;
-      device_size[DEVICE_TYPE_NVM] = 64;
       break;
     }
 
     case SIZE_TYPE_3: {
       device_size[DEVICE_TYPE_DRAM] = 64;
-      device_size[DEVICE_TYPE_NVM] = 256;
       break;
     }
 
     case SIZE_TYPE_4: {
       device_size[DEVICE_TYPE_DRAM] = 256;
-      device_size[DEVICE_TYPE_NVM] = 1024;
       break;
     }
 
     case SIZE_TYPE_5: {
       device_size[DEVICE_TYPE_DRAM] = 1024;
-      device_size[DEVICE_TYPE_NVM] = 4096;
       break;
     }
 
     case SIZE_TYPE_6: {
       device_size[DEVICE_TYPE_DRAM] = 4096;
-      device_size[DEVICE_TYPE_NVM] = 16384;
       break;
     }
 
     default:{
-      std::cout << "Invalid size type: " << size_type << "\n";
+      std::cout << "Invalid size type: " << state.size_type << "\n";
       exit(EXIT_FAILURE);
     }
   }
+
+  // Setup size of NVM device
+  device_size[DEVICE_TYPE_NVM] = device_size[DEVICE_TYPE_DRAM];
+  device_size[DEVICE_TYPE_NVM] *= state.size_ratio_type;
 
   switch (device_type){
     case DEVICE_TYPE_CACHE:
@@ -420,7 +417,7 @@ Device DeviceFactory::GetDevice(const DeviceType& device_type,
         size = 1024 * 1024;
       }
       return Device(device_type,
-                    caching_type,
+                    state.caching_type,
                     size * scale_factor
       );
     }

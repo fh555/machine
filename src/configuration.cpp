@@ -15,6 +15,7 @@ void Usage() {
       "Command line options : machine <options>\n"
       "   -a --hierarchy_type                 :  hierarchy type\n"
       "   -s --size_type                      :  size type\n"
+      "   -r --size_ratio_type                :  size ratio type\n"
       "   -l --latency_type                   :  latency type\n"
       "   -c --caching_type                   :  caching type\n"
       "   -f --file_name                      :  file name\n"
@@ -28,6 +29,7 @@ void Usage() {
 static struct option opts[] = {
     {"hierarchy_type", optional_argument, NULL, 'a'},
     {"size_type", optional_argument, NULL, 's'},
+    {"size_ratio_type", optional_argument, NULL, 'r'},
     {"latency_type", optional_argument, NULL, 'l'},
     {"caching_type", optional_argument, NULL, 'c'},
     {"file_name", optional_argument, NULL, 'f'},
@@ -50,7 +52,7 @@ static void ValidateHierarchyType(const configuration &state) {
 }
 
 static void ValidateSizeType(const configuration &state) {
-  if (state.size_type < 1 || state.size_type > 6) {
+  if (state.size_type < 1 || state.size_type > SIZE_TYPE_MAX) {
     printf("Invalid size_type :: %d\n", state.size_type);
     exit(EXIT_FAILURE);
   }
@@ -60,8 +62,19 @@ static void ValidateSizeType(const configuration &state) {
   }
 }
 
+static void ValidateSizeRatioType(const configuration &state) {
+  if (state.size_ratio_type < 1 || state.size_ratio_type > SIZE_RATIO_TYPE_MAX) {
+    printf("Invalid size_ratio_type :: %d\n", state.size_ratio_type);
+    exit(EXIT_FAILURE);
+  }
+  else {
+    printf("%30s : %s\n", "size_ratio_type",
+           SizeRatioTypeToString(state.size_ratio_type).c_str());
+  }
+}
+
 static void ValidateCachingType(const configuration &state) {
-  if (state.caching_type < 1 || state.caching_type > 4) {
+  if (state.caching_type < 1 || state.caching_type > CACHING_TYPE_MAX) {
     printf("Invalid caching_type :: %d\n", state.caching_type);
     exit(EXIT_FAILURE);
   }
@@ -80,7 +93,7 @@ static void ValidateSummaryFile(const configuration &state){
 }
 
 static void ValidateLatencyType(const configuration &state) {
-  if (state.latency_type < 1 || state.latency_type > 6) {
+  if (state.latency_type < 1 || state.latency_type > LATENCY_TYPE_MAX) {
     printf("Invalid latency_type :: %d\n", state.latency_type);
     exit(EXIT_FAILURE);
   }
@@ -160,20 +173,16 @@ void ConstructDeviceList(configuration &state){
 
   auto last_device_type = GetLastDevice(state.hierarchy_type);
   Device cache_device = DeviceFactory::GetDevice(DEVICE_TYPE_CACHE,
-                                                 state.size_type,
-                                                 state.caching_type,
+                                                 state,
                                                  last_device_type);
   Device dram_device = DeviceFactory::GetDevice(DEVICE_TYPE_DRAM,
-                                                state.size_type,
-                                                state.caching_type,
+                                                state,
                                                 last_device_type);
   Device nvm_device = DeviceFactory::GetDevice(DEVICE_TYPE_NVM,
-                                               state.size_type,
-                                               state.caching_type,
+                                               state,
                                                last_device_type);
   Device ssd_device = DeviceFactory::GetDevice(DEVICE_TYPE_SSD,
-                                               state.size_type,
-                                               state.caching_type,
+                                               state,
                                                last_device_type);
 
   switch (state.hierarchy_type) {
@@ -224,6 +233,7 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
 
   state.hierarchy_type = HIERARCHY_TYPE_DRAM_NVM_SSD;
   state.size_type = SIZE_TYPE_1;
+  state.size_ratio_type = SIZE_RATIO_TYPE_1;
   state.caching_type = CACHING_TYPE_LRU;
   state.latency_type = LATENCY_TYPE_1;
   state.migration_frequency = 3;
@@ -234,7 +244,7 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
   while (1) {
     int idx = 0;
     int c = getopt_long(argc, argv,
-                        "a:c:f:m:l:o:s:vz:h",
+                        "a:c:f:m:l:o:r:s:vz:h",
                         opts, &idx);
 
     if (c == -1) break;
@@ -257,6 +267,9 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
         break;
       case 'o':
         state.operation_count = atoi(optarg);
+        break;
+      case 'r':
+        state.size_ratio_type = (SizeRatioType)atoi(optarg);
         break;
       case 's':
         state.size_type = (SizeType)atoi(optarg);
@@ -284,6 +297,7 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
 
   ValidateHierarchyType(state);
   ValidateSizeType(state);
+  ValidateSizeRatioType(state);
   ValidateLatencyType(state);
   ValidateCachingType(state);
   ValidateFileName(state);

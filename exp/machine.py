@@ -470,7 +470,7 @@ def create_legend_hierarchy_type():
                      handleheight=1, handlelength=3)
 
     figlegend.savefig(LEGEND_PLOT_DIR + 'legend_hierarchy_type.pdf')
-
+    
 def create_legend_hierarchy_skip_nvm_only_type():
     fig = pylab.figure()
     ax1 = fig.add_subplot(111)

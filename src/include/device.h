@@ -65,8 +65,7 @@ class DeviceFactory {
   virtual ~DeviceFactory();
 
   static Device GetDevice(const DeviceType& device_type,
-                          const SizeType& size_type,
-                          const CachingType& caching_type,
+                          const configuration& state,
                           const DeviceType& last_device_type);
 
 };
