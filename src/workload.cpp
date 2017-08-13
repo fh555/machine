@@ -149,15 +149,20 @@ void PrintWorkload(const std::map<size_t, size_t>& block_map){
     total_frequency += frequency;
   }
 
-  /*
   std::cout << "FREQUENCY DISTRIBUTION \n";
   for(auto frequency : frequency_map){
-    std::cout << "Frequency : " << std::setw(5)
-    << (frequency.first) << " - "
-    << " Block Count: " << frequency.second << "\n";
+    if(frequency.second > 1000){
+      std::cout << "Frequency : " << std::setw(5)
+      << (frequency.first) << " - "
+      << " Block Count: " << frequency.second << " ";
+
+      if(frequency.second == 1){
+        std::cout << "Block: " << frequency.first;
+      }
+      std::cout << "\n";
+    }
   }
   std::cout << "\n";
-  */
 
   // SPACE REQUIRED TO COVER A FRACTION OF WORKING SET
   std::vector<size_t> percents = {10, 25, 50, 75, 90};
