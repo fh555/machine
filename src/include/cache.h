@@ -19,6 +19,8 @@ struct Block{
   size_t block_type;
 };
 
+void PrintCapacity(const size_t block_count);
+
 // Base class for all caching algorithms
 template <typename Key, typename Value, typename Policy>
 class Cache {

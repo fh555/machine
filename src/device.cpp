@@ -378,7 +378,7 @@ Device DeviceFactory::GetDevice(const DeviceType& device_type,
   size_t scale_factor = 1000 / 4;
 
   // CACHE size
-  device_size[DEVICE_TYPE_CACHE] = 16;
+  device_size[DEVICE_TYPE_CACHE] = 32;
 
   // SSD size
   device_size[DEVICE_TYPE_DISK] = 64 * 1024;
@@ -387,22 +387,22 @@ Device DeviceFactory::GetDevice(const DeviceType& device_type,
   switch(state.size_type){
 
     case SIZE_TYPE_1: {
-      device_size[DEVICE_TYPE_DRAM] = 128;
+      device_size[DEVICE_TYPE_DRAM] = 1024;
       break;
     }
 
     case SIZE_TYPE_2: {
-      device_size[DEVICE_TYPE_DRAM] = 512;
+      device_size[DEVICE_TYPE_DRAM] = 1024 * 2;
       break;
     }
 
     case SIZE_TYPE_3: {
-      device_size[DEVICE_TYPE_DRAM] = 2048;
+      device_size[DEVICE_TYPE_DRAM] = 1024 * 4;
       break;
     }
 
     case SIZE_TYPE_4: {
-      device_size[DEVICE_TYPE_DRAM] = 8096;
+      device_size[DEVICE_TYPE_DRAM] = 1024 * 16;
       break;
     }
 

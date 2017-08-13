@@ -89,17 +89,8 @@ void PrintRequiredBlocks(size_t percent,
 
   std::cout << "PERCENT: " << percent << " ";
   std::cout << "BLOCKS NEEDED: ";
-  auto capacity = (current_total_blocks * super_block_factor);
-  if(capacity < 1024) {
-    std::cout << "[" << capacity <<" KB] ";
-  }
-  else if(capacity < 1024 * 1024){
-    std::cout << "[" << capacity/1024 <<" MB] ";
-  }
-  else {
-    std::cout << "[" << capacity/(1024 * 1024) <<" GB] ";
-  }
-  std::cout  << "\n";
+  PrintCapacity(current_total_blocks);
+  std::cout << "\n";
 
 }
 
@@ -125,16 +116,7 @@ void PrintFrequency(size_t available_blocks,
   auto captured_frequency = (current_total_frequency * 100)/total_frequency;
 
   std::cout << "AVAILABLE BLOCKS: ";
-  auto capacity = (available_blocks * super_block_factor);
-  if(capacity < 1024) {
-    std::cout << "[" << capacity <<" KB] ";
-  }
-  else if(capacity < 1024 * 1024){
-    std::cout << "[" << capacity/1024 <<" MB] ";
-  }
-  else {
-    std::cout << "[" << capacity/(1024 * 1024) <<" GB] ";
-  }
+  PrintCapacity(available_blocks);
 
   std::cout << " PERCENT: " << captured_frequency << "%\n";
 }

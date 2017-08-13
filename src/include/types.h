@@ -72,8 +72,6 @@ enum DeviceType {
 
 };
 
-static const int super_block_factor = 128;
-
 DeviceType GetLastDevice(const HierarchyType& hierarchy_type);
 
 std::string HierarchyTypeToString(const HierarchyType& hierarchy_type);

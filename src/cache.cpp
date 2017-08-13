@@ -12,6 +12,23 @@
 
 namespace machine {
 
+void PrintCapacity(const size_t block_count){
+
+  // 1 block == 4 KB
+  size_t capacity = block_count * 4;
+
+  if(capacity < 1024) {
+    std::cout << "[" << capacity <<" KB] ";
+  }
+  else if(capacity < 1024 * 1024){
+    std::cout << "[" << capacity/1024 <<" MB] ";
+  }
+  else {
+    std::cout << "[" << capacity/(1024 * 1024) <<" GB] ";
+  }
+
+}
+
 #define CACHE_TEMPLATE_ARGUMENT \
     template <typename Key, typename Value, typename Policy>
 

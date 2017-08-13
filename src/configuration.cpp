@@ -188,7 +188,7 @@ void ConstructDeviceList(configuration &state){
     break;
     case HIERARCHY_TYPE_DRAM_DISK: {
       state.devices = {cache_device, dram_device, disk_device};
-      state.memory_devices = {cache_device, dram_device, disk_device};
+      state.memory_devices = {cache_device, dram_device};
       state.storage_devices = {disk_device};
     }
     break;

@@ -9,7 +9,7 @@ StorageCache::StorageCache(DeviceType device_type,
                            size_t capacity) :
                            device_type_(device_type),
                            caching_type_(caching_type),
-                           capacity_(capacity/super_block_factor){
+                           capacity_(capacity){
 
   switch(caching_type_){
 
