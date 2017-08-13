@@ -450,16 +450,7 @@ def get_label(label):
     bold_label = "\\textbf{" + label + "}"
     return bold_label
 
-# GET HIERARCHY TYPE COLOR ID OFFSET
-def get_color_idx_offset(hierarchy_types):
-    if hierarchy_types == HIERARCHY_TYPES_WITHOUT_SSD:
-        return 0
-    elif hierarchy_types == HIERARCHY_TYPES_WITH_SSD:
-        return 2
-    else:
-        LOG.error("Invalid hierarchy types")
-
-def create_latency_line_chart(datasets,hierarchy_types):
+def create_latency_line_chart(datasets):
     fig = plot.figure()
     ax1 = fig.add_subplot(111)
 
@@ -467,8 +458,6 @@ def create_latency_line_chart(datasets,hierarchy_types):
     x_values = [LATENCY_TYPES_STRINGS[i] for i in LATENCY_EXP_LATENCY_TYPES]
     N = len(x_values)
     ind = np.arange(N)
-
-    color_idx_offset = get_color_idx_offset(hierarchy_types)
 
     idx = 0
     for group in range(len(datasets)):
@@ -480,9 +469,9 @@ def create_latency_line_chart(datasets,hierarchy_types):
                     y_values.append(datasets[group][line][col])
         LOG.info("group_data = %s", str(y_values))
         ax1.plot(ind + 0.5, y_values,
-                 color=OPT_COLORS[idx + color_idx_offset],
+                 color=OPT_COLORS[idx],
                  linewidth=OPT_LINE_WIDTH,
-                 marker=OPT_MARKERS[idx + color_idx_offset],
+                 marker=OPT_MARKERS[idx],
                  markersize=OPT_MARKER_SIZE,
                  label=str(group))
         idx = idx + 1
@@ -491,12 +480,12 @@ def create_latency_line_chart(datasets,hierarchy_types):
     makeGrid(ax1)
 
     # Y-AXIS
-    YAXIS_MIN = 0
+    #YAXIS_MIN = 0
     ax1.yaxis.set_major_locator(LinearLocator(YAXIS_TICKS))
     ax1.minorticks_off()
     ax1.set_ylabel(get_label('Throughput (ops)'), fontproperties=LABEL_FP)
-    ax1.set_ylim(bottom=YAXIS_MIN)
-    #ax1.set_yscale('log', nonposy='clip')
+    #ax1.set_ylim(bottom=YAXIS_MIN)
+    ax1.set_yscale('log', nonposy='clip')
 
     # X-AXIS
     ax1.set_xticks(ind + 0.5)
@@ -511,14 +500,14 @@ def create_latency_line_chart(datasets,hierarchy_types):
 
     return fig
 
-def create_size_bar_chart(datasets, hierarchy_type):
+def create_size_bar_chart(datasets):
     fig = plot.figure()
     ax1 = fig.add_subplot(111)
 
     # X-AXIS
     x_values = [str(chr(ord('A') + i - 1)) for i in SIZE_EXP_SIZE_TYPES]
     N = len(x_values)
-    M = 1
+    M = 3
     ind = np.arange(N)
     margin = 0.1
     width = (1.-2.*margin)/M
@@ -544,16 +533,13 @@ def create_size_bar_chart(datasets, hierarchy_type):
     makeGrid(ax1)
 
     # Y-AXIS
-    YAXIS_MIN = 0
-    YAXIS_MAX = 20000
-    if hierarchy_type != HIERARCHY_TYPE_DRAM_NVM:
-        YAXIS_MAX = 7500
-
     ax1.yaxis.set_major_locator(LinearLocator(YAXIS_TICKS))
     ax1.minorticks_off()
     ax1.set_ylabel(get_label('Throughput (ops)'), fontproperties=LABEL_FP)
-    ax1.set_ylim(bottom=YAXIS_MIN, top=YAXIS_MAX)
-    #ax1.set_yscale('log', nonposy='clip')
+    #YAXIS_MIN = 0
+    #YAXIS_MAX = 50000
+    #ax1.set_ylim(bottom=YAXIS_MIN, top=YAXIS_MAX)
+    ax1.set_yscale('log', nonposy='clip')
 
     # X-AXIS
     ax1.set_xticks(ind + 0.5)
@@ -599,13 +585,13 @@ def create_cache_line_chart(datasets):
     makeGrid(ax1)
 
     # Y-AXIS
-    YAXIS_MIN = 0
-    YAXIS_MAX = 24000
     ax1.yaxis.set_major_locator(LinearLocator(YAXIS_TICKS))
     ax1.minorticks_off()
     ax1.set_ylabel(get_label('Throughput (ops)'), fontproperties=LABEL_FP)
-    ax1.set_ylim(bottom=YAXIS_MIN, top=YAXIS_MAX)
-    #ax1.set_yscale('log', nonposy='clip')
+    YAXIS_MIN = 0
+    YAXIS_MAX = 24000
+    #ax1.set_ylim(bottom=YAXIS_MIN, top=YAXIS_MAX)
+    ax1.set_yscale('log', nonposy='clip')
 
     # X-AXIS
     XAXIS_MIN = 0.25
@@ -653,7 +639,7 @@ def latency_plot():
                     dataset = loadDataFile(result_file)
                     datasets.append(dataset)
 
-                fig = create_latency_line_chart(datasets,hierarchy_types)
+                fig = create_latency_line_chart(datasets)
 
                 file_name = LATENCY_PLOT_DIR + "latency" + "-" + \
                             BENCHMARK_TYPES_STRINGS[trace_type] + "-" + \
@@ -677,8 +663,8 @@ def size_plot():
 
             for latency_type in SIZE_EXP_LATENCY_TYPES:
 
+                datasets = []
                 for hierarchy_type in SIZE_EXP_HIERARCHY_TYPES:
-                    datasets = []
 
                     # Get result file
                     result_dir_list = [BENCHMARK_TYPES_STRINGS[trace_type],
@@ -690,15 +676,14 @@ def size_plot():
                     dataset = loadDataFile(result_file)
                     datasets.append(dataset)
 
-                    fig = create_size_bar_chart(datasets, hierarchy_type)
+                fig = create_size_bar_chart(datasets)
 
-                    file_name = SIZE_PLOT_DIR + "size" + "-" + \
-                                BENCHMARK_TYPES_STRINGS[trace_type] + "-" + \
-                                HIERARCHY_TYPES_STRINGS[hierarchy_type] + "-" + \
-                                CACHING_TYPES_STRINGS[caching_type] + "-" + \
-                                str(latency_type) + ".pdf"
+                file_name = SIZE_PLOT_DIR + "size" + "-" + \
+                            BENCHMARK_TYPES_STRINGS[trace_type] + "-" + \
+                            CACHING_TYPES_STRINGS[caching_type] + "-" + \
+                            str(latency_type) + ".pdf"
 
-                    saveGraph(fig, file_name, width=OPT_GRAPH_WIDTH, height=OPT_GRAPH_HEIGHT)
+                saveGraph(fig, file_name, width=OPT_GRAPH_WIDTH, height=OPT_GRAPH_HEIGHT)
 
 # CACHE -- PLOT
 def cache_plot():
