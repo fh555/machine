@@ -51,6 +51,9 @@ class configuration {
   // HDD mode
   bool hdd_mode;
 
+  // NVM bootstrap percent
+  int nvm_bootstrap_percent;
+
   // DERIVED BASED ON HIERARCHY TYPE
 
   // list of devices in hierarchy

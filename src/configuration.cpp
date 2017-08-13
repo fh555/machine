@@ -224,6 +224,7 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
   state.migration_frequency = 3;
   state.file_name = "";
   state.operation_count = 0;
+  state.nvm_bootstrap_percent = 90;
 
   // Parse args
   while (1) {
