@@ -20,6 +20,10 @@ struct Device {
     device_size(device_size),
     cache(device_type, caching_type, device_size){
     // Nothing to do here!
+
+    std::cout << "Initialize Device: " << DeviceTypeToString(device_type)
+        << " Capacity: " << (device_size / super_block_factor) << "\n";
+
   }
 
   // type of the device

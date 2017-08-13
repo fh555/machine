@@ -7,9 +7,9 @@ namespace machine {
 StorageCache::StorageCache(DeviceType device_type,
                            CachingType caching_type,
                            size_t capacity) :
-                                   device_type_(device_type),
-                                   caching_type_(caching_type),
-                                   capacity_(capacity){
+                           device_type_(device_type),
+                           caching_type_(caching_type),
+                           capacity_(capacity/super_block_factor){
 
   switch(caching_type_){
 
