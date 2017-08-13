@@ -154,12 +154,24 @@ SIZE_TYPE_2 = 2
 SIZE_TYPE_3 = 3
 SIZE_TYPE_4 = 4
 
-
 SIZE_TYPES = [
     SIZE_TYPE_1,
     SIZE_TYPE_2,
     SIZE_TYPE_3,
     SIZE_TYPE_4
+]
+
+## SIZE RATIO TYPES
+SIZE_RATIO_TYPE_1 = 1
+SIZE_RATIO_TYPE_2 = 2
+SIZE_RATIO_TYPE_3 = 3
+SIZE_RATIO_TYPE_4 = 4
+
+SIZE_RATIO_TYPES = [
+    SIZE_RATIO_TYPE_1,
+    SIZE_RATIO_TYPE_2,
+    SIZE_RATIO_TYPE_3,
+    SIZE_RATIO_TYPE_4
 ]
 
 ## LATENCY TYPES
@@ -256,6 +268,7 @@ SCALE_FACTOR = 10
 DEFAULT_DURATION = 10
 DEFAULT_HIERARCHY_TYPE = HIERARCHY_TYPE_NVM
 DEFAULT_SIZE_TYPE = SIZE_TYPE_2
+DEFAULT_SIZE_RATIO_TYPE = SIZE_RATIO_TYPE_3
 DEFAULT_CACHING_TYPE = CACHING_TYPE_LRU
 DEFAULT_LATENCY_TYPE = LATENCY_TYPE_2
 DEFAULT_BENCHMARK_TYPE = BENCHMARK_TYPE_TPCC
@@ -981,6 +994,7 @@ def run_experiment(
     hierarchy_type=DEFAULT_HIERARCHY_TYPE,
     latency_type=DEFAULT_LATENCY_TYPE,
     size_type=DEFAULT_SIZE_TYPE,
+    size_ratio_type=DEFAULT_SIZE_RATIO_TYPE,
     caching_type=DEFAULT_CACHING_TYPE,
     trace_type=DEFAULT_BENCHMARK_TYPE,
     migration_frequency=DEFAULT_MIGRATION_FREQUENCY,
@@ -992,6 +1006,7 @@ def run_experiment(
     arg_list = [program,
                     "-a", str(hierarchy_type),
                     "-l", str(latency_type),
+                    "-r", str(size_ratio_type),
                     "-s", str(size_type),
                     "-c", str(caching_type),
                     "-f", BENCHMARK_TYPES_DIRS[trace_type],
