@@ -54,8 +54,9 @@ OPT_GRAPH_WIDTH = 400
 # Make a list by cycling through the colors you care about
 # to match the length of your data.
 NUM_COLORS = 5
-COLOR_MAP = ( '#418259', '#bd5632', '#e1a94c', '#7d6c5b', '#364d38', '#c4e1c6')
-COLOR_MAP_2 = ( '#262626', '#FECEA8', '#67abb8', '#f15b40')
+COLOR_MAP = ( '#556270', '#4ECDC4', '#C44D58', '#FF6B6B', '#C7F464')
+COLOR_MAP_2 = ( '#418259', '#bd5632', '#e1a94c', '#7d6c5b', '#364d38', '#c4e1c6')
+COLOR_MAP_3 = ( '#262626', '#FECEA8', '#67abb8', '#f15b40')
 
 OPT_COLORS = COLOR_MAP
 
@@ -75,8 +76,8 @@ OPT_STYLE = 'bmh'
 
 OPT_LABEL_WEIGHT = 'bold'
 OPT_LINE_COLORS = COLOR_MAP
-OPT_LINE_WIDTH = 4.0
-OPT_MARKER_SIZE = 5.0
+OPT_LINE_WIDTH = 6.0
+OPT_MARKER_SIZE = 10.0
 
 AXIS_LINEWIDTH = 1.3
 BAR_LINEWIDTH = 1.2
@@ -93,7 +94,7 @@ XAXIS_MIN = 0.25
 XAXIS_MAX = 3.75
 
 # SET STYLE
-plot.style.use(OPT_STYLE)
+#plot.style.use(OPT_STYLE)
 
 # SET TYPE1 FONTS
 matplotlib.rcParams['ps.useafm'] = True
@@ -412,14 +413,14 @@ def create_legend_hierarchy_type():
 
     LEGEND_VALUES = HIERARCHY_TYPES
 
-    figlegend = pylab.figure(figsize=(15, 0.5))
+    figlegend = pylab.figure(figsize=(10, 0.5))
     idx = 0
     lines = [None] * (len(LEGEND_VALUES) + 1)
     data = [1]
     x_values = [1]
 
     TITLE = "HIERARCHY TYPES:"
-    LABELS = [TITLE, "NVM", "DRAM-NVM", "DRAM-SSD", "NVM-SSD", "DRAM-NVM-SSD"]
+    LABELS = [TITLE, "NVM", "SSD", "NVM-SSD"]
 
     lines[idx], = ax1.plot(x_values, data, linewidth = 0)
     idx = 1
@@ -480,7 +481,6 @@ def create_latency_line_chart(datasets):
     makeGrid(ax1)
 
     # Y-AXIS
-    #YAXIS_MIN = 0
     ax1.yaxis.set_major_locator(LinearLocator(YAXIS_TICKS))
     ax1.minorticks_off()
     ax1.set_ylabel(get_label('Throughput (ops)'), fontproperties=LABEL_FP)
@@ -488,10 +488,12 @@ def create_latency_line_chart(datasets):
     ax1.set_yscale('log', nonposy='clip')
 
     # X-AXIS
+    XAXIS_MIN = 0.25
+    XAXIS_MAX = 3.75
     ax1.set_xticks(ind + 0.5)
     ax1.set_xlabel(get_label('Latency Types'), fontproperties=LABEL_FP)
     ax1.set_xticklabels(x_values)
-    #ax1.set_xlim([XAXIS_MIN, XAXIS_MAX])
+    ax1.set_xlim([XAXIS_MIN, XAXIS_MAX])
 
     for label in ax1.get_yticklabels() :
         label.set_fontproperties(TICK_FP)
@@ -536,8 +538,6 @@ def create_size_bar_chart(datasets):
     ax1.yaxis.set_major_locator(LinearLocator(YAXIS_TICKS))
     ax1.minorticks_off()
     ax1.set_ylabel(get_label('Throughput (ops)'), fontproperties=LABEL_FP)
-    #YAXIS_MIN = 0
-    #YAXIS_MAX = 50000
     #ax1.set_ylim(bottom=YAXIS_MIN, top=YAXIS_MAX)
     ax1.set_yscale('log', nonposy='clip')
 
@@ -588,14 +588,12 @@ def create_cache_line_chart(datasets):
     ax1.yaxis.set_major_locator(LinearLocator(YAXIS_TICKS))
     ax1.minorticks_off()
     ax1.set_ylabel(get_label('Throughput (ops)'), fontproperties=LABEL_FP)
-    YAXIS_MIN = 0
-    YAXIS_MAX = 24000
     #ax1.set_ylim(bottom=YAXIS_MIN, top=YAXIS_MAX)
     ax1.set_yscale('log', nonposy='clip')
 
     # X-AXIS
     XAXIS_MIN = 0.25
-    XAXIS_MAX = 3.75
+    XAXIS_MAX = 2.75
     ax1.set_xticks(ind + 0.5)
     ax1.set_xlabel(get_label('Caching Algorithm Types'), fontproperties=LABEL_FP)
     ax1.set_xticklabels(x_values)
