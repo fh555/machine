@@ -142,24 +142,26 @@ void PrintFrequency(size_t available_blocks,
 void PrintWorkload(const std::map<size_t, size_t>& block_map){
   std::map<size_t, size_t> frequency_map;
   size_t total_frequency = 0;
+  size_t frequency_threshold = 50000;
 
+  std::cout << "BLOCK FREQUENCY \n";
   for(auto entry: block_map){
     auto frequency = entry.second;
     frequency_map[frequency]++;
     total_frequency += frequency;
+    if(entry.second > frequency_threshold){
+      std::cout << "Block : " << entry.first << " - "
+          << " Frequency : " << entry.second << "\n";
+    }
   }
+  std::cout << "\n";
 
   std::cout << "FREQUENCY DISTRIBUTION \n";
   for(auto frequency : frequency_map){
-    if(frequency.second > 1000){
+    if(frequency.first > frequency_threshold){
       std::cout << "Frequency : " << std::setw(5)
       << (frequency.first) << " - "
-      << " Block Count: " << frequency.second << " ";
-
-      if(frequency.second == 1){
-        std::cout << "Block: " << frequency.first;
-      }
-      std::cout << "\n";
+      << " Block Count: " << frequency.second << "\n";
     }
   }
   std::cout << "\n";
