@@ -41,7 +41,7 @@ static struct option opts[] = {
 };
 
 static void ValidateHierarchyType(const configuration &state) {
-  if (state.hierarchy_type < 1 || state.hierarchy_type > 8) {
+  if (state.hierarchy_type < 1 || state.hierarchy_type > HIERARCHY_TYPE_MAX) {
     printf("Invalid hierarchy_type :: %d\n", state.hierarchy_type);
     exit(EXIT_FAILURE);
   }
@@ -137,24 +137,12 @@ void SetupNVMLatency(configuration &state){
     }
 
     case LATENCY_TYPE_3: {
-      state.nvm_read_latency = 2;
+      state.nvm_read_latency = 4;
       state.nvm_write_latency = 10;
       break;
     }
 
     case LATENCY_TYPE_4: {
-      state.nvm_read_latency = 4;
-      state.nvm_write_latency = 4;
-      break;
-    }
-
-    case LATENCY_TYPE_5: {
-      state.nvm_read_latency = 4;
-      state.nvm_write_latency = 10;
-      break;
-    }
-
-    case LATENCY_TYPE_6: {
       state.nvm_read_latency = 10;
       state.nvm_write_latency = 20;
       break;
@@ -175,9 +163,6 @@ void ConstructDeviceList(configuration &state){
   Device cache_device = DeviceFactory::GetDevice(DEVICE_TYPE_CACHE,
                                                  state,
                                                  last_device_type);
-  Device dram_device = DeviceFactory::GetDevice(DEVICE_TYPE_DRAM,
-                                                state,
-                                                last_device_type);
   Device nvm_device = DeviceFactory::GetDevice(DEVICE_TYPE_NVM,
                                                state,
                                                last_device_type);
@@ -192,30 +177,15 @@ void ConstructDeviceList(configuration &state){
       state.storage_devices = {nvm_device};
     }
     break;
-    case HIERARCHY_TYPE_DRAM_NVM: {
-      state.devices = {cache_device, dram_device, nvm_device};
-      state.memory_devices = {cache_device, dram_device, nvm_device};
-      state.storage_devices = {nvm_device};
-    }
-    break;
-    case HIERARCHY_TYPE_DRAM_SSD:
-    case HIERARCHY_TYPE_DRAM_HDD: {
-      state.devices = {cache_device, dram_device, ssd_device};
-      state.memory_devices = {cache_device, dram_device};
+    case HIERARCHY_TYPE_SSD: {
+      state.devices = {cache_device, ssd_device};
+      state.memory_devices = {cache_device};
       state.storage_devices = {ssd_device};
     }
     break;
-    case HIERARCHY_TYPE_NVM_SSD:
-    case HIERARCHY_TYPE_NVM_HDD: {
+    case HIERARCHY_TYPE_NVM_SSD: {
       state.devices = {cache_device, nvm_device, ssd_device};
       state.memory_devices = {cache_device, nvm_device};
-      state.storage_devices = {ssd_device};
-    }
-    break;
-    case HIERARCHY_TYPE_DRAM_NVM_SSD:
-    case HIERARCHY_TYPE_DRAM_NVM_HDD: {
-      state.devices = {cache_device, dram_device, nvm_device, ssd_device};
-      state.memory_devices = {cache_device, dram_device, nvm_device};
       state.storage_devices = {nvm_device, ssd_device};
     }
     break;
@@ -231,7 +201,7 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
   // Default Values
   state.verbose = false;
 
-  state.hierarchy_type = HIERARCHY_TYPE_DRAM_NVM_SSD;
+  state.hierarchy_type = HIERARCHY_TYPE_NVM_SSD;
   state.size_type = SIZE_TYPE_1;
   state.size_ratio_type = SIZE_RATIO_TYPE_1;
   state.caching_type = CACHING_TYPE_LRU;

@@ -26,8 +26,6 @@ std::string DeviceTypeToString(const DeviceType& device_type){
   switch (device_type){
     case DEVICE_TYPE_CACHE:
       return "CACHE";
-    case DEVICE_TYPE_DRAM:
-      return "DRAM";
     case DEVICE_TYPE_NVM:
       return "NVM";
     case DEVICE_TYPE_SSD:
@@ -43,20 +41,10 @@ std::string HierarchyTypeToString(const HierarchyType& hierarchy_type){
   switch (hierarchy_type) {
     case HIERARCHY_TYPE_NVM:
       return "CACHE-NVM";
-    case HIERARCHY_TYPE_DRAM_NVM:
-      return "CACHE-DRAM-NVM";
-    case HIERARCHY_TYPE_DRAM_SSD:
-      return "CACHE-DRAM-SSD";
+    case HIERARCHY_TYPE_SSD:
+      return "CACHE-SSD";
     case HIERARCHY_TYPE_NVM_SSD:
       return "CACHE-NVM-SSD";
-    case HIERARCHY_TYPE_DRAM_NVM_SSD:
-      return "CACHE-DRAM-NVM-SSD";
-    case HIERARCHY_TYPE_DRAM_HDD:
-      return "CACHE-DRAM-HDD";
-    case HIERARCHY_TYPE_NVM_HDD:
-      return "CACHE-NVM-HDD";
-    case HIERARCHY_TYPE_DRAM_NVM_HDD:
-      return "CACHE-DRAM-NVM-HDD";
     default:
       return "INVALID";
   }
@@ -74,10 +62,6 @@ std::string SizeTypeToString(const SizeType& size_type){
       return "SIZE-3";
     case SIZE_TYPE_4:
       return "SIZE-4";
-    case SIZE_TYPE_5:
-      return "SIZE-5";
-    case SIZE_TYPE_6:
-      return "SIZE-6";
     default:
       return "INVALID";
   }
@@ -95,10 +79,6 @@ std::string SizeRatioTypeToString(const SizeRatioType& size_ratio_type){
       return "RATIO-3";
     case SIZE_RATIO_TYPE_4:
       return "RATIO-4";
-    case SIZE_RATIO_TYPE_5:
-      return "RATIO-5";
-    case SIZE_RATIO_TYPE_6:
-      return "RATIO-6";
     default:
       return "INVALID";
   }
@@ -116,10 +96,6 @@ std::string LatencyTypeToString(const LatencyType& latency_type){
       return "3";
     case LATENCY_TYPE_4:
       return "4";
-    case LATENCY_TYPE_5:
-      return "5";
-    case LATENCY_TYPE_6:
-      return "6";
     default:
       return "INVALID";
   }
@@ -131,11 +107,9 @@ DeviceType GetLastDevice(const HierarchyType& hierarchy_type){
   switch (hierarchy_type) {
      case HIERARCHY_TYPE_NVM:
        return DeviceType::DEVICE_TYPE_NVM;
-     case HIERARCHY_TYPE_DRAM_NVM:
-       return DeviceType::DEVICE_TYPE_NVM;
-     case HIERARCHY_TYPE_DRAM_SSD:
+     case HIERARCHY_TYPE_SSD:
        return DeviceType::DEVICE_TYPE_SSD;
-     case HIERARCHY_TYPE_DRAM_NVM_SSD:
+     case HIERARCHY_TYPE_NVM_SSD:
        return DeviceType::DEVICE_TYPE_SSD;
      default:
        return DeviceType::DEVICE_TYPE_INVALID;
