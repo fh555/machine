@@ -133,46 +133,23 @@ PROGRAM_NAME = BUILD_DIR + "machine"
 
 ## HIERARCHY TYPES
 HIERARCHY_TYPE_NVM = 1
-HIERARCHY_TYPE_DRAM_NVM = 2
-HIERARCHY_TYPE_DRAM_SSD = 3
-HIERARCHY_TYPE_NVM_SSD = 4
-HIERARCHY_TYPE_DRAM_NVM_SSD = 5
-HIERARCHY_TYPE_DRAM_HDD = 6
-HIERARCHY_TYPE_NVM_HDD = 7
-HIERARCHY_TYPE_DRAM_NVM_HDD = 8
+HIERARCHY_TYPE_SSD = 2
+HIERARCHY_TYPE_NVM_SSD = 3
 
 HIERARCHY_TYPES_STRINGS = {
     1 : "nvm",
-    2 : "dram-nvm",
-    3 : "dram-ssd",
-    4 : "nvm-ssd",
-    5 : "dram-nvm-ssd",
-    6 : "dram-hdd",
-    7 : "nvm-hdd",
-    8 : "dram-nvm-hdd",
+    2 : "ssd",
+    3 : "nvm-ssd"
 }
 
 HIERARCHY_TYPES = [
     HIERARCHY_TYPE_NVM,
-    HIERARCHY_TYPE_DRAM_NVM,
-    HIERARCHY_TYPE_DRAM_SSD,
-    HIERARCHY_TYPE_NVM_SSD,
-    HIERARCHY_TYPE_DRAM_NVM_SSD
+    HIERARCHY_TYPE_SSD,
+    HIERARCHY_TYPE_NVM_SSD
 ]
 
 HIERARCHY_TYPES_SKIP_NVM_ONLY = [
     HIERARCHY_TYPE_DRAM_NVM,
-    HIERARCHY_TYPE_DRAM_SSD,
-    HIERARCHY_TYPE_NVM_SSD,
-    HIERARCHY_TYPE_DRAM_NVM_SSD
-]
-
-HIERARCHY_TYPES_WITHOUT_SSD = [
-    HIERARCHY_TYPE_NVM,
-    HIERARCHY_TYPE_DRAM_NVM,  
-]
-
-HIERARCHY_TYPES_WITH_SSD = [
     HIERARCHY_TYPE_DRAM_SSD,
     HIERARCHY_TYPE_NVM_SSD,
     HIERARCHY_TYPE_DRAM_NVM_SSD
@@ -183,17 +160,13 @@ SIZE_TYPE_1 = 1
 SIZE_TYPE_2 = 2
 SIZE_TYPE_3 = 3
 SIZE_TYPE_4 = 4
-SIZE_TYPE_5 = 5
-SIZE_TYPE_6 = 6
 
 
 SIZE_TYPES = [
     SIZE_TYPE_1,
     SIZE_TYPE_2,
     SIZE_TYPE_3,
-    SIZE_TYPE_4,
-    SIZE_TYPE_5,
-    SIZE_TYPE_6,
+    SIZE_TYPE_4
 ]
 
 ## LATENCY TYPES
@@ -201,25 +174,19 @@ LATENCY_TYPE_1 = 1
 LATENCY_TYPE_2 = 2
 LATENCY_TYPE_3 = 3
 LATENCY_TYPE_4 = 4
-LATENCY_TYPE_5 = 5
-LATENCY_TYPE_6 = 6
 
 LATENCY_TYPES = [
     LATENCY_TYPE_1,
     LATENCY_TYPE_2,
     LATENCY_TYPE_3,
-    LATENCY_TYPE_4,
-    LATENCY_TYPE_5,
-    LATENCY_TYPE_6
+    LATENCY_TYPE_4
 ]
 
 LATENCY_TYPES_STRINGS = {
     1 : "1x-1x",
     2 : "2x-4x",
-    3 : "2x-10x",
-    4 : "4x-4x",
-    5 : "4x-10x",
-    6 : "10x-20x"
+    3 : "4x-10x",
+    4 : "10x-20x"
 }
 
 ## CACHING TYPES
@@ -470,44 +437,6 @@ def create_legend_hierarchy_type():
                      handleheight=1, handlelength=3)
 
     figlegend.savefig(LEGEND_PLOT_DIR + 'legend_hierarchy_type.pdf')
-    
-def create_legend_hierarchy_skip_nvm_only_type():
-    fig = pylab.figure()
-    ax1 = fig.add_subplot(111)
-
-    LOG.info("Creating hierarchy type skip nvm only");
-
-    LEGEND_VALUES = HIERARCHY_TYPES_SKIP_NVM_ONLY
-
-    figlegend = pylab.figure(figsize=(15, 0.5))
-    idx = 0
-    lines = [None] * (len(LEGEND_VALUES) + 1)
-    data = [1]
-    x_values = [1]
-
-    TITLE = "HIERARCHY TYPES:"
-    LABELS = [TITLE, "DRAM-NVM", "DRAM-SSD", "NVM-SSD", "DRAM-NVM-SSD"]
-
-    lines[idx], = ax1.plot(x_values, data, linewidth = 0)
-    idx = 1
-
-    for group in range(len(LEGEND_VALUES)):
-        color_idx = idx
-        lines[idx], = ax1.plot(x_values, data,
-                               color=OPT_LINE_COLORS[color_idx],
-                               linewidth=OPT_LINE_WIDTH,
-                               marker=OPT_MARKERS[color_idx],
-                               markersize=OPT_MARKER_SIZE)
-        idx = idx + 1
-
-    # LEGEND
-    figlegend.legend(lines, LABELS, prop=LEGEND_FP,
-                     loc=1, ncol=6,
-                     mode="expand", shadow=OPT_LEGEND_SHADOW,
-                     frameon=False, borderaxespad=0.0,
-                     handleheight=1, handlelength=3)
-
-    figlegend.savefig(LEGEND_PLOT_DIR + 'legend_hierarchy_type_skip_nvm_only.pdf')
 
 
 ###################################################################################
@@ -694,17 +623,11 @@ def create_cache_line_chart(datasets):
 # PLOT HELPERS
 ###################################################################################
 
-# GET HIERARCHY TYPE
-def get_hierarchy_types(hierarchy_types):
-    if hierarchy_types == HIERARCHY_TYPES_WITHOUT_SSD:
-        return "without_ssd"
-    elif hierarchy_types == HIERARCHY_TYPES_WITH_SSD:
-        return "with_ssd"
-    else: 
-        LOG.error("Invalid hierarchy types")
-
 # LATENCY -- PLOT
-def latency_plot(hierarchy_types):
+def latency_plot():
+
+    # CLEAN UP RESULT DIR
+    clean_up_dir(LATENCY_PLOT_DIR)
 
     for trace_type in LATENCY_EXP_BENCHMARK_TYPES:
         LOG.info(MAJOR_STRING)
@@ -715,7 +638,7 @@ def latency_plot(hierarchy_types):
             for size_type in LATENCY_EXP_SIZE_TYPES:
 
                 datasets = []
-                for hierarchy_type in hierarchy_types:
+                for hierarchy_type in LATENCY_EXP_HIERARCHY_TYPES:
 
                     # Get result file
                     result_dir_list = [BENCHMARK_TYPES_STRINGS[trace_type],
@@ -731,9 +654,9 @@ def latency_plot(hierarchy_types):
 
                 file_name = LATENCY_PLOT_DIR + "latency" + "-" + \
                             BENCHMARK_TYPES_STRINGS[trace_type] + "-" + \
+                            HIERARCHY_TYPES_STRINGS[hierarchy_type] + "-" + \
                             CACHING_TYPES_STRINGS[caching_type] + "-" + \
-                            str(size_type) + "-" + \
-                            get_hierarchy_types(hierarchy_types) + ".pdf"
+                            str(size_type) + ".pdf"
 
                 saveGraph(fig, file_name, width=OPT_GRAPH_WIDTH, height=OPT_GRAPH_HEIGHT)
 
@@ -1146,9 +1069,7 @@ if __name__ == '__main__':
     ## PLOTTING GROUP
 
     if args.latency_plot:
-        clean_up_dir(LATENCY_PLOT_DIR)
-        latency_plot(HIERARCHY_TYPES_WITHOUT_SSD)
-        latency_plot(HIERARCHY_TYPES_WITH_SSD)
+        latency_plot()
 
     if args.size_plot:
         size_plot()
@@ -1161,5 +1082,4 @@ if __name__ == '__main__':
     ## LEGEND GROUP
 
     #create_legend_hierarchy_type()
-    #create_legend_hierarchy_skip_nvm_only_type()
 
