@@ -11,6 +11,8 @@ StorageCache::StorageCache(DeviceType device_type,
                            caching_type_(caching_type),
                            capacity_(capacity){
 
+  //std::cout << "STORAGE CACHE CAPACITY: " << capacity << "\n";
+
   switch(caching_type_){
 
     case CACHING_TYPE_FIFO:

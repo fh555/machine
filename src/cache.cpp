@@ -12,6 +12,8 @@
 
 namespace machine {
 
+int super_block_factor = 1;
+
 void PrintCapacity(const size_t block_count){
 
   // 1 block == 4 KB

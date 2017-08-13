@@ -126,6 +126,9 @@ void PrintWorkload(const std::map<size_t, size_t>& block_map){
   size_t total_frequency = 0;
   size_t frequency_threshold = 50000;
 
+  std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+  std::cout << "WORKLOAD ANALYSIS \n";
+
   std::cout << "BLOCK FREQUENCY \n";
   for(auto entry: block_map){
     auto frequency = entry.second;
@@ -149,7 +152,7 @@ void PrintWorkload(const std::map<size_t, size_t>& block_map){
   std::cout << "\n";
 
   // SPACE REQUIRED TO COVER A FRACTION OF WORKING SET
-  std::vector<size_t> percents = {10, 25, 50, 75, 90};
+  std::vector<size_t> percents = {10, 25, 50, 75, 90, 100};
   for(auto percent: percents){
     PrintRequiredBlocks(percent,
                         total_frequency,
@@ -169,6 +172,7 @@ void PrintWorkload(const std::map<size_t, size_t>& block_map){
   }
 
   std::cout << "\n";
+  std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 
 }
 
@@ -405,12 +409,12 @@ void MachineHelper() {
   char operation_type;
   size_t fork_number;
   size_t block_number;
-  size_t warm_up_ratio = 0; // 10%
+  size_t warm_up_ratio = 10; // 10%
 
   // Figure out warm up operation count
   auto warm_up_operation_count = (warm_up_ratio * state.operation_count)/100;
 
-  std::cout << "WARM UP OPERATION COUNT: " << warm_up_operation_count << "\n";
+  std::cout << "WARMING UP SIMULATOR:: OPERATION COUNT: " << warm_up_operation_count << "\n";
 
   if (state.file_name.empty()) {
     return;
@@ -536,11 +540,7 @@ void MachineHelper() {
             << total_duration / (1000 * 1000) << "s \n";
       }
 
-      //auto throughput = (operation_itr * 1000 * 1000)/total_duration;
-      //std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-      std::cout << "Warm Up : " << warm_up_operation_count << " ops \n";
-      //std::cout << "Warm Up Throughput : " << throughput << " (ops/s) \n";
-      //std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+      std::cout << "Warmed Up : " << warm_up_operation_count << " ops \n";
 
       // Reinit duration
       total_duration = 0;
@@ -551,7 +551,7 @@ void MachineHelper() {
       flush_operation_itr = 0;
 
       // Print machine caches
-      //PrintMachine();
+      PrintMachine();
 
       // Reset stats
       machine_stats.Reset();
@@ -578,7 +578,7 @@ void MachineHelper() {
   auto throughput = (operation_itr * 1000 * 1000)/total_duration;
 
   std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-  std::cout << "Overall Throughput : " << throughput << " (ops/s) \n";
+  std::cout << "THROUGHPUT : " << throughput << " (OPS/S) \n";
   std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 
   // Get machine size

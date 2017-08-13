@@ -19,7 +19,7 @@ struct Block{
   size_t block_type;
 };
 
-static const int super_block_factor = 1;
+extern int super_block_factor;
 
 void PrintCapacity(const size_t block_count);
 

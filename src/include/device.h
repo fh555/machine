@@ -23,7 +23,7 @@ struct Device {
 
     std::cout << "Initialize Device: " << DeviceTypeToString(device_type)
         << " Capacity: ";
-    PrintCapacity(device_size);
+    PrintCapacity(device_size / super_block_factor);
     std::cout << "\n";
 
   }

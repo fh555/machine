@@ -321,13 +321,13 @@ size_t GetSizeRatio(const SizeRatioType& size_ratio){
 
   switch (size_ratio) {
     case SIZE_RATIO_TYPE_1:
-      return 1;
-    case SIZE_RATIO_TYPE_2:
       return 4;
-    case SIZE_RATIO_TYPE_3:
+    case SIZE_RATIO_TYPE_2:
       return 16;
-    case SIZE_RATIO_TYPE_4:
+    case SIZE_RATIO_TYPE_3:
       return 64;
+    case SIZE_RATIO_TYPE_4:
+      return 256;
     default:
       return -1;
   }
