@@ -48,6 +48,9 @@ class configuration {
   // Verbose output
   bool verbose;
 
+  // HDD mode
+  bool hdd_mode;
+
   // DERIVED BASED ON HIERARCHY TYPE
 
   // list of devices in hierarchy

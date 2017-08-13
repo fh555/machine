@@ -12,12 +12,14 @@ void Stats::Reset(){
   write_ops.clear();
 
   read_ops[DeviceType::DEVICE_TYPE_CACHE] = 0;
+  read_ops[DeviceType::DEVICE_TYPE_DRAM] = 0;
   read_ops[DeviceType::DEVICE_TYPE_NVM] = 0;
-  read_ops[DeviceType::DEVICE_TYPE_SSD] = 0;
+  read_ops[DeviceType::DEVICE_TYPE_DISK] = 0;
 
   write_ops[DeviceType::DEVICE_TYPE_CACHE] = 0;
+  write_ops[DeviceType::DEVICE_TYPE_DRAM] = 0;
   write_ops[DeviceType::DEVICE_TYPE_NVM] = 0;
-  write_ops[DeviceType::DEVICE_TYPE_SSD] = 0;
+  write_ops[DeviceType::DEVICE_TYPE_DISK] = 0;
 }
 
 void Stats::IncrementReadCount(DeviceType device_type){

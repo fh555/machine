@@ -199,7 +199,8 @@ DeviceType LocateInStorageDevices(const size_t& block_id){
 }
 
 bool IsVolatileDevice(DeviceType device_type){
-  return (device_type == DeviceType::DEVICE_TYPE_CACHE);
+  return (device_type == DeviceType::DEVICE_TYPE_CACHE ||
+      device_type == DeviceType::DEVICE_TYPE_DRAM);
 }
 
 void BringBlockToMemory(const size_t& block_id){
@@ -222,7 +223,7 @@ void BringBlockToMemory(const size_t& block_id){
     }
     else {
       Copy(state.devices,
-           DeviceType::DEVICE_TYPE_CACHE,
+           DeviceType::DEVICE_TYPE_DRAM,
            storage_device_type,
            block_id,
            CLEAN_BLOCK,
@@ -230,20 +231,40 @@ void BringBlockToMemory(const size_t& block_id){
     }
   }
 
-  // NVM to CACHE migration
+  // NVM to DRAM migration
   memory_device_type = LocateInMemoryDevices(block_id);
 
   if(memory_device_type == DeviceType::DEVICE_TYPE_NVM){
+    auto dram_exists = DeviceExists(state.devices, DeviceType::DEVICE_TYPE_DRAM);
     bool migrate_upwards = (rand() % state.migration_frequency == 0);
     if(migrate_upwards == true){
+      if(dram_exists == true){
         Copy(state.devices,
-             DeviceType::DEVICE_TYPE_CACHE,
+             DeviceType::DEVICE_TYPE_DRAM,
              DeviceType::DEVICE_TYPE_NVM,
              block_id,
              CLEAN_BLOCK,
              total_duration);
+      }
     }
   }
+
+  // DRAM/NVM to CACHE migration
+  memory_device_type = LocateInMemoryDevices(block_id);
+
+  if(memory_device_type == DeviceType::DEVICE_TYPE_DRAM ||
+      memory_device_type == DeviceType::DEVICE_TYPE_NVM){
+    bool migrate_upwards = (rand() % state.migration_frequency == 0);
+    if(migrate_upwards == true){
+      Copy(state.devices,
+           DeviceType::DEVICE_TYPE_CACHE,
+           memory_device_type,
+           block_id,
+           CLEAN_BLOCK,
+           total_duration);
+    }
+  }
+
 
 }
 
@@ -273,7 +294,7 @@ void BringBlockToStorage(const size_t& block_id,
     }
     else {
       Copy(state.devices,
-           DeviceType::DEVICE_TYPE_SSD,
+           DeviceType::DEVICE_TYPE_DISK,
            source,
            block_id,
            CLEAN_BLOCK,

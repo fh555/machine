@@ -21,27 +21,43 @@ void BootstrapDeviceMetrics(const configuration &state){
   // LATENCIES (ns)
 
   // CACHE
-  seq_read_latency[DEVICE_TYPE_CACHE] = 20;
-  seq_write_latency[DEVICE_TYPE_CACHE] = 20;
-  rnd_read_latency[DEVICE_TYPE_CACHE] = 20;
-  rnd_write_latency[DEVICE_TYPE_CACHE] = 20;
+  seq_read_latency[DEVICE_TYPE_CACHE] = 10;
+  seq_write_latency[DEVICE_TYPE_CACHE] = 10;
+  rnd_read_latency[DEVICE_TYPE_CACHE] = 10;
+  rnd_write_latency[DEVICE_TYPE_CACHE] = 10;
+
+  // DRAM
+  seq_read_latency[DEVICE_TYPE_DRAM] = 100;
+  seq_write_latency[DEVICE_TYPE_DRAM] = 100;
+  rnd_read_latency[DEVICE_TYPE_DRAM] = 100;
+  rnd_write_latency[DEVICE_TYPE_DRAM] = 100;
 
   // NVM
-  seq_read_latency[DEVICE_TYPE_NVM] = seq_read_latency[DEVICE_TYPE_CACHE];
-  seq_write_latency[DEVICE_TYPE_NVM] = seq_write_latency[DEVICE_TYPE_CACHE];
-  rnd_read_latency[DEVICE_TYPE_NVM] = rnd_read_latency[DEVICE_TYPE_CACHE];
-  rnd_write_latency[DEVICE_TYPE_NVM] = rnd_write_latency[DEVICE_TYPE_CACHE];
+  seq_read_latency[DEVICE_TYPE_NVM] = seq_read_latency[DEVICE_TYPE_DRAM];
+  seq_write_latency[DEVICE_TYPE_NVM] = seq_write_latency[DEVICE_TYPE_DRAM];
+  rnd_read_latency[DEVICE_TYPE_NVM] = rnd_read_latency[DEVICE_TYPE_DRAM];
+  rnd_write_latency[DEVICE_TYPE_NVM] = rnd_write_latency[DEVICE_TYPE_DRAM];
 
   seq_read_latency[DEVICE_TYPE_NVM] *=  state.nvm_read_latency;
   seq_write_latency[DEVICE_TYPE_NVM] *= state.nvm_write_latency;
   rnd_read_latency[DEVICE_TYPE_NVM] *= state.nvm_read_latency;
   rnd_write_latency[DEVICE_TYPE_NVM] *= state.nvm_write_latency;
 
-  // SSD
-  seq_read_latency[DEVICE_TYPE_SSD] = 100 * 100;
-  seq_write_latency[DEVICE_TYPE_SSD] = 250 * 100;
-  rnd_read_latency[DEVICE_TYPE_SSD] = 100 * 100;
-  rnd_write_latency[DEVICE_TYPE_SSD] = 400 * 100;
+  // Check disk mode
+  if(state.hdd_mode == false){
+    // SSD
+    seq_read_latency[DEVICE_TYPE_DISK] = 100 * 100;
+    seq_write_latency[DEVICE_TYPE_DISK] = 250 * 100;
+    rnd_read_latency[DEVICE_TYPE_DISK] = 100 * 100;
+    rnd_write_latency[DEVICE_TYPE_DISK] = 400 * 100;
+  }
+  else {
+    // HDD
+    seq_read_latency[DEVICE_TYPE_DISK] = 1 * 1000 * 1000;
+    seq_write_latency[DEVICE_TYPE_DISK] = 1 * 1000 * 1000;
+    rnd_read_latency[DEVICE_TYPE_DISK] = 4 * 1000 * 1000;
+    rnd_write_latency[DEVICE_TYPE_DISK] = 10 * 1000 * 1000;
+  }
 
 }
 
@@ -72,8 +88,9 @@ size_t GetWriteLatency(std::vector<Device>& devices,
 
   switch(device_type){
     case DEVICE_TYPE_CACHE:
+    case DEVICE_TYPE_DRAM:
     case DEVICE_TYPE_NVM:
-    case DEVICE_TYPE_SSD: {
+    case DEVICE_TYPE_DISK: {
       if(is_sequential == true){
         return seq_write_latency[device_type];
       }
@@ -86,7 +103,7 @@ size_t GetWriteLatency(std::vector<Device>& devices,
       return 0;
 
     default: {
-      std::cout << "Get invalid device";
+      std::cout << "GetWriteLatency: Get invalid device";
       exit(EXIT_FAILURE);
     }
   }
@@ -106,8 +123,9 @@ size_t GetReadLatency(std::vector<Device>& devices,
 
   switch(device_type){
     case DEVICE_TYPE_CACHE:
+    case DEVICE_TYPE_DRAM:
     case DEVICE_TYPE_NVM:
-    case DEVICE_TYPE_SSD: {
+    case DEVICE_TYPE_DISK: {
       if(is_sequential == true){
         return seq_read_latency[device_type];
       }
@@ -120,7 +138,7 @@ size_t GetReadLatency(std::vector<Device>& devices,
       return 0;
 
     default: {
-      std::cout << "Get invalid device";
+      std::cout << "GetReadLatency: Get invalid device";
       exit(EXIT_FAILURE);
     }
   }
@@ -169,7 +187,7 @@ size_t GetDeviceOffset(std::vector<Device>& devices,
     device_itr++;
   }
 
-  std::cout << "Get invalid device";
+  std::cout << "GetDeviceOffset: Get invalid device: " << DeviceTypeToString(device_type);
   exit(EXIT_FAILURE);
 }
 
@@ -203,27 +221,38 @@ bool IsSequential(std::vector<Device>& devices,
 DeviceType GetLowerDevice(std::vector<Device>& devices,
                           DeviceType source){
   DeviceType destination = DeviceType::DEVICE_TYPE_INVALID;
+  auto dram_exists = DeviceExists(devices, DeviceType::DEVICE_TYPE_DRAM);
   auto nvm_exists = DeviceExists(devices, DeviceType::DEVICE_TYPE_NVM);
 
   switch(source){
     case DEVICE_TYPE_CACHE: {
+      if(dram_exists == true) {
+        destination = DEVICE_TYPE_DRAM;
+      }
+      else {
+        destination = DEVICE_TYPE_NVM;
+      }
+      break;
+    }
+
+    case DEVICE_TYPE_DRAM: {
       if(nvm_exists == true){
         destination = DEVICE_TYPE_NVM;
       }
       else {
-        destination = DEVICE_TYPE_SSD;
+        destination = DEVICE_TYPE_DISK;
       }
       break;
     }
 
     case DEVICE_TYPE_NVM: {
-      destination = DEVICE_TYPE_SSD;
+      destination = DEVICE_TYPE_DISK;
       break;
     }
 
     default:
     case DEVICE_TYPE_INVALID: {
-      std::cout << "Get invalid device";
+      std::cout << "GetLowerDevice: Get invalid device";
       exit(EXIT_FAILURE);
     }
   }
@@ -291,17 +320,17 @@ void Copy(std::vector<Device>& devices,
 size_t GetSizeRatio(const SizeRatioType& size_ratio){
 
   switch (size_ratio) {
-     case SIZE_RATIO_TYPE_1:
-       return 1;
-     case SIZE_RATIO_TYPE_2:
-       return 4;
-     case SIZE_RATIO_TYPE_3:
-       return 16;
-     case SIZE_RATIO_TYPE_4:
-       return 64;
-     default:
-       return -1;
-   }
+    case SIZE_RATIO_TYPE_1:
+      return 1;
+    case SIZE_RATIO_TYPE_2:
+      return 4;
+    case SIZE_RATIO_TYPE_3:
+      return 16;
+    case SIZE_RATIO_TYPE_4:
+      return 64;
+    default:
+      return -1;
+  }
 
 }
 
@@ -313,6 +342,7 @@ void MoveVictim(std::vector<Device>& devices,
 
   bool victim_exists = (block_id != INVALID_KEY);
   bool memory_device = (source == DeviceType::DEVICE_TYPE_CACHE ||
+      source == DeviceType::DEVICE_TYPE_DRAM ||
       source == DeviceType::DEVICE_TYPE_NVM);
   bool is_dirty = (block_status == DIRTY_BLOCK);
 
@@ -347,25 +377,32 @@ Device DeviceFactory::GetDevice(const DeviceType& device_type,
 
   size_t scale_factor = 1000/4;
 
+  // CACHE size
+  device_size[DEVICE_TYPE_CACHE] = 8;
+
+  // SSD size
+  device_size[DEVICE_TYPE_DISK] = 32 * 1024;
+
+  // DRAM size
   switch(state.size_type){
 
     case SIZE_TYPE_1: {
-      device_size[DEVICE_TYPE_CACHE] = 4;
+      device_size[DEVICE_TYPE_DRAM] = 4;
       break;
     }
 
     case SIZE_TYPE_2: {
-      device_size[DEVICE_TYPE_CACHE] = 16;
+      device_size[DEVICE_TYPE_DRAM] = 16;
       break;
     }
 
     case SIZE_TYPE_3: {
-      device_size[DEVICE_TYPE_CACHE] = 64;
+      device_size[DEVICE_TYPE_DRAM] = 64;
       break;
     }
 
     case SIZE_TYPE_4: {
-      device_size[DEVICE_TYPE_CACHE] = 256;
+      device_size[DEVICE_TYPE_DRAM] = 256;
       break;
     }
 
@@ -375,17 +412,15 @@ Device DeviceFactory::GetDevice(const DeviceType& device_type,
     }
   }
 
-  // SSD size
-  device_size[DEVICE_TYPE_SSD] = 32 * 1024;
-
   // NVM size
-  device_size[DEVICE_TYPE_NVM] = device_size[DEVICE_TYPE_CACHE];
+  device_size[DEVICE_TYPE_NVM] = device_size[DEVICE_TYPE_DRAM];
   device_size[DEVICE_TYPE_NVM] *= GetSizeRatio(state.size_ratio_type);
 
   switch (device_type){
     case DEVICE_TYPE_CACHE:
+    case DEVICE_TYPE_DRAM:
     case DEVICE_TYPE_NVM:
-    case DEVICE_TYPE_SSD:  {
+    case DEVICE_TYPE_DISK:  {
       // Check for last device
       auto size = device_size[device_type];
       if(last_device_type == device_type){
@@ -399,7 +434,7 @@ Device DeviceFactory::GetDevice(const DeviceType& device_type,
 
     case DEVICE_TYPE_INVALID:
     default: {
-      std::cout << "Get invalid device";
+      std::cout << "GetDevice: Get invalid device";
       exit(EXIT_FAILURE);
     }
   }

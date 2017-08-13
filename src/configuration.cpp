@@ -163,12 +163,15 @@ void ConstructDeviceList(configuration &state){
   Device cache_device = DeviceFactory::GetDevice(DEVICE_TYPE_CACHE,
                                                  state,
                                                  last_device_type);
+  Device dram_device = DeviceFactory::GetDevice(DEVICE_TYPE_DRAM,
+                                                state,
+                                                last_device_type);
   Device nvm_device = DeviceFactory::GetDevice(DEVICE_TYPE_NVM,
                                                state,
                                                last_device_type);
-  Device ssd_device = DeviceFactory::GetDevice(DEVICE_TYPE_SSD,
-                                               state,
-                                               last_device_type);
+  Device disk_device = DeviceFactory::GetDevice(DEVICE_TYPE_DISK,
+                                                state,
+                                                last_device_type);
 
   switch (state.hierarchy_type) {
     case HIERARCHY_TYPE_NVM: {
@@ -177,16 +180,28 @@ void ConstructDeviceList(configuration &state){
       state.storage_devices = {nvm_device};
     }
     break;
-    case HIERARCHY_TYPE_SSD: {
-      state.devices = {cache_device, ssd_device};
-      state.memory_devices = {cache_device};
-      state.storage_devices = {ssd_device};
+    case HIERARCHY_TYPE_DRAM_NVM: {
+      state.devices = {cache_device, dram_device, nvm_device};
+      state.memory_devices = {cache_device, dram_device, nvm_device};
+      state.storage_devices = {nvm_device};
     }
     break;
-    case HIERARCHY_TYPE_NVM_SSD: {
-      state.devices = {cache_device, nvm_device, ssd_device};
+    case HIERARCHY_TYPE_DRAM_DISK: {
+      state.devices = {cache_device, dram_device, disk_device};
+      state.memory_devices = {cache_device, dram_device, disk_device};
+      state.storage_devices = {disk_device};
+    }
+    break;
+    case HIERARCHY_TYPE_NVM_DISK: {
+      state.devices = {cache_device, nvm_device, disk_device};
       state.memory_devices = {cache_device, nvm_device};
-      state.storage_devices = {nvm_device, ssd_device};
+      state.storage_devices = {nvm_device, disk_device};
+    }
+    break;
+    case HIERARCHY_TYPE_DRAM_NVM_DISK: {
+      state.devices = {cache_device, dram_device, nvm_device, disk_device};
+      state.memory_devices = {cache_device, dram_device, nvm_device};
+      state.storage_devices = {nvm_device, disk_device};
     }
     break;
     default:
@@ -201,7 +216,7 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
   // Default Values
   state.verbose = false;
 
-  state.hierarchy_type = HIERARCHY_TYPE_NVM_SSD;
+  state.hierarchy_type = HIERARCHY_TYPE_DRAM_NVM_DISK;
   state.size_type = SIZE_TYPE_1;
   state.size_ratio_type = SIZE_RATIO_TYPE_1;
   state.caching_type = CACHING_TYPE_LRU;

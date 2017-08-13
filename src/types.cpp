@@ -26,9 +26,11 @@ std::string DeviceTypeToString(const DeviceType& device_type){
   switch (device_type){
     case DEVICE_TYPE_CACHE:
       return "CACHE";
+    case DEVICE_TYPE_DRAM:
+      return "DRAM";
     case DEVICE_TYPE_NVM:
       return "NVM";
-    case DEVICE_TYPE_SSD:
+    case DEVICE_TYPE_DISK:
       return "SSD";
     default:
       return "INVALID";
@@ -40,11 +42,15 @@ std::string HierarchyTypeToString(const HierarchyType& hierarchy_type){
 
   switch (hierarchy_type) {
     case HIERARCHY_TYPE_NVM:
-      return "CACHE-NVM";
-    case HIERARCHY_TYPE_SSD:
-      return "CACHE-SSD";
-    case HIERARCHY_TYPE_NVM_SSD:
-      return "CACHE-NVM-SSD";
+      return "NVM";
+    case HIERARCHY_TYPE_DRAM_NVM:
+      return "DRAM-NVM";
+    case HIERARCHY_TYPE_DRAM_DISK:
+      return "DRAM-DISK";
+    case HIERARCHY_TYPE_NVM_DISK:
+      return "NVM-DISK";
+    case HIERARCHY_TYPE_DRAM_NVM_DISK:
+      return "DRAM-NVM-DISK";
     default:
       return "INVALID";
   }
@@ -105,13 +111,16 @@ std::string LatencyTypeToString(const LatencyType& latency_type){
 DeviceType GetLastDevice(const HierarchyType& hierarchy_type){
 
   switch (hierarchy_type) {
-     case HIERARCHY_TYPE_NVM:
-       return DeviceType::DEVICE_TYPE_NVM;
-     case HIERARCHY_TYPE_SSD:
-       return DeviceType::DEVICE_TYPE_SSD;
-     case HIERARCHY_TYPE_NVM_SSD:
-       return DeviceType::DEVICE_TYPE_SSD;
-     default:
+    case HIERARCHY_TYPE_NVM:
+    case HIERARCHY_TYPE_DRAM_NVM:
+      return DeviceType::DEVICE_TYPE_NVM;
+
+    case HIERARCHY_TYPE_DRAM_DISK:
+    case HIERARCHY_TYPE_NVM_DISK:
+    case HIERARCHY_TYPE_DRAM_NVM_DISK:
+      return DeviceType::DEVICE_TYPE_DISK;
+
+    default:
        return DeviceType::DEVICE_TYPE_INVALID;
    }
 
