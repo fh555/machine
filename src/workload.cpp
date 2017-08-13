@@ -405,7 +405,7 @@ void MachineHelper() {
   char operation_type;
   size_t fork_number;
   size_t block_number;
-  size_t warm_up_ratio = 50; // 10%
+  size_t warm_up_ratio = 0; // 10%
 
   // Figure out warm up operation count
   auto warm_up_operation_count = (warm_up_ratio * state.operation_count)/100;

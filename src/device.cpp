@@ -387,22 +387,22 @@ Device DeviceFactory::GetDevice(const DeviceType& device_type,
   switch(state.size_type){
 
     case SIZE_TYPE_1: {
-      device_size[DEVICE_TYPE_DRAM] = 1024;
-      break;
-    }
-
-    case SIZE_TYPE_2: {
-      device_size[DEVICE_TYPE_DRAM] = 1024 * 2;
-      break;
-    }
-
-    case SIZE_TYPE_3: {
       device_size[DEVICE_TYPE_DRAM] = 1024 * 4;
       break;
     }
 
-    case SIZE_TYPE_4: {
+    case SIZE_TYPE_2: {
+      device_size[DEVICE_TYPE_DRAM] = 1024 * 8;
+      break;
+    }
+
+    case SIZE_TYPE_3: {
       device_size[DEVICE_TYPE_DRAM] = 1024 * 16;
+      break;
+    }
+
+    case SIZE_TYPE_4: {
+      device_size[DEVICE_TYPE_DRAM] = 1024 * 32;
       break;
     }
 

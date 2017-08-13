@@ -19,6 +19,8 @@ struct Block{
   size_t block_type;
 };
 
+static const int super_block_factor = 1;
+
 void PrintCapacity(const size_t block_count);
 
 // Base class for all caching algorithms

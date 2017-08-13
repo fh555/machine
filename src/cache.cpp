@@ -15,7 +15,7 @@ namespace machine {
 void PrintCapacity(const size_t block_count){
 
   // 1 block == 4 KB
-  size_t capacity = block_count * 4;
+  size_t capacity = block_count * 4 * super_block_factor;
 
   if(capacity < 1024) {
     std::cout << "[" << capacity <<" KB] ";

@@ -18,7 +18,7 @@ struct Device {
          const size_t& device_size)
   : device_type(device_type),
     device_size(device_size),
-    cache(device_type, caching_type, device_size){
+    cache(device_type, caching_type, device_size / super_block_factor){
     // Nothing to do here!
 
     std::cout << "Initialize Device: " << DeviceTypeToString(device_type)

@@ -157,16 +157,7 @@ std::ostream& operator<< (std::ostream& stream,
   std::cout << "[" << DeviceTypeToString(cache.device_type_) << "] ";
   std::cout << "[" << CachingTypeToString(cache.caching_type_) <<"] ";
 
-  auto capacity = (cache.capacity_ * 4);
-  if(capacity < 1000) {
-    std::cout << "[" << capacity <<" KB] ";
-  }
-  else if(capacity < 1000 * 1000){
-    std::cout << "[" << capacity/1000 <<" MB] ";
-  }
-  else {
-    std::cout << "[" << capacity/(1000 * 1000) <<" GB] ";
-  }
+  PrintCapacity(cache.capacity_);
 
   switch(cache.caching_type_){
 
