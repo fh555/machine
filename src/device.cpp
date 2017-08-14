@@ -44,19 +44,24 @@ void BootstrapDeviceMetrics(const configuration &state){
   rnd_write_latency[DEVICE_TYPE_NVM] *= state.nvm_write_latency;
 
   // Check disk mode
-  if(state.hdd_mode == false){
-    // SSD
+
+  // SSD
+  if(state.disk_mode_type == DiskModeType::DISK_MODE_TYPE_SSD){
     seq_read_latency[DEVICE_TYPE_DISK] = 100 * 100;
     seq_write_latency[DEVICE_TYPE_DISK] = 250 * 100;
     rnd_read_latency[DEVICE_TYPE_DISK] = 100 * 100;
     rnd_write_latency[DEVICE_TYPE_DISK] = 400 * 100;
   }
-  else {
-    // HDD
+  // HDD
+  else if(state.disk_mode_type == DiskModeType::DISK_MODE_TYPE_HDD) {
     seq_read_latency[DEVICE_TYPE_DISK] = 1 * 1000 * 1000;
     seq_write_latency[DEVICE_TYPE_DISK] = 1 * 1000 * 1000;
     rnd_read_latency[DEVICE_TYPE_DISK] = 4 * 1000 * 1000;
     rnd_write_latency[DEVICE_TYPE_DISK] = 10 * 1000 * 1000;
+  }
+  else {
+    std::cout << "Invalid disk mode type: " << state.disk_mode_type;
+    exit(EXIT_FAILURE);
   }
 
 }

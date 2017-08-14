@@ -214,7 +214,12 @@ CACHING_TYPES = [
     CACHING_TYPE_LFU
 ]
 
+## DISK MODE TYPES
+DISK_MODE_TYPE_SSD = 1
+DISK_MODE_TYPE_HDD = 2 
+
 ## BENCHMARK TYPES
+BENCHMARK_TYPE_EXAMPLE = 0
 BENCHMARK_TYPE_TPCC = 1
 BENCHMARK_TYPE_YCSB = 2
 BENCHMARK_TYPE_VOTER = 3
@@ -225,6 +230,7 @@ BENCHMARK_TYPE_AUCTIONMARK = 7
 BENCHMARK_TYPE_SMALLBANK = 8
 
 BENCHMARK_TYPES_STRINGS = {
+    0 : "example",                
     1 : "tpcc",
     2 : "ycsb",
     3 : "voter",
@@ -236,6 +242,7 @@ BENCHMARK_TYPES_STRINGS = {
 }
 
 BENCHMARK_TYPES_DIRS = {
+    0 : BENCHMARK_DIR + BENCHMARK_TYPES_STRINGS[0] + ".txt",                        
     1 : BENCHMARK_DIR + BENCHMARK_TYPES_STRINGS[1] + ".txt",
     2 : BENCHMARK_DIR + BENCHMARK_TYPES_STRINGS[2] + ".txt",
     3 : BENCHMARK_DIR + BENCHMARK_TYPES_STRINGS[3] + ".txt",
@@ -247,6 +254,7 @@ BENCHMARK_TYPES_DIRS = {
 }
 
 BENCHMARK_TYPES = [
+#     BENCHMARK_TYPE_EXAMPLE,
     BENCHMARK_TYPE_TPCC,
     BENCHMARK_TYPE_VOTER,
     BENCHMARK_TYPE_YCSB,
@@ -271,6 +279,7 @@ DEFAULT_SIZE_TYPE = SIZE_TYPE_2
 DEFAULT_SIZE_RATIO_TYPE = SIZE_RATIO_TYPE_4
 DEFAULT_CACHING_TYPE = CACHING_TYPE_LRU
 DEFAULT_LATENCY_TYPE = LATENCY_TYPE_2
+DEFAULT_DISK_MODE_TYPE = DISK_MODE_TYPE_SSD
 DEFAULT_BENCHMARK_TYPE = BENCHMARK_TYPE_TPCC
 DEFAULT_MIGRATION_FREQUENCY = 3
 DEFAULT_OPERATION_COUNT = 100000 * SCALE_FACTOR
@@ -336,6 +345,15 @@ SIZE_RATIO_EXP_HIERARCHY_TYPES = HIERARCHY_TYPES
 SIZE_RATIO_EXP_SIZE_RATIO_TYPES = SIZE_RATIO_TYPES
 SIZE_RATIO_EXP_LATENCY_TYPES = [DEFAULT_LATENCY_TYPE]
 SIZE_RATIO_EXP_CACHING_TYPES = [DEFAULT_CACHING_TYPE]
+
+## HARD DISK EXPERIMENT
+
+HARD_DISK_EXP_BENCHMARK_TYPES = BENCHMARK_TYPES
+HARD_DISK_EXP_HIERARCHY_TYPES = HIERARCHY_TYPES
+HARD_DISK_EXP_SIZE_TYPES = [DEFAULT_SIZE_TYPE]
+HARD_DISK_EXP_LATENCY_TYPES = LATENCY_TYPES
+HARD_DISK_EXP_CACHING_TYPES = [DEFAULT_CACHING_TYPE]
+HARD_DISK_EXPERIMENT_DISK_MODE_TYPE = DISK_MODE_TYPE_HDD
 
 ## CSV FILES
 
@@ -630,7 +648,7 @@ def create_size_ratio_bar_chart(datasets):
     ax1 = fig.add_subplot(111)
 
     # X-AXIS
-    x_values = [str(chr(ord('A') + i - 1)) for i in SIZE_RATIO_EXP_SIZE_TYPES]
+    x_values = [str(chr(ord('A') + i - 1)) for i in SIZE_RATIO_EXP_SIZE_RATIO_TYPES]
     N = len(x_values)
     M = 3
     ind = np.arange(N)
@@ -823,6 +841,43 @@ def size_ratio_plot():
                             BENCHMARK_TYPES_STRINGS[trace_type] + "-" + \
                             CACHING_TYPES_STRINGS[caching_type] + "-" + \
                             str(latency_type) + ".pdf"
+
+                saveGraph(fig, file_name, width=OPT_GRAPH_WIDTH, height=OPT_GRAPH_HEIGHT)
+
+
+# HARD DISK -- PLOT
+def hard_disk_plot():
+
+    # CLEAN UP RESULT DIR
+    clean_up_dir(HARD_DISK_PLOT_DIR)
+
+    for trace_type in HARD_DISK_EXP_BENCHMARK_TYPES:
+        LOG.info(MAJOR_STRING)
+
+        for caching_type in HARD_DISK_EXP_CACHING_TYPES:
+            LOG.info(MINOR_STRING)
+
+            for size_type in HARD_DISK_EXP_SIZE_TYPES:
+
+                datasets = []
+                for hierarchy_type in HARD_DISK_EXP_HIERARCHY_TYPES:
+
+                    # Get result file
+                    result_dir_list = [BENCHMARK_TYPES_STRINGS[trace_type],
+                                       CACHING_TYPES_STRINGS[caching_type],
+                                       str(size_type),
+                                       HIERARCHY_TYPES_STRINGS[hierarchy_type]]
+                    result_file = get_result_file(HARD_DISK_DIR, result_dir_list, HARD_DISK_CSV)
+
+                    dataset = loadDataFile(result_file)
+                    datasets.append(dataset)
+
+                fig = create_latency_line_chart(datasets)
+
+                file_name = HARD_DISK_PLOT_DIR + "hard-disk" + "-" + \
+                            BENCHMARK_TYPES_STRINGS[trace_type] + "-" + \
+                            CACHING_TYPES_STRINGS[caching_type] + "-" + \
+                            str(size_type) + ".pdf"
 
                 saveGraph(fig, file_name, width=OPT_GRAPH_WIDTH, height=OPT_GRAPH_HEIGHT)
 
@@ -1091,6 +1146,62 @@ def size_ratio_eval():
                         # Write stat
                         write_stat(result_file, size_ratio_type, stat)
 
+# HARD DISK -- EVAL
+def hard_disk_eval():
+
+    # CLEAN UP RESULT DIR
+    clean_up_dir(HARD_DISK_DIR)
+    LOG.info("HARD DISK EVAL")
+
+    # ETA
+    l1 = len(HARD_DISK_EXP_BENCHMARK_TYPES)
+    l2 = len(HARD_DISK_EXP_CACHING_TYPES)
+    l3 = len(HARD_DISK_EXP_SIZE_TYPES)
+    l4 = len(HARD_DISK_EXP_LATENCY_TYPES)
+    l5 = len(HARD_DISK_EXP_HIERARCHY_TYPES)
+    print_eta(l1, l2, l3, l4, l5)
+
+    for trace_type in HARD_DISK_EXP_BENCHMARK_TYPES:
+        LOG.info(MAJOR_STRING)
+
+        for caching_type in HARD_DISK_EXP_CACHING_TYPES:
+            LOG.info(MINOR_STRING)
+
+            for size_type in HARD_DISK_EXP_SIZE_TYPES:
+                LOG.info(SUB_MINOR_STRING)
+
+                for hierarchy_type in HARD_DISK_EXP_HIERARCHY_TYPES:
+
+                    for latency_type in HARD_DISK_EXP_LATENCY_TYPES:
+                        LOG.info(" > trace_type: " + BENCHMARK_TYPES_STRINGS[trace_type] +
+                              " caching_type: " + CACHING_TYPES_STRINGS[caching_type] +
+                              " size_type: " + str(size_type) +
+                              " latency_type: " + str(latency_type) +
+                              " hierarchy_type: " + HIERARCHY_TYPES_STRINGS[hierarchy_type] +
+                              "\n"
+                        )
+
+                        # Get result file
+                        result_dir_list = [BENCHMARK_TYPES_STRINGS[trace_type],
+                                           CACHING_TYPES_STRINGS[caching_type],
+                                           str(size_type),
+                                           HIERARCHY_TYPES_STRINGS[hierarchy_type]]
+                        result_file = get_result_file(HARD_DISK_DIR, result_dir_list, HARD_DISK_CSV)
+
+                        # Run experiment
+                        stat = run_experiment(stat_offset=THROUGHPUT_OFFSET,
+                                              trace_type=trace_type,
+                                              hierarchy_type=hierarchy_type,
+                                              latency_type=latency_type,
+                                              size_type=size_type,
+                                              caching_type=caching_type,
+                                              disk_mode_type=HARD_DISK_EXPERIMENT_DISK_MODE_TYPE,
+                                              summary_file=HARD_DISK_EXPERIMENT_SUMMARY)
+
+                        # Write stat
+                        write_stat(result_file, latency_type, stat)
+
+
 
 ###################################################################################
 # TEST
@@ -1133,6 +1244,7 @@ def run_experiment(
     program=PROGRAM_NAME,
     stat_offset=THROUGHPUT_OFFSET,
     hierarchy_type=DEFAULT_HIERARCHY_TYPE,
+    disk_mode_type=DEFAULT_DISK_MODE_TYPE,
     latency_type=DEFAULT_LATENCY_TYPE,
     size_type=DEFAULT_SIZE_TYPE,
     size_ratio_type=DEFAULT_SIZE_RATIO_TYPE,
@@ -1146,6 +1258,7 @@ def run_experiment(
     PROGRAM_OUTPUT_FILE = open(PROGRAM_OUTPUT_FILE_NAME, "w")
     arg_list = [program,
                     "-a", str(hierarchy_type),
+                    "-d", str(disk_mode_type),
                     "-l", str(latency_type),
                     "-r", str(size_ratio_type),
                     "-s", str(size_type),

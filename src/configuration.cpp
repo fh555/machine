@@ -14,6 +14,7 @@ void Usage() {
       "\n"
       "Command line options : machine <options>\n"
       "   -a --hierarchy_type                 :  hierarchy type\n"
+      "   -d --disk_mode_type                 :  disk mode type\n"
       "   -s --size_type                      :  size type\n"
       "   -r --size_ratio_type                :  size ratio type\n"
       "   -l --latency_type                   :  latency type\n"
@@ -28,6 +29,7 @@ void Usage() {
 
 static struct option opts[] = {
     {"hierarchy_type", optional_argument, NULL, 'a'},
+    {"disk_mode_type", optional_argument, NULL, 'd'},
     {"size_type", optional_argument, NULL, 's'},
     {"size_ratio_type", optional_argument, NULL, 'r'},
     {"latency_type", optional_argument, NULL, 'l'},
@@ -46,8 +48,19 @@ static void ValidateHierarchyType(const configuration &state) {
     exit(EXIT_FAILURE);
   }
   else {
-    printf("%30s : %s\n", "caching_type",
+    printf("%30s : %s\n", "hierarchy_type",
            HierarchyTypeToString(state.hierarchy_type).c_str());
+  }
+}
+
+static void ValidateDiskModeType(const configuration &state) {
+  if (state.disk_mode_type < 1 || state.disk_mode_type > DISK_MODE_TYPE_MAX) {
+    printf("Invalid disk_mode_type :: %d\n", state.disk_mode_type);
+    exit(EXIT_FAILURE);
+  }
+  else {
+    printf("%30s : %s\n", "disk_mode_type",
+           DiskModeTypeToString(state.disk_mode_type).c_str());
   }
 }
 
@@ -217,6 +230,7 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
   state.verbose = false;
 
   state.hierarchy_type = HIERARCHY_TYPE_DRAM_NVM_DISK;
+  state.disk_mode_type = DISK_MODE_TYPE_SSD;
   state.size_type = SIZE_TYPE_1;
   state.size_ratio_type = SIZE_RATIO_TYPE_1;
   state.caching_type = CACHING_TYPE_LRU;
@@ -229,7 +243,7 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
   while (1) {
     int idx = 0;
     int c = getopt_long(argc, argv,
-                        "a:c:f:m:l:o:r:s:vz:h",
+                        "a:c:d:f:m:l:o:r:s:vz:h",
                         opts, &idx);
 
     if (c == -1) break;
@@ -240,6 +254,9 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
         break;
       case 'c':
         state.caching_type = (CachingType)atoi(optarg);
+        break;
+      case 'd':
+        state.disk_mode_type = (DiskModeType)atoi(optarg);
         break;
       case 'f':
         state.file_name = optarg;
@@ -281,6 +298,7 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
   printf("//===----------------------------------------------------------------------===//\n");
 
   ValidateHierarchyType(state);
+  ValidateDiskModeType(state);
   ValidateSizeType(state);
   ValidateSizeRatioType(state);
   ValidateLatencyType(state);
