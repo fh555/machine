@@ -54,16 +54,21 @@ OPT_GRAPH_WIDTH = 400
 # Make a list by cycling through the colors you care about
 # to match the length of your data.
 NUM_COLORS = 5
-COLOR_MAP = ( '#556270', '#4ECDC4', '#C44D58', '#FF6B6B', '#C7F464')
+
+COLOR_MAP_1 = ( '#556270', '#4ECDC4', '#C44D58', '#FF6B6B', '#C7F464')
 COLOR_MAP_2 = ( '#418259', '#bd5632', '#e1a94c', '#7d6c5b', '#364d38', '#c4e1c6')
 COLOR_MAP_3 = ( '#262626', '#FECEA8', '#67abb8', '#f15b40')
-
-OPT_COLORS = COLOR_MAP
+COLOR_MAPS = (COLOR_MAP_1, COLOR_MAP_2, COLOR_MAP_3)
 
 OPT_GRID_COLOR = '#EEEEEE' # gray
 OPT_LEGEND_SHADOW = False
 OPT_MARKERS = (['o', 's', 'v', "^", "h", "v", ">", "x", "d", "<", "|", "", "|", "_"])
-OPT_PATTERNS = ([ "////", "o", "\\\\" , ".", "\\\\\\"])
+
+PATTERNS_1 = ([ "////", "o", "\\\\" , ".", "\\\\\\"])
+PATTERNS_2 = ([ "\\\\" , ".", "////", "o", "\\\\\\"])
+PATTERNS_3 = ([ "////", "o", "\\\\" , ".", "\\\\\\"])
+
+PATTERNS = (PATTERNS_1, PATTERNS_2, PATTERNS_3) 
 
 OPT_STACK_COLORS = ('#2b3742', '#c9b385', '#610606', '#1f1501')
 OPT_LINE_STYLES= ('-', ':', '--', '-.')
@@ -75,7 +80,6 @@ OPT_LINE_STYLES= ('-', ':', '--', '-.')
 OPT_STYLE = 'bmh'
 
 OPT_LABEL_WEIGHT = 'bold'
-OPT_LINE_COLORS = COLOR_MAP
 OPT_LINE_WIDTH = 6.0
 OPT_MARKER_SIZE = 10.0
 
@@ -443,11 +447,11 @@ def get_result_file(base_result_dir, result_dir_list, result_file_name):
 # LEGEND
 ###################################################################################
 
-def create_legend_hierarchy_type():
+def create_legend_hierarchy_type_line(color_mode):
     fig = pylab.figure()
     ax1 = fig.add_subplot(111)
-
-    LOG.info("Creating hierarchy type");
+    
+    LOG.info("Creating hierarchy type line");
 
     LEGEND_VALUES = HIERARCHY_TYPES
 
@@ -465,7 +469,7 @@ def create_legend_hierarchy_type():
 
     for group in range(len(LEGEND_VALUES)):
         lines[idx], = ax1.plot(x_values, data,
-                               color=OPT_LINE_COLORS[idx - 1],
+                               color=COLOR_MAPS[color_mode][idx - 1],
                                linewidth=OPT_LINE_WIDTH,
                                marker=OPT_MARKERS[idx - 1],
                                markersize=OPT_MARKER_SIZE)
@@ -478,8 +482,53 @@ def create_legend_hierarchy_type():
                      frameon=False, borderaxespad=0.0,
                      handleheight=1, handlelength=3)
 
-    figlegend.savefig(LEGEND_PLOT_DIR + 'legend_hierarchy_type.pdf')
+    figlegend.savefig(LEGEND_PLOT_DIR + 'legend_hierarchy_type_line_' 
+                      + str(color_mode) + '.pdf')  
 
+
+def create_legend_hierarchy_type_bar(color_mode):
+    fig = pylab.figure()
+    ax1 = fig.add_subplot(111)
+
+    LOG.info("Creating hierarchy type bar");
+
+    LEGEND_VALUES = HIERARCHY_TYPES
+
+    figlegend = pylab.figure(figsize=(13, 0.5))
+
+    num_items = len(LEGEND_VALUES) + 1;
+    ind = np.arange(1)
+    margin = 0.10
+    width = (1.0 - 2 * margin) / num_items
+    idx = 0
+    data = [1]
+
+    bars = [None] * len(LEGEND_VALUES) * num_items
+
+    TITLE = "STORAGE HIERARCHY TYPES:"
+    LABELS = [TITLE, "DRAM-DISK", "NVM-DISK", "DRAM-NVM-DISK"]
+
+    bars[idx], = ax1.bar(0, data, 0, color = 'w', linewidth = 0)
+    idx = 1
+
+    for group in xrange(len(LABELS)):
+        bars[idx] = ax1.bar(ind + margin + (idx * width),
+                              data,
+                              width,
+                              color=COLOR_MAPS[color_mode][idx - 1],
+                              hatch=PATTERNS[color_mode][idx - 1],
+                              linewidth=BAR_LINEWIDTH)
+        idx = idx + 1
+
+    # LEGEND
+    figlegend.legend(bars, LABELS, prop=LABEL_FP,
+                     loc=1, ncol=len(LABELS),
+                     mode="expand", shadow=OPT_LEGEND_SHADOW,
+                     frameon=False, borderaxespad=0.0,
+                     handleheight=1, handlelength=4)
+
+    figlegend.savefig(LEGEND_PLOT_DIR + 'legend_hierarchy_type_bar_' 
+                      + str(color_mode) + '.pdf')  
 
 ###################################################################################
 # PLOT
@@ -489,7 +538,7 @@ def get_label(label):
     bold_label = "\\textbf{" + label + "}"
     return bold_label
 
-def create_latency_line_chart(datasets):
+def create_latency_line_chart(datasets, color_mode):
     fig = plot.figure()
     ax1 = fig.add_subplot(111)
 
@@ -508,7 +557,7 @@ def create_latency_line_chart(datasets):
                     y_values.append(datasets[group][line][col])
         LOG.info("group_data = %s", str(y_values))
         ax1.plot(ind + 0.5, y_values,
-                 color=OPT_COLORS[idx],
+                 color=COLOR_MAPS[color_mode][idx],
                  linewidth=OPT_LINE_WIDTH,
                  marker=OPT_MARKERS[idx],
                  markersize=OPT_MARKER_SIZE,
@@ -542,7 +591,7 @@ def create_latency_line_chart(datasets):
 
     return fig
 
-def create_size_bar_chart(datasets):
+def create_size_bar_chart(datasets, color_mode):
     fig = plot.figure()
     ax1 = fig.add_subplot(111)
 
@@ -566,8 +615,8 @@ def create_size_bar_chart(datasets):
         LOG.info("group_data = %s", str(y_values))
         bars[group] =  ax1.bar(ind + margin + (group * width),
                                y_values, width,
-                               color=OPT_COLORS[group],
-                               hatch=OPT_PATTERNS[group],
+                               color=COLOR_MAPS[color_mode][group],
+                               hatch=PATTERNS[color_mode][group],
                                linewidth=BAR_LINEWIDTH)
         idx = idx + 1
 
@@ -596,7 +645,7 @@ def create_size_bar_chart(datasets):
 
     return fig
 
-def create_cache_line_chart(datasets):
+def create_cache_line_chart(datasets, color_mode):
     fig = plot.figure()
     ax1 = fig.add_subplot(111)
 
@@ -615,7 +664,7 @@ def create_cache_line_chart(datasets):
                     y_values.append(datasets[group][line][col])
         LOG.info("group_data = %s", str(y_values))
         ax1.plot(ind + 0.5, y_values,
-                 color=OPT_COLORS[idx],
+                 color=COLOR_MAPS[color_mode][idx],
                  linewidth=OPT_LINE_WIDTH,
                  marker=OPT_MARKERS[idx],
                  markersize=OPT_MARKER_SIZE,
@@ -649,7 +698,7 @@ def create_cache_line_chart(datasets):
 
     return fig
 
-def create_size_ratio_bar_chart(datasets):
+def create_size_ratio_bar_chart(datasets, color_mode):
     fig = plot.figure()
     ax1 = fig.add_subplot(111)
 
@@ -673,8 +722,8 @@ def create_size_ratio_bar_chart(datasets):
         LOG.info("group_data = %s", str(y_values))
         bars[group] =  ax1.bar(ind + margin + (group * width),
                                y_values, width,
-                               color=OPT_COLORS[group],
-                               hatch=OPT_PATTERNS[group],
+                               color=COLOR_MAPS[color_mode][group],
+                               hatch=PATTERNS[color_mode][group],
                                linewidth=BAR_LINEWIDTH)
         idx = idx + 1
 
@@ -734,7 +783,7 @@ def latency_plot():
                     dataset = loadDataFile(result_file)
                     datasets.append(dataset)
 
-                fig = create_latency_line_chart(datasets)
+                fig = create_latency_line_chart(datasets, 2)
 
                 file_name = LATENCY_PLOT_DIR + "latency" + "-" + \
                             BENCHMARK_TYPES_STRINGS[trace_type] + "-" + \
@@ -770,7 +819,7 @@ def size_plot():
                     dataset = loadDataFile(result_file)
                     datasets.append(dataset)
 
-                fig = create_size_bar_chart(datasets)
+                fig = create_size_bar_chart(datasets, 0)
 
                 file_name = SIZE_PLOT_DIR + "size" + "-" + \
                             BENCHMARK_TYPES_STRINGS[trace_type] + "-" + \
@@ -806,7 +855,7 @@ def cache_plot():
                     dataset = loadDataFile(result_file)
                     datasets.append(dataset)
 
-                fig = create_cache_line_chart(datasets)
+                fig = create_cache_line_chart(datasets, 0)
 
                 file_name = CACHE_PLOT_DIR + "cache" + "-" + \
                             BENCHMARK_TYPES_STRINGS[trace_type] + "-" + \
@@ -843,7 +892,7 @@ def size_ratio_plot():
                     dataset = loadDataFile(result_file)
                     datasets.append(dataset)
 
-                fig = create_size_ratio_bar_chart(datasets)
+                fig = create_size_ratio_bar_chart(datasets, 1)
 
                 file_name = SIZE_RATIO_PLOT_DIR + "size-ratio" + "-" + \
                             BENCHMARK_TYPES_STRINGS[trace_type] + "-" + \
@@ -880,7 +929,7 @@ def hard_disk_plot():
                     dataset = loadDataFile(result_file)
                     datasets.append(dataset)
 
-                fig = create_latency_line_chart(datasets)
+                fig = create_latency_line_chart(datasets, 2)
 
                 file_name = HARD_DISK_PLOT_DIR + "hard-disk" + "-" + \
                             BENCHMARK_TYPES_STRINGS[trace_type] + "-" + \
@@ -1365,5 +1414,8 @@ if __name__ == '__main__':
 
     ## LEGEND GROUP
 
-    #create_legend_hierarchy_type()
+    create_legend_hierarchy_type_line(0)
+    #create_legend_hierarchy_type_bar(0)
+    create_legend_hierarchy_type_line(2)
+    #create_legend_hierarchy_type_bar(2)
 
