@@ -276,7 +276,7 @@ SCALE_FACTOR = 50
 DEFAULT_DURATION = 10
 DEFAULT_HIERARCHY_TYPE = HIERARCHY_TYPE_NVM
 DEFAULT_SIZE_TYPE = SIZE_TYPE_2
-DEFAULT_SIZE_RATIO_TYPE = SIZE_RATIO_TYPE_4
+DEFAULT_SIZE_RATIO_TYPE = SIZE_RATIO_TYPE_3
 DEFAULT_CACHING_TYPE = CACHING_TYPE_LRU
 DEFAULT_LATENCY_TYPE = LATENCY_TYPE_2
 DEFAULT_DISK_MODE_TYPE = DISK_MODE_TYPE_SSD
@@ -451,7 +451,7 @@ def create_legend_hierarchy_type():
 
     LEGEND_VALUES = HIERARCHY_TYPES
 
-    figlegend = pylab.figure(figsize=(15, 0.5))
+    figlegend = pylab.figure(figsize=(13, 0.5))
     idx = 0
     lines = [None] * (len(LEGEND_VALUES) + 1)
     data = [1]
@@ -519,10 +519,12 @@ def create_latency_line_chart(datasets):
     makeGrid(ax1)
 
     # Y-AXIS
+    YAXIS_MIN = 1
+    YAXIS_MAX = 10**5
     ax1.yaxis.set_major_locator(LinearLocator(YAXIS_TICKS))
     ax1.minorticks_off()
     ax1.set_ylabel(get_label('Throughput (ops)'), fontproperties=LABEL_FP)
-    #ax1.set_ylim(bottom=YAXIS_MIN)
+    ax1.set_ylim(bottom=YAXIS_MIN, top=YAXIS_MAX)
     ax1.set_yscale('log', nonposy='clip')
 
     # X-AXIS
@@ -573,10 +575,12 @@ def create_size_bar_chart(datasets):
     makeGrid(ax1)
 
     # Y-AXIS
+    YAXIS_MIN = 1
+    YAXIS_MAX = 10**5    
     ax1.yaxis.set_major_locator(LinearLocator(YAXIS_TICKS))
     ax1.minorticks_off()
     ax1.set_ylabel(get_label('Throughput (ops)'), fontproperties=LABEL_FP)
-    #ax1.set_ylim(bottom=YAXIS_MIN, top=YAXIS_MAX)
+    ax1.set_ylim(bottom=YAXIS_MIN, top=YAXIS_MAX)
     ax1.set_yscale('log', nonposy='clip')
 
     # X-AXIS
@@ -622,10 +626,12 @@ def create_cache_line_chart(datasets):
     makeGrid(ax1)
 
     # Y-AXIS
+    YAXIS_MIN = 1
+    YAXIS_MAX = 10**5
     ax1.yaxis.set_major_locator(LinearLocator(YAXIS_TICKS))
     ax1.minorticks_off()
     ax1.set_ylabel(get_label('Throughput (ops)'), fontproperties=LABEL_FP)
-    #ax1.set_ylim(bottom=YAXIS_MIN, top=YAXIS_MAX)
+    ax1.set_ylim(bottom=YAXIS_MIN, top=YAXIS_MAX)
     ax1.set_yscale('log', nonposy='clip')
 
     # X-AXIS
@@ -676,10 +682,12 @@ def create_size_ratio_bar_chart(datasets):
     makeGrid(ax1)
 
     # Y-AXIS
+    YAXIS_MIN = 1
+    YAXIS_MAX = 10**5
     ax1.yaxis.set_major_locator(LinearLocator(YAXIS_TICKS))
     ax1.minorticks_off()
     ax1.set_ylabel(get_label('Throughput (ops)'), fontproperties=LABEL_FP)
-    #ax1.set_ylim(bottom=YAXIS_MIN, top=YAXIS_MAX)
+    ax1.set_ylim(bottom=YAXIS_MIN, top=YAXIS_MAX)
     ax1.set_yscale('log', nonposy='clip')
 
     # X-AXIS
@@ -1339,7 +1347,7 @@ if __name__ == '__main__':
         hard_disk_eval()
 
     ## PLOTTING GROUP
-
+    
     if args.latency_plot:
         latency_plot()
 

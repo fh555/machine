@@ -48,11 +48,11 @@ class configuration {
   // operation count
   size_t operation_count;
 
+  // simulate
+  bool simulate;
+
   // Verbose output
   bool verbose;
-
-  // HDD mode
-  bool hdd_mode;
 
   // DERIVED BASED ON HIERARCHY TYPE
 
