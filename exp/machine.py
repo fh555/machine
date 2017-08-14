@@ -585,7 +585,6 @@ def create_cache_line_chart(datasets):
 
     idx = 0
     for group in range(len(datasets)):
-        color_idx = idx + 1
         # GROUP
         y_values = []
         for line in  range(len(datasets[group])):
@@ -594,9 +593,9 @@ def create_cache_line_chart(datasets):
                     y_values.append(datasets[group][line][col])
         LOG.info("group_data = %s", str(y_values))
         ax1.plot(ind + 0.5, y_values,
-                 color=OPT_COLORS[color_idx],
+                 color=OPT_COLORS[idx],
                  linewidth=OPT_LINE_WIDTH,
-                 marker=OPT_MARKERS[color_idx],
+                 marker=OPT_MARKERS[idx],
                  markersize=OPT_MARKER_SIZE,
                  label=str(group))
         idx = idx + 1
@@ -713,7 +712,6 @@ def latency_plot():
 
                 file_name = LATENCY_PLOT_DIR + "latency" + "-" + \
                             BENCHMARK_TYPES_STRINGS[trace_type] + "-" + \
-                            HIERARCHY_TYPES_STRINGS[hierarchy_type] + "-" + \
                             CACHING_TYPES_STRINGS[caching_type] + "-" + \
                             str(size_type) + ".pdf"
 
