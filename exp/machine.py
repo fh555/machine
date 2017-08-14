@@ -248,13 +248,13 @@ BENCHMARK_TYPES_DIRS = {
 
 BENCHMARK_TYPES = [
     BENCHMARK_TYPE_TPCC,
-#    BENCHMARK_TYPE_VOTER,
-#    BENCHMARK_TYPE_YCSB,
-#    BENCHMARK_TYPE_YCSB_READ,
-#    BENCHMARK_TYPE_YCSB_INSERT,
-#    BENCHMARK_TYPE_CHBENCHMARK,
-#    BENCHMARK_TYPE_AUCTIONMARK,
-#    BENCHMARK_TYPE_SMALLBANK
+    BENCHMARK_TYPE_VOTER,
+    BENCHMARK_TYPE_YCSB,
+    BENCHMARK_TYPE_YCSB_READ,
+    BENCHMARK_TYPE_YCSB_INSERT,
+    BENCHMARK_TYPE_CHBENCHMARK,
+    BENCHMARK_TYPE_AUCTIONMARK,
+    BENCHMARK_TYPE_SMALLBANK
 ]
 
 ## OUTPUT
@@ -1087,7 +1087,7 @@ def size_ratio_eval():
                                               size_ratio_type=size_ratio_type,
                                               caching_type=caching_type,
                                               summary_file=SIZE_RATIO_EXPERIMENT_SUMMARY)
-                        
+
                         # Write stat
                         write_stat(result_file, size_ratio_type, stat)
 
