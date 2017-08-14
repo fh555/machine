@@ -281,13 +281,6 @@ void MoveVictim(std::vector<Device>& devices,
                 const size_t& block_status,
                 double& total_duration);
 
-size_t copy_dram_count = 0;
-size_t copy_nvm_count = 0;
-size_t copy_disk_count = 0;
-size_t move_victim_dram_count = 0;
-size_t move_victim_nvm_count = 0;
-size_t move_victim_disk_count = 0;
-
 void Copy(std::vector<Device>& devices,
           DeviceType destination,
           DeviceType source,
@@ -299,16 +292,6 @@ void Copy(std::vector<Device>& devices,
       << DeviceTypeToString(source) << " " \
       << "---> " << DeviceTypeToString(destination) << " " \
       << CleanStatus(block_status) << "\n";
-
-  if(destination == DeviceType::DEVICE_TYPE_DRAM){
-    copy_dram_count++;
-  }
-  else if(destination == DeviceType::DEVICE_TYPE_NVM){
-    copy_nvm_count++;
-  }
-  else if(destination == DeviceType::DEVICE_TYPE_DISK){
-    copy_disk_count++;
-  }
 
   // Write to destination device
   auto device_offset = GetDeviceOffset(devices, destination);
@@ -373,16 +356,6 @@ void MoveVictim(std::vector<Device>& devices,
     // Dirty victim
     if((memory_device && is_dirty) || on_nvm){
       auto destination = GetLowerDevice(devices, source);
-
-      if(destination == DeviceType::DEVICE_TYPE_DRAM){
-        move_victim_dram_count++;
-      }
-      else if(destination == DeviceType::DEVICE_TYPE_NVM){
-        move_victim_nvm_count++;
-      }
-      else if(destination == DeviceType::DEVICE_TYPE_DISK){
-        move_victim_disk_count++;
-      }
 
       // Copy to lower device
       Copy(devices,
