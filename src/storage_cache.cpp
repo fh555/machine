@@ -152,6 +152,29 @@ size_t StorageCache::CurrentCapacity() const{
 
 }
 
+double StorageCache::GetOccupiedFraction() const{
+
+  switch(caching_type_){
+
+    case CACHING_TYPE_FIFO:
+      return fifo_cache->GetOccupiedFraction();
+
+    case CACHING_TYPE_LRU:
+      return lru_cache->GetOccupiedFraction();
+
+    case CACHING_TYPE_LFU:
+      return lfu_cache->GetOccupiedFraction();
+
+    case CACHING_TYPE_ARC:
+      return arc_cache->GetOccupiedFraction();
+
+    case CACHING_TYPE_INVALID:
+    default:
+      exit(EXIT_FAILURE);
+  }
+
+}
+
 std::ostream& operator<< (std::ostream& stream,
                           const StorageCache& cache){
 

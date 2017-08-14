@@ -281,6 +281,13 @@ void MoveVictim(std::vector<Device>& devices,
                 const size_t& block_status,
                 double& total_duration);
 
+size_t copy_dram_count = 0;
+size_t copy_nvm_count = 0;
+size_t copy_disk_count = 0;
+size_t move_victim_dram_count = 0;
+size_t move_victim_nvm_count = 0;
+size_t move_victim_disk_count = 0;
+
 void Copy(std::vector<Device>& devices,
           DeviceType destination,
           DeviceType source,
@@ -292,6 +299,16 @@ void Copy(std::vector<Device>& devices,
       << DeviceTypeToString(source) << " " \
       << "---> " << DeviceTypeToString(destination) << " " \
       << CleanStatus(block_status) << "\n";
+
+  if(destination == DeviceType::DEVICE_TYPE_DRAM){
+    copy_dram_count++;
+  }
+  else if(destination == DeviceType::DEVICE_TYPE_NVM){
+    copy_nvm_count++;
+  }
+  else if(destination == DeviceType::DEVICE_TYPE_DISK){
+    copy_disk_count++;
+  }
 
   // Write to destination device
   auto device_offset = GetDeviceOffset(devices, destination);
@@ -321,13 +338,13 @@ size_t GetSizeRatio(const SizeRatioType& size_ratio){
 
   switch (size_ratio) {
     case SIZE_RATIO_TYPE_1:
-      return 4;
-    case SIZE_RATIO_TYPE_2:
       return 16;
+    case SIZE_RATIO_TYPE_2:
+      return 32;
     case SIZE_RATIO_TYPE_3:
       return 64;
     case SIZE_RATIO_TYPE_4:
-      return 256;
+      return 128;
     default:
       return -1;
   }
@@ -342,27 +359,39 @@ void MoveVictim(std::vector<Device>& devices,
 
   bool victim_exists = (block_id != INVALID_KEY);
   bool memory_device = (source == DeviceType::DEVICE_TYPE_CACHE ||
-      source == DeviceType::DEVICE_TYPE_DRAM ||
-      source == DeviceType::DEVICE_TYPE_NVM);
+      source == DeviceType::DEVICE_TYPE_DRAM);
+  bool on_nvm = (source == DeviceType::DEVICE_TYPE_NVM);
   bool is_dirty = (block_status == DIRTY_BLOCK);
 
   if(victim_exists == true) {
-    DLOG(INFO) << "Move victim   : " << block_id << "\n";
-    DLOG(INFO) << "Memory device : " << memory_device << "\n";
+    DLOG(INFO) << "Move victim   : " << block_id << " :: ";
+    DLOG(INFO) << "Memory device : " << DeviceTypeToString(source) << " :: ";
     DLOG(INFO) << CleanStatus(block_status) << "\n";
   }
 
-  // Check if we have a dirty victim in DRAM
-  if(victim_exists && memory_device && is_dirty){
-    auto destination = GetLowerDevice(devices, source);
+  if(victim_exists){
+    // Dirty victim
+    if((memory_device && is_dirty) || on_nvm){
+      auto destination = GetLowerDevice(devices, source);
 
-    // Copy to device
-    Copy(devices,
-         destination,
-         source,
-         block_id,
-         block_status,
-         total_duration);
+      if(destination == DeviceType::DEVICE_TYPE_DRAM){
+        move_victim_dram_count++;
+      }
+      else if(destination == DeviceType::DEVICE_TYPE_NVM){
+        move_victim_nvm_count++;
+      }
+      else if(destination == DeviceType::DEVICE_TYPE_DISK){
+        move_victim_disk_count++;
+      }
+
+      // Copy to lower device
+      Copy(devices,
+           destination,
+           source,
+           block_id,
+           block_status,
+           total_duration);
+    }
   }
 
 }

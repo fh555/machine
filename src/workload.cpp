@@ -195,10 +195,6 @@ void BringBlockToMemory(const size_t& block_id){
   auto storage_device_type = LocateInStorageDevices(block_id);
   auto nvm_exists = DeviceExists(state.devices, DeviceType::DEVICE_TYPE_NVM);
 
-  DLOG(INFO) << "BringBlockToMemory:: "
-      << DeviceTypeToString(memory_device_type) << " "
-      << DeviceTypeToString(storage_device_type) << "\n";
-
   // Not found on DRAM & NVM
   if(memory_device_type == DeviceType::DEVICE_TYPE_INVALID &&
       storage_device_type != DeviceType::DEVICE_TYPE_INVALID){
@@ -388,6 +384,20 @@ void FlushBlock(const size_t& block_id) {
 }
 
 void BootstrapBlock(const size_t& block_id) {
+
+  auto nvm_exists = DeviceExists(state.devices, DeviceType::DEVICE_TYPE_NVM);
+  if(nvm_exists == true){
+    auto device_offset = GetDeviceOffset(state.devices, DeviceType::DEVICE_TYPE_NVM);
+    auto device_cache = state.devices[device_offset].cache;
+
+    auto occupied_fraction = device_cache.GetOccupiedFraction();
+    if(occupied_fraction > 0.5){
+      // Bootstrap on last device
+      auto last_device_cache = state.devices.back().cache;
+      last_device_cache.Put(block_id, CLEAN_BLOCK);
+      return;
+    }
+  }
 
   // Bootstrap on durable storage
   WriteBlock(block_id);

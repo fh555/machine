@@ -23,6 +23,8 @@ class StorageCache {
 
   size_t CurrentCapacity() const;
 
+  double GetOccupiedFraction() const;
+
   bool IsSequential(const size_t& next);
 
   friend std::ostream& operator<< (std::ostream& stream,

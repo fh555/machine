@@ -44,6 +44,9 @@ class Cache {
 
   size_t CurrentCapacity() const;
 
+  // Returns a fraction (0-->1)
+  double GetOccupiedFraction() const;
+
   void Print() const;
 
   bool IsSequential(const size_t& next);

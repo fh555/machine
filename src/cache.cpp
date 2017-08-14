@@ -12,7 +12,7 @@
 
 namespace machine {
 
-int super_block_factor = 1;
+int super_block_factor = 512;
 
 void PrintCapacity(const size_t block_count){
 
@@ -113,7 +113,19 @@ const Value& CACHE_TEMPLATE_TYPE::Get(const Key& key,
 CACHE_TEMPLATE_ARGUMENT
 size_t CACHE_TEMPLATE_TYPE::CurrentCapacity() const {
 
-  return cache_items_map.size();
+  double currently_occupied_slots = cache_items_map.size();
+
+  return currently_occupied_slots;
+}
+
+CACHE_TEMPLATE_ARGUMENT
+double CACHE_TEMPLATE_TYPE::GetOccupiedFraction() const {
+
+  double currently_occupied_slots = cache_items_map.size();
+  double full_capacity = capacity_;
+  double occupied_fraction = currently_occupied_slots/full_capacity;
+
+  return occupied_fraction;
 }
 
 CACHE_TEMPLATE_ARGUMENT
