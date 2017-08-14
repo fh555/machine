@@ -18,6 +18,15 @@ enum HierarchyType {
   HIERARCHY_TYPE_MAX = 5
 };
 
+enum DiskModeType {
+  DISK_MODE_TYPE_INVALID = 0,
+
+  DISK_MODE_TYPE_SSD = 1,
+  DISK_MODE_TYPE_HDD = 2,
+
+  DISK_MODE_TYPE_MAX = 2
+};
+
 enum SizeType {
   SIZE_TYPE_INVALID = 0,
 
@@ -75,6 +84,8 @@ enum DeviceType {
 DeviceType GetLastDevice(const HierarchyType& hierarchy_type);
 
 std::string HierarchyTypeToString(const HierarchyType& hierarchy_type);
+
+std::string DiskModeTypeToString(const DiskModeType& disk_mode_type);
 
 std::string SizeTypeToString(const SizeType& size_type);
 

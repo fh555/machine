@@ -38,6 +38,19 @@ std::string DeviceTypeToString(const DeviceType& device_type){
 
 }
 
+std::string DiskModeTypeToString(const DiskModeType& disk_mode_type) {
+
+  switch (disk_mode_type){
+    case DISK_MODE_TYPE_SSD:
+      return "SSD";
+    case DISK_MODE_TYPE_HDD:
+      return "HDD";
+    default:
+      return "INVALID";
+  }
+
+}
+
 std::string HierarchyTypeToString(const HierarchyType& hierarchy_type){
 
   switch (hierarchy_type) {

@@ -21,6 +21,9 @@ class configuration {
   // hierarchy type
   HierarchyType hierarchy_type;
 
+  // disk mode type
+  DiskModeType disk_mode_type;
+
   // size type
   SizeType size_type;
 
