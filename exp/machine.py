@@ -215,6 +215,7 @@ CACHING_TYPES = [
 ]
 
 ## BENCHMARK TYPES
+BENCHMARK_TYPE_EXAMPLE = 0
 BENCHMARK_TYPE_TPCC = 1
 BENCHMARK_TYPE_YCSB = 2
 BENCHMARK_TYPE_VOTER = 3
@@ -225,6 +226,7 @@ BENCHMARK_TYPE_AUCTIONMARK = 7
 BENCHMARK_TYPE_SMALLBANK = 8
 
 BENCHMARK_TYPES_STRINGS = {
+    0 : "example",                
     1 : "tpcc",
     2 : "ycsb",
     3 : "voter",
@@ -236,6 +238,7 @@ BENCHMARK_TYPES_STRINGS = {
 }
 
 BENCHMARK_TYPES_DIRS = {
+    0 : BENCHMARK_DIR + BENCHMARK_TYPES_STRINGS[0] + ".txt",                        
     1 : BENCHMARK_DIR + BENCHMARK_TYPES_STRINGS[1] + ".txt",
     2 : BENCHMARK_DIR + BENCHMARK_TYPES_STRINGS[2] + ".txt",
     3 : BENCHMARK_DIR + BENCHMARK_TYPES_STRINGS[3] + ".txt",
@@ -247,7 +250,8 @@ BENCHMARK_TYPES_DIRS = {
 }
 
 BENCHMARK_TYPES = [
-    BENCHMARK_TYPE_TPCC,
+     BENCHMARK_TYPE_EXAMPLE,
+#    BENCHMARK_TYPE_TPCC,
 #    BENCHMARK_TYPE_VOTER,
 #    BENCHMARK_TYPE_YCSB,
 #    BENCHMARK_TYPE_YCSB_READ,
@@ -263,7 +267,7 @@ THROUGHPUT_OFFSET = 0
 
 ## DEFAULTS
 
-SCALE_FACTOR = 50
+SCALE_FACTOR = 10
 
 DEFAULT_DURATION = 10
 DEFAULT_HIERARCHY_TYPE = HIERARCHY_TYPE_NVM
@@ -630,7 +634,7 @@ def create_size_ratio_bar_chart(datasets):
     ax1 = fig.add_subplot(111)
 
     # X-AXIS
-    x_values = [str(chr(ord('A') + i - 1)) for i in SIZE_RATIO_EXP_SIZE_TYPES]
+    x_values = [str(chr(ord('A') + i - 1)) for i in SIZE_RATIO_EXP_SIZE_RATIO_TYPES]
     N = len(x_values)
     M = 3
     ind = np.arange(N)
