@@ -262,11 +262,7 @@ BENCHMARK_TYPES = [
     BENCHMARK_TYPE_TPCC,
     BENCHMARK_TYPE_VOTER,
     BENCHMARK_TYPE_YCSB,
-    BENCHMARK_TYPE_YCSB_READ,
-    BENCHMARK_TYPE_YCSB_INSERT,
-    BENCHMARK_TYPE_CHBENCHMARK,
-    BENCHMARK_TYPE_AUCTIONMARK,
-    BENCHMARK_TYPE_SMALLBANK
+    BENCHMARK_TYPE_CHBENCHMARK
 ]
 
 ## OUTPUT
@@ -477,7 +473,7 @@ def create_legend_hierarchy_type_line(color_mode):
 
     # LEGEND
     figlegend.legend(lines, LABELS, prop=LEGEND_FP,
-                     loc=1, ncol=7,
+                     loc=1, ncol=4,
                      mode="expand", shadow=OPT_LEGEND_SHADOW,
                      frameon=False, borderaxespad=0.0,
                      handleheight=1, handlelength=3)
@@ -512,20 +508,20 @@ def create_legend_hierarchy_type_bar(color_mode):
     idx = 1
 
     for group in xrange(len(LABELS)):
-        bars[idx] = ax1.bar(ind + margin + (idx * width),
+        bars[idx], = ax1.bar(ind + margin + (idx * width),
                               data,
                               width,
                               color=COLOR_MAPS[color_mode][idx - 1],
                               hatch=PATTERNS[color_mode][idx - 1],
                               linewidth=BAR_LINEWIDTH)
         idx = idx + 1
-
+    
     # LEGEND
-    figlegend.legend(bars, LABELS, prop=LABEL_FP,
-                     loc=1, ncol=len(LABELS),
+    figlegend.legend(bars, LABELS, prop=LEGEND_FP,
+                     loc=1, ncol=4,
                      mode="expand", shadow=OPT_LEGEND_SHADOW,
                      frameon=False, borderaxespad=0.0,
-                     handleheight=1, handlelength=4)
+                     handleheight=1, handlelength=3)
 
     figlegend.savefig(LEGEND_PLOT_DIR + 'legend_hierarchy_type_bar_' 
                       + str(color_mode) + '.pdf')  
@@ -783,7 +779,7 @@ def latency_plot():
                     dataset = loadDataFile(result_file)
                     datasets.append(dataset)
 
-                fig = create_latency_line_chart(datasets, 2)
+                fig = create_latency_line_chart(datasets, 0)
 
                 file_name = LATENCY_PLOT_DIR + "latency" + "-" + \
                             BENCHMARK_TYPES_STRINGS[trace_type] + "-" + \
@@ -892,7 +888,7 @@ def size_ratio_plot():
                     dataset = loadDataFile(result_file)
                     datasets.append(dataset)
 
-                fig = create_size_ratio_bar_chart(datasets, 1)
+                fig = create_size_ratio_bar_chart(datasets, 0)
 
                 file_name = SIZE_RATIO_PLOT_DIR + "size-ratio" + "-" + \
                             BENCHMARK_TYPES_STRINGS[trace_type] + "-" + \
@@ -929,7 +925,7 @@ def hard_disk_plot():
                     dataset = loadDataFile(result_file)
                     datasets.append(dataset)
 
-                fig = create_latency_line_chart(datasets, 2)
+                fig = create_latency_line_chart(datasets, 0)
 
                 file_name = HARD_DISK_PLOT_DIR + "hard-disk" + "-" + \
                             BENCHMARK_TYPES_STRINGS[trace_type] + "-" + \
@@ -1415,7 +1411,4 @@ if __name__ == '__main__':
     ## LEGEND GROUP
 
     create_legend_hierarchy_type_line(0)
-    #create_legend_hierarchy_type_bar(0)
-    create_legend_hierarchy_type_line(2)
-    #create_legend_hierarchy_type_bar(2)
-
+    create_legend_hierarchy_type_bar(0)
