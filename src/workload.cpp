@@ -505,6 +505,9 @@ void MachineHelper() {
   size_t write_operation_itr = 0;
   size_t flush_operation_itr = 0;
 
+  // PHYSICAL TIME
+  struct timespec start, end;
+
   // RUN SIMULATION
   while(!input->eof()){
     operation_itr++;
@@ -572,6 +575,9 @@ void MachineHelper() {
 
       // Set warmed up
       warmed_up = true;
+
+      // Start physical timer
+      clock_gettime(CLOCK_MONOTONIC_RAW, &start);
     }
 
     if(operation_itr % 100000 == 0){
@@ -583,6 +589,8 @@ void MachineHelper() {
 
     if(state.operation_count != 0){
       if(operation_itr > state.operation_count){
+        // Stop physical timer
+        clock_gettime(CLOCK_MONOTONIC_RAW, &end);
         break;
       }
     }
@@ -594,6 +602,15 @@ void MachineHelper() {
   std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
   std::cout << "THROUGHPUT : " << throughput << " (OPS/S) \n";
   std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+
+  // Get physical time
+  uint64_t physical_us = (end.tv_sec - start.tv_sec) * 1000000;
+  physical_us += (end.tv_nsec - start.tv_nsec) / 1000;
+
+  std::cout << "\n\n";
+  std::cout << "PHYSICAL TIME (s): " << physical_us/(1000 * 1000) << "\n";
+  std::cout << "LOGICAL TIME  (s): " << total_duration/(1000 * 1000) << "\n";
+  std::cout << "\n\n";
 
   // Get machine size
   auto machine_size = GetMachineSize();
