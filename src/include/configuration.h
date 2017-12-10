@@ -54,6 +54,9 @@ class configuration {
   // Verbose output
   bool verbose;
 
+  // Emulate
+  bool emulate;
+
   // DERIVED BASED ON HIERARCHY TYPE
 
   // list of devices in hierarchy

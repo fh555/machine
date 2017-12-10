@@ -8,6 +8,8 @@ namespace machine {
 
 extern size_t scale_factor;
 
+#define BLOCK_SIZE 1024
+
 class configuration;
 
 struct Device {
@@ -48,6 +50,10 @@ size_t GetReadLatency(std::vector<Device>& devices,
                       const size_t& block_id);
 
 void BootstrapDeviceMetrics(const configuration &state);
+
+void BootstrapFileSystemForEmulation();
+
+extern bool emulate;
 
 void Copy(std::vector<Device>& devices,
           DeviceType destination,

@@ -7,6 +7,8 @@
 #include <iomanip>
 #include <map>
 #include <set>
+#include <unistd.h>
+#include <cstdio>
 
 #include "macros.h"
 #include "workload.h"
@@ -21,6 +23,8 @@ namespace machine {
 size_t query_itr;
 
 double total_duration = 0;
+
+bool emulate = false;
 
 // Stats
 extern Stats machine_stats;
@@ -609,6 +613,12 @@ void MachineHelper() {
 }
 
 void RunMachineTest() {
+
+  // Bootstrap filesystem if needed
+  if(state.emulate == true){
+    emulate = true;
+    BootstrapFileSystemForEmulation();
+  }
 
   // Run the benchmark once
   MachineHelper();

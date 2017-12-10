@@ -66,6 +66,85 @@ void BootstrapDeviceMetrics(const configuration &state){
 
 }
 
+std::vector<DeviceType> emulated_device_types =
+{
+    DeviceType::DEVICE_TYPE_DRAM,
+    DeviceType::DEVICE_TYPE_NVM,
+    DeviceType::DEVICE_TYPE_DISK
+};
+
+std::map<DeviceType, bool> is_device_emulated;
+std::map<DeviceType, size_t> file_sizes;
+std::map<DeviceType, std::string> file_paths;
+std::map<DeviceType, FILE*> file_pointers;
+
+std::string buffer;
+
+std::string random_string(size_t length){
+  auto randchar = []() -> char
+      {
+    const char charset[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+    const size_t max_index = (sizeof(charset) - 1);
+    return charset[ rand() % max_index ];
+      };
+  std::string str(length,0);
+  std::generate_n( str.begin(), length, randchar );
+  return str;
+}
+
+void BootstrapFileSystemForEmulation(){
+
+  // Setup buffer
+  buffer = random_string(BLOCK_SIZE);
+
+  is_device_emulated[DeviceType::DEVICE_TYPE_INVALID] = false;
+  is_device_emulated[DeviceType::DEVICE_TYPE_CACHE] = false;
+  is_device_emulated[DeviceType::DEVICE_TYPE_DRAM] = true;
+  is_device_emulated[DeviceType::DEVICE_TYPE_NVM] = true;
+  is_device_emulated[DeviceType::DEVICE_TYPE_DISK] = true;
+
+  file_sizes[DeviceType::DEVICE_TYPE_DRAM] = 1 * (1024 * 1024 * 1024);
+  file_sizes[DeviceType::DEVICE_TYPE_NVM] = 1 * (1024 * 1024 * 1024);
+  file_sizes[DeviceType::DEVICE_TYPE_DISK] = 1 * (1024 * 1024 * 1024);
+
+  file_paths[DeviceType::DEVICE_TYPE_DRAM] = "/data1/database";
+  file_paths[DeviceType::DEVICE_TYPE_NVM] = "/mnt/pmfs/database";
+  file_paths[DeviceType::DEVICE_TYPE_DISK] = "/data2/database";
+
+  // Create and truncate files
+  for(auto device_type : emulated_device_types){
+    FILE *file_pointer = NULL;
+    int status;
+
+    file_pointer = fopen(file_paths[device_type].c_str(), "w");
+    if(file_pointer == NULL) {
+      std::cout << "Could not open file: " << file_paths[device_type] << "\n";
+      exit(EXIT_FAILURE);
+    }
+
+    // Cache file pointer
+    file_pointers[device_type] = file_pointer;
+
+    // Size in GB
+    auto file_size = file_sizes[device_type];
+    status = ftruncate(fileno(file_pointer), file_size);
+    if(status != 0){
+      std::cout << "Could not truncate file: " << file_paths[device_type] << "\n";
+      exit(EXIT_FAILURE);
+    }
+    else {
+      std::cout << "Truncated file: " << file_paths[device_type] << " file_size: " << file_size << "\n";
+    }
+
+  }
+
+  std::cout << "Bootstrapped File System \n";
+
+}
+
 bool IsSequential(std::vector<Device>& devices,
                   const DeviceType& device_type,
                   const size_t& next);
@@ -87,6 +166,30 @@ size_t GetWriteLatency(std::vector<Device>& devices,
 
   // Increment stats
   machine_stats.IncrementWriteCount(device_type);
+
+  // Emulate if needed
+  if(emulate == true && is_device_emulated[device_type] == true){
+    // Seek
+    auto max_size = file_sizes[device_type];
+    auto location = (block_id * BLOCK_SIZE) % max_size;
+    auto status = fseek(file_pointers[device_type], location, SEEK_SET);
+    if(status != 0){
+      std::cout << "seek_status: " << status << "\n";
+      exit(EXIT_FAILURE);
+    }
+
+    // Write
+    auto write_size = fwrite(buffer.c_str(), buffer.size(), 1,
+                             file_pointers[device_type]);
+    if(write_size == 0){
+      std::cout << "Writing error: " << file_paths[device_type];
+      std::cout << " write_size: " << write_size << "\n";
+      exit(EXIT_FAILURE);
+    }
+    else {
+      std::cout << "Wrote at: " << location << "\n";
+    }
+  }
 
   // Check if sequential or random?
   bool is_sequential = IsSequential(devices, device_type, block_id);
@@ -114,6 +217,8 @@ size_t GetWriteLatency(std::vector<Device>& devices,
   }
 }
 
+char read_buffer[BLOCK_SIZE*2];
+
 size_t GetReadLatency(std::vector<Device>& devices,
                       DeviceType device_type,
                       const size_t& block_id){
@@ -125,6 +230,32 @@ size_t GetReadLatency(std::vector<Device>& devices,
 
   // Check if sequential or random?
   bool is_sequential = IsSequential(devices, device_type, block_id);
+
+  // Emulate if needed
+  if(emulate == true && is_device_emulated[device_type] == true){
+    // Seek
+    auto max_size = file_sizes[device_type];
+    auto location = (block_id * BLOCK_SIZE) % max_size;
+    std::cout << "Location: " << location << "\n";
+    auto status = fseek(file_pointers[device_type], location, SEEK_SET);
+    if(status != 0){
+      std::cout << "seek_status: " << status << "\n";
+      exit(EXIT_FAILURE);
+    }
+
+    // Read
+    auto read_size = fread(read_buffer, BLOCK_SIZE, 1,
+                           file_pointers[device_type]);
+    if(read_size != 1){
+      std::cout << "Reading error: " << file_pointers[device_type];
+      std::cout << " "  << file_paths[device_type];
+      std::cout << " read_size: " << read_size << "\n";
+      exit(EXIT_FAILURE);
+    }
+    else {
+      std::cout << "Read at: " << location << "\n";
+    }
+  }
 
   switch(device_type){
     case DEVICE_TYPE_CACHE:

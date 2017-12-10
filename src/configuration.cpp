@@ -14,29 +14,31 @@ void Usage() {
       "\n"
       "Command line options : machine <options>\n"
       "   -a --hierarchy_type                 :  hierarchy type\n"
-      "   -d --disk_mode_type                 :  disk mode type\n"
-      "   -s --size_type                      :  size type\n"
-      "   -r --size_ratio_type                :  size ratio type\n"
-      "   -l --latency_type                   :  latency type\n"
       "   -c --caching_type                   :  caching type\n"
+      "   -d --disk_mode_type                 :  disk mode type\n"
+      "   -e --emulate                        :  emulate\n"
       "   -f --file_name                      :  file name\n"
+      "   -l --latency_type                   :  latency type\n"
       "   -m --migration_frequency            :  migration frequency\n"
       "   -o --operation_count                :  operation count\n"
-      "   -z --summary_file                   :  summary file\n"
-      "   -v --verbose                        :  verbose\n";
-  exit(EXIT_FAILURE);
+      "   -r --size_ratio_type                :  size ratio type\n"
+      "   -s --size_type                      :  size type\n"
+      "   -v --verbose                        :  verbose\n"
+      "   -z --summary_file                   :  summary file\n";
+      exit(EXIT_FAILURE);
 }
 
 static struct option opts[] = {
     {"hierarchy_type", optional_argument, NULL, 'a'},
-    {"disk_mode_type", optional_argument, NULL, 'd'},
-    {"size_type", optional_argument, NULL, 's'},
-    {"size_ratio_type", optional_argument, NULL, 'r'},
-    {"latency_type", optional_argument, NULL, 'l'},
     {"caching_type", optional_argument, NULL, 'c'},
+    {"disk_mode_type", optional_argument, NULL, 'd'},
+    {"emulate", optional_argument, NULL, 'e'},
     {"file_name", optional_argument, NULL, 'f'},
+    {"latency_type", optional_argument, NULL, 'l'},
     {"migration_frequency", optional_argument, NULL, 'm'},
     {"operation_count", optional_argument, NULL, 'o'},
+    {"size_ratio_type", optional_argument, NULL, 'r'},
+    {"size_type", optional_argument, NULL, 's'},
     {"verbose", optional_argument, NULL, 'v'},
     {"summary_file", optional_argument, NULL, 'z'},
     {NULL, 0, NULL, 0}
@@ -223,7 +225,6 @@ void ConstructDeviceList(configuration &state){
 
 }
 
-
 void ParseArguments(int argc, char *argv[], configuration &state) {
 
   // Default Values
@@ -238,12 +239,13 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
   state.migration_frequency = 3;
   state.file_name = "";
   state.operation_count = 0;
+  state.emulate = false;
 
   // Parse args
   while (1) {
     int idx = 0;
     int c = getopt_long(argc, argv,
-                        "a:c:d:f:m:l:o:r:s:vz:h",
+                        "a:c:d:e:f:m:l:o:r:s:vz:h",
                         opts, &idx);
 
     if (c == -1) break;
@@ -257,6 +259,9 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
         break;
       case 'd':
         state.disk_mode_type = (DiskModeType)atoi(optarg);
+        break;
+      case 'e':
+        state.emulate = atoi(optarg);
         break;
       case 'f':
         state.file_name = optarg;
@@ -293,9 +298,16 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
   }
 
   // Run validators
-  printf("//===----------------------------------------------------------------------===//\n");
-  printf("//                               MACHINE                                      //\n");
-  printf("//===----------------------------------------------------------------------===//\n");
+  if(state.emulate == false){
+    printf("//===----------------------------------------------------------------------===//\n");
+    printf("//                         MACHINE SIMULATOR                                  //\n");
+    printf("//===----------------------------------------------------------------------===//\n");
+  }
+  else {
+    printf("//===----------------------------------------------------------------------===//\n");
+    printf("//                         MACHINE EMULATOR                                   //\n");
+    printf("//===----------------------------------------------------------------------===//\n");
+  }
 
   ValidateHierarchyType(state);
   ValidateDiskModeType(state);
