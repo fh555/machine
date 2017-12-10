@@ -78,7 +78,8 @@ std::map<DeviceType, size_t> file_sizes;
 std::map<DeviceType, std::string> file_paths;
 std::map<DeviceType, FILE*> file_pointers;
 
-std::string buffer;
+std::string write_buffer;
+char read_buffer[BLOCK_SIZE*2];
 
 std::string random_string(size_t length){
   auto randchar = []() -> char
@@ -98,7 +99,7 @@ std::string random_string(size_t length){
 void BootstrapFileSystemForEmulation(){
 
   // Setup buffer
-  buffer = random_string(BLOCK_SIZE);
+  write_buffer = random_string(BLOCK_SIZE);
 
   is_device_emulated[DeviceType::DEVICE_TYPE_INVALID] = false;
   is_device_emulated[DeviceType::DEVICE_TYPE_CACHE] = false;
@@ -125,9 +126,6 @@ void BootstrapFileSystemForEmulation(){
       exit(EXIT_FAILURE);
     }
 
-    // Cache file pointer
-    file_pointers[device_type] = file_pointer;
-
     // Size in GB
     auto file_size = file_sizes[device_type];
     status = ftruncate(fileno(file_pointer), file_size);
@@ -139,9 +137,38 @@ void BootstrapFileSystemForEmulation(){
       std::cout << "Truncated file: " << file_paths[device_type] << " file_size: " << file_size << "\n";
     }
 
+    // Sync
+    status = fsync(fileno(file_pointer));
+    if(status != 0){
+      std::cout << "Could not sync file: " << file_paths[device_type] << "\n";
+      exit(EXIT_FAILURE);
+    }
+
+    // Close file
+    status = fclose(file_pointer);
+    if(status != 0){
+      std::cout << "Could not close file: " << file_paths[device_type] << "\n";
+      exit(EXIT_FAILURE);
+    }
+
   }
 
   std::cout << "Bootstrapped File System \n";
+
+  // Open all files
+  for(auto device_type : emulated_device_types){
+    FILE *file_pointer = NULL;
+
+    file_pointer = fopen(file_paths[device_type].c_str(), "rw+");
+    if(file_pointer == NULL) {
+      std::cout << "Could not open file: " << file_paths[device_type] << "\n";
+      exit(EXIT_FAILURE);
+    }
+
+    // Cache file pointer
+    file_pointers[device_type] = file_pointer;
+
+  }
 
 }
 
@@ -174,21 +201,21 @@ size_t GetWriteLatency(std::vector<Device>& devices,
     auto location = (block_id * BLOCK_SIZE) % max_size;
     auto status = fseek(file_pointers[device_type], location, SEEK_SET);
     if(status != 0){
-      std::cout << "seek_status: " << status << "\n";
+      perror("seek");
       exit(EXIT_FAILURE);
     }
 
     // Write
-    auto write_size = fwrite(buffer.c_str(), buffer.size(), 1,
+    auto write_size = fwrite(write_buffer.c_str(), write_buffer.size(), 1,
                              file_pointers[device_type]);
     if(write_size == 0){
       std::cout << "Writing error: " << file_paths[device_type];
-      std::cout << " write_size: " << write_size << "\n";
+      std::cout << " "  << file_paths[device_type];
+      std::cout << " "  << "write_size: " << write_size << "\n";
+      perror("write");
       exit(EXIT_FAILURE);
     }
-    else {
-      std::cout << "Wrote at: " << location << "\n";
-    }
+
   }
 
   // Check if sequential or random?
@@ -217,8 +244,6 @@ size_t GetWriteLatency(std::vector<Device>& devices,
   }
 }
 
-char read_buffer[BLOCK_SIZE*2];
-
 size_t GetReadLatency(std::vector<Device>& devices,
                       DeviceType device_type,
                       const size_t& block_id){
@@ -236,10 +261,9 @@ size_t GetReadLatency(std::vector<Device>& devices,
     // Seek
     auto max_size = file_sizes[device_type];
     auto location = (block_id * BLOCK_SIZE) % max_size;
-    std::cout << "Location: " << location << "\n";
     auto status = fseek(file_pointers[device_type], location, SEEK_SET);
     if(status != 0){
-      std::cout << "seek_status: " << status << "\n";
+      perror("seek");
       exit(EXIT_FAILURE);
     }
 
@@ -249,12 +273,11 @@ size_t GetReadLatency(std::vector<Device>& devices,
     if(read_size != 1){
       std::cout << "Reading error: " << file_pointers[device_type];
       std::cout << " "  << file_paths[device_type];
-      std::cout << " read_size: " << read_size << "\n";
+      std::cout << " "  << "read_size: " << read_size << "\n";
+      perror("read");
       exit(EXIT_FAILURE);
     }
-    else {
-      std::cout << "Read at: " << location << "\n";
-    }
+
   }
 
   switch(device_type){
