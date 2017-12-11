@@ -47,10 +47,10 @@ void BootstrapDeviceMetrics(const configuration &state){
 
   // SSD
   if(state.disk_mode_type == DiskModeType::DISK_MODE_TYPE_SSD){
-    seq_read_latency[DEVICE_TYPE_DISK] = 100 * 100;
-    seq_write_latency[DEVICE_TYPE_DISK] = 250 * 100;
-    rnd_read_latency[DEVICE_TYPE_DISK] = 100 * 100;
-    rnd_write_latency[DEVICE_TYPE_DISK] = 400 * 100;
+    seq_read_latency[DEVICE_TYPE_DISK] = 30 * 1000;
+    seq_write_latency[DEVICE_TYPE_DISK] = 100 * 1000;
+    rnd_read_latency[DEVICE_TYPE_DISK] = 50 * 1000;
+    rnd_write_latency[DEVICE_TYPE_DISK] = 150 * 1000;
   }
   // HDD
   else if(state.disk_mode_type == DiskModeType::DISK_MODE_TYPE_HDD) {
@@ -185,6 +185,8 @@ std::string GetPattern(bool is_sequential){
 
 // GET READ & WRITE LATENCY
 
+size_t sync_frequency = 100;
+
 size_t GetWriteLatency(std::vector<Device>& devices,
                        DeviceType device_type,
                        const size_t& block_id,
@@ -194,6 +196,9 @@ size_t GetWriteLatency(std::vector<Device>& devices,
 
   // Increment stats
   machine_stats.IncrementWriteCount(device_type);
+  if(flush_block == true){
+    machine_stats.IncrementFlushCount(device_type);
+  }
 
   // Emulate if needed
   if(emulate == true && is_device_emulated[device_type] == true){
@@ -224,6 +229,18 @@ size_t GetWriteLatency(std::vector<Device>& devices,
         perror("fflush");
         exit(EXIT_FAILURE);
       }
+
+      // Sync if needed
+      auto sync = rand() % sync_frequency;
+      if(sync == 0){
+        status = fsync(fileno(file_pointers[device_type]));
+        if(status != 0){
+          perror("fsync");
+          exit(EXIT_FAILURE);
+        }
+        machine_stats.IncrementSyncCount(device_type);
+      }
+
     }
 
   }

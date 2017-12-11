@@ -22,7 +22,7 @@ namespace machine {
 
 size_t query_itr;
 
-double total_duration = 0;
+double total_duration_ns = 0;
 
 bool emulate = false;
 
@@ -211,7 +211,7 @@ void BringBlockToMemory(const size_t& block_id){
            block_id,
            CLEAN_BLOCK,
            flush_block,
-           total_duration);
+           total_duration_ns);
     }
     else {
       Copy(state.devices,
@@ -220,7 +220,7 @@ void BringBlockToMemory(const size_t& block_id){
            block_id,
            CLEAN_BLOCK,
            flush_block,
-           total_duration);
+           total_duration_ns);
     }
   }
 
@@ -238,7 +238,7 @@ void BringBlockToMemory(const size_t& block_id){
              block_id,
              CLEAN_BLOCK,
              flush_block,
-             total_duration);
+             total_duration_ns);
       }
     }
   }
@@ -256,7 +256,7 @@ void BringBlockToMemory(const size_t& block_id){
            block_id,
            CLEAN_BLOCK,
            flush_block,
-           total_duration);
+           total_duration_ns);
     }
   }
 
@@ -288,7 +288,7 @@ void BringBlockToStorage(const size_t& block_id,
            block_id,
            nvm_status,
            flush_block,
-           total_duration);
+           total_duration_ns);
     }
     else {
       Copy(state.devices,
@@ -297,7 +297,7 @@ void BringBlockToStorage(const size_t& block_id,
            block_id,
            CLEAN_BLOCK,
            flush_block,
-           total_duration);
+           total_duration_ns);
     }
 
     // Mark block as clean
@@ -309,7 +309,7 @@ void BringBlockToStorage(const size_t& block_id,
     }
 
     // Update duration
-    total_duration += GetWriteLatency(state.devices, source, block_id, flush_block);
+    total_duration_ns += GetWriteLatency(state.devices, source, block_id, flush_block);
   }
 
 }
@@ -333,7 +333,7 @@ void WriteBlock(const size_t& block_id) {
          block_id,
          DIRTY_BLOCK,
          flush_block,
-         total_duration);
+         total_duration_ns);
 
     return;
   }
@@ -353,7 +353,7 @@ void WriteBlock(const size_t& block_id) {
   }
 
   // Update duration
-  total_duration += GetWriteLatency(state.devices, destination, block_id, flush_block);
+  total_duration_ns += GetWriteLatency(state.devices, destination, block_id, flush_block);
 
 }
 
@@ -365,7 +365,7 @@ void ReadBlock(const size_t& block_id){
 
   // Update duration
   auto source = LocateInMemoryDevices(block_id);
-  total_duration += GetReadLatency(state.devices, source, block_id);
+  total_duration_ns += GetReadLatency(state.devices, source, block_id);
 
   if(source == DeviceType::DEVICE_TYPE_INVALID){
     std::cout << "Could not read block : " << block_id << "\n";
@@ -505,7 +505,7 @@ void MachineHelper() {
   input->seekg(0, std::ios::beg);
 
   // Reinit duration
-  total_duration = 0;
+  total_duration_ns = 0;
   operation_itr = 0;
 
   // Reset stats
@@ -565,13 +565,13 @@ void MachineHelper() {
         std::cout << "Operation " << operation_itr << " :: " <<
             operation_type << " " << global_block_number << " "
             << fork_number << " " << block_number << " :: "
-            << total_duration / (1000 * 1000) << "s \n";
+            << total_duration_ns / (1000 * 1000) << "s \n";
       }
 
       std::cout << "Warmed Up : " << warm_up_operation_count << " ops \n";
 
       // Reinit duration
-      total_duration = 0;
+      total_duration_ns = 0;
       operation_itr = 0;
 
       read_operation_itr = 0;
@@ -591,11 +591,12 @@ void MachineHelper() {
       clock_gettime(CLOCK_MONOTONIC_RAW, &start);
     }
 
+    auto total_duration_s = total_duration_ns/(1000 * 1000 * 1000);
     if(operation_itr % 100000 == 0){
       std::cout << "Operation " << operation_itr << " :: " <<
           operation_type << " " << global_block_number << " "
           << fork_number << " " << block_number << " :: "
-          << total_duration / (1000 * 1000) << "s \n";
+          << total_duration_s  << "s \n";
     }
 
     if(state.operation_count != 0){
@@ -608,19 +609,21 @@ void MachineHelper() {
 
   }
 
-  auto throughput = (operation_itr * 1000 * 1000)/total_duration;
+  auto logical_s = total_duration_ns/(1000 * 1000 * 1000);
+  auto throughput = operation_itr/logical_s;
 
   std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
   std::cout << "THROUGHPUT : " << throughput << " (OPS/S) \n";
   std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 
   // Get physical time
-  uint64_t physical_us = (end.tv_sec - start.tv_sec) * 1000000;
-  physical_us += (end.tv_nsec - start.tv_nsec) / 1000;
+  double physical_ns = (end.tv_sec - start.tv_sec) * (1000 * 1000 * 1000);
+  physical_ns += (end.tv_nsec - start.tv_nsec);
+  auto physical_s = physical_ns/(1000 * 1000 * 1000);
 
   std::cout << "\n\n";
-  std::cout << "PHYSICAL TIME (s): " << physical_us/(1000 * 1000) << "\n";
-  std::cout << "LOGICAL TIME  (s): " << total_duration/(1000 * 1000) << "\n";
+  std::cout << "PHYSICAL TIME (s): " << physical_s << "\n";
+  std::cout << "LOGICAL TIME  (s): " << logical_s << "\n";
   std::cout << "\n\n";
 
   // Get machine size
