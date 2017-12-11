@@ -198,6 +198,7 @@ void BringBlockToMemory(const size_t& block_id){
   auto memory_device_type = LocateInMemoryDevices(block_id);
   auto storage_device_type = LocateInStorageDevices(block_id);
   auto nvm_exists = DeviceExists(state.devices, DeviceType::DEVICE_TYPE_NVM);
+  auto flush_block = false;
 
   // Not found on DRAM & NVM
   if(memory_device_type == DeviceType::DEVICE_TYPE_INVALID &&
@@ -209,6 +210,7 @@ void BringBlockToMemory(const size_t& block_id){
            storage_device_type,
            block_id,
            CLEAN_BLOCK,
+           flush_block,
            total_duration);
     }
     else {
@@ -217,6 +219,7 @@ void BringBlockToMemory(const size_t& block_id){
            storage_device_type,
            block_id,
            CLEAN_BLOCK,
+           flush_block,
            total_duration);
     }
   }
@@ -234,6 +237,7 @@ void BringBlockToMemory(const size_t& block_id){
              DeviceType::DEVICE_TYPE_NVM,
              block_id,
              CLEAN_BLOCK,
+             flush_block,
              total_duration);
       }
     }
@@ -251,6 +255,7 @@ void BringBlockToMemory(const size_t& block_id){
            memory_device_type,
            block_id,
            CLEAN_BLOCK,
+           flush_block,
            total_duration);
     }
   }
@@ -267,6 +272,8 @@ void BringBlockToStorage(const size_t& block_id,
   auto last_device_type = state.devices.back().device_type;
   auto nvm_last = (last_device_type == DeviceType::DEVICE_TYPE_NVM);
   auto nvm_status = block_status;
+  auto flush_block = true;
+
   if(nvm_last == true){
     nvm_status = CLEAN_BLOCK;
   }
@@ -280,6 +287,7 @@ void BringBlockToStorage(const size_t& block_id,
            source,
            block_id,
            nvm_status,
+           flush_block,
            total_duration);
     }
     else {
@@ -288,6 +296,7 @@ void BringBlockToStorage(const size_t& block_id,
            source,
            block_id,
            CLEAN_BLOCK,
+           flush_block,
            total_duration);
     }
 
@@ -300,7 +309,7 @@ void BringBlockToStorage(const size_t& block_id,
     }
 
     // Update duration
-    total_duration += GetWriteLatency(state.devices, source, block_id);
+    total_duration += GetWriteLatency(state.devices, source, block_id, flush_block);
   }
 
 }
@@ -311,6 +320,7 @@ void WriteBlock(const size_t& block_id) {
   BringBlockToMemory(block_id);
 
   auto destination = LocateInMemoryDevices(block_id);
+  auto flush_block = false;
 
   // CASE 1: New block
   if(destination == DeviceType::DEVICE_TYPE_INVALID){
@@ -322,6 +332,7 @@ void WriteBlock(const size_t& block_id) {
          DeviceType::DEVICE_TYPE_INVALID,
          block_id,
          DIRTY_BLOCK,
+         flush_block,
          total_duration);
 
     return;
@@ -342,7 +353,7 @@ void WriteBlock(const size_t& block_id) {
   }
 
   // Update duration
-  total_duration += GetWriteLatency(state.devices, destination, block_id);
+  total_duration += GetWriteLatency(state.devices, destination, block_id, flush_block);
 
 }
 

@@ -43,7 +43,8 @@ struct Device {
 
 size_t GetWriteLatency(std::vector<Device>& devices,
                        DeviceType device_type,
-                       const size_t& block_id);
+                       const size_t& block_id,
+                       const bool& flush_block);
 
 size_t GetReadLatency(std::vector<Device>& devices,
                       DeviceType device_type,
@@ -60,6 +61,7 @@ void Copy(std::vector<Device>& devices,
           DeviceType source,
           const size_t& block_id,
           const size_t& block_status,
+          const bool& flush_block,
           double& total_duration);
 
 DeviceType LocateInDevices(std::vector<Device> devices,

@@ -187,7 +187,8 @@ std::string GetPattern(bool is_sequential){
 
 size_t GetWriteLatency(std::vector<Device>& devices,
                        DeviceType device_type,
-                       const size_t& block_id){
+                       const size_t& block_id,
+                       const bool& flush_block){
 
   DLOG(INFO) << "WRITE :: " << DeviceTypeToString(device_type) << "\n";
 
@@ -214,6 +215,15 @@ size_t GetWriteLatency(std::vector<Device>& devices,
       std::cout << " "  << "write_size: " << write_size << "\n";
       perror("write");
       exit(EXIT_FAILURE);
+    }
+
+    // Flush if needed
+    if(flush_block == true){
+      status = fflush(file_pointers[device_type]);
+      if(status != 0){
+        perror("fflush");
+        exit(EXIT_FAILURE);
+      }
     }
 
   }
@@ -445,6 +455,7 @@ void Copy(std::vector<Device>& devices,
           DeviceType source,
           const size_t& block_id,
           const size_t& block_status,
+          const bool& flush_block,
           double& total_duration){
 
   DLOG(INFO) << "COPY : " << block_id << " " << " " \
@@ -463,7 +474,7 @@ void Copy(std::vector<Device>& devices,
   auto victim = device_cache.Put(block_id, final_block_status);
 
   total_duration += GetReadLatency(devices, source, block_id);
-  total_duration += GetWriteLatency(devices, destination, block_id);
+  total_duration += GetWriteLatency(devices, destination, block_id, flush_block);
 
   // Move victim
   auto victim_key = victim.block_id;
@@ -504,6 +515,7 @@ void MoveVictim(std::vector<Device>& devices,
       source == DeviceType::DEVICE_TYPE_DRAM);
   bool on_nvm = (source == DeviceType::DEVICE_TYPE_NVM);
   bool is_dirty = (block_status == DIRTY_BLOCK);
+  auto flush_block = false;
 
   if(victim_exists == true) {
     DLOG(INFO) << "Move victim   : " << block_id << " :: ";
@@ -522,6 +534,7 @@ void MoveVictim(std::vector<Device>& devices,
            source,
            block_id,
            block_status,
+           flush_block,
            total_duration);
     }
   }
