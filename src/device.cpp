@@ -27,10 +27,10 @@ void BootstrapDeviceMetrics(const configuration &state){
   rnd_write_latency[DEVICE_TYPE_CACHE] = 10;
 
   // DRAM
-  seq_read_latency[DEVICE_TYPE_DRAM] = 100;
-  seq_write_latency[DEVICE_TYPE_DRAM] = 100;
-  rnd_read_latency[DEVICE_TYPE_DRAM] = 100;
-  rnd_write_latency[DEVICE_TYPE_DRAM] = 100;
+  seq_read_latency[DEVICE_TYPE_DRAM] = 1000;
+  seq_write_latency[DEVICE_TYPE_DRAM] = 2000;
+  rnd_read_latency[DEVICE_TYPE_DRAM] = 2000;
+  rnd_write_latency[DEVICE_TYPE_DRAM] = 2500;
 
   // NVM
   seq_read_latency[DEVICE_TYPE_NVM] = seq_read_latency[DEVICE_TYPE_DRAM];
