@@ -1,3 +1,7 @@
+#
+# Specify directory
+# fio --directory=/mnt/ramdisk/ profile.fio
+#
 # Do some important numbers on SSD drives, to gauge what kind of
 # performance you might get out of them.
 #
@@ -14,24 +18,17 @@
 bs=4k
 ioengine=libaio
 iodepth=4
-size=1g
-direct=0
+size=4G
+direct=1
 runtime=60
-directory=/mnt/ramdisk/
-filename=test.txt
+filename=tmp.txt
+time_based=1
+runtime=30
 
-[seq-read]
-rw=read
+[SEQUENTIAL READ-WRITE TEST]
+rw=rw
 stonewall
 
-[rand-read]
-rw=randread
-stonewall
-
-[seq-write]
-rw=write
-stonewall
-
-[rand-write]
-rw=randwrite
+[RANDOM READ-WRITE TEST]
+rw=randrw
 stonewall
