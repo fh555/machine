@@ -57,6 +57,9 @@ class configuration {
   // Emulate
   bool emulate;
 
+  // Large file mode
+  bool large_file_mode;
+
   // DERIVED BASED ON HIERARCHY TYPE
 
   // list of devices in hierarchy

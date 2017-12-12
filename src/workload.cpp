@@ -641,7 +641,7 @@ void RunMachineTest() {
   // Bootstrap filesystem if needed
   if(state.emulate == true){
     emulate = true;
-    BootstrapFileSystemForEmulation();
+    BootstrapFileSystemForEmulation(state);
   }
 
   // Run the benchmark once

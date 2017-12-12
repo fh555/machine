@@ -5,6 +5,8 @@
 #include "configuration.h"
 #include "stats.h"
 
+#define _FILE_OFFSET_BITS  64
+
 namespace machine {
 
 std::map<DeviceType, size_t> device_size;
@@ -76,7 +78,7 @@ std::vector<DeviceType> emulated_device_types =
 };
 
 std::map<DeviceType, bool> is_device_emulated;
-std::map<DeviceType, size_t> file_sizes;
+std::map<DeviceType, off64_t> file_sizes;
 std::map<DeviceType, std::string> file_paths;
 std::map<DeviceType, FILE*> file_pointers;
 
@@ -98,7 +100,7 @@ std::string random_string(size_t length){
   return str;
 }
 
-void BootstrapFileSystemForEmulation(){
+void BootstrapFileSystemForEmulation(const configuration& state){
 
   // Setup buffer
   write_buffer = random_string(BLOCK_SIZE);
@@ -109,9 +111,17 @@ void BootstrapFileSystemForEmulation(){
   is_device_emulated[DeviceType::DEVICE_TYPE_NVM] = true;
   is_device_emulated[DeviceType::DEVICE_TYPE_DISK] = true;
 
-  file_sizes[DeviceType::DEVICE_TYPE_DRAM] = 1 * (1024 * 1024 * 1024);
-  file_sizes[DeviceType::DEVICE_TYPE_NVM] = 1 * (1024 * 1024 * 1024);
-  file_sizes[DeviceType::DEVICE_TYPE_DISK] = 1 * (1024 * 1024 * 1024);
+  // Large file mode
+  if(state.large_file_mode == false){
+    file_sizes[DeviceType::DEVICE_TYPE_DRAM] = 1 * (1024 * 1024 * 1024);
+    file_sizes[DeviceType::DEVICE_TYPE_NVM] = 1 * (1024 * 1024 * 1024);
+    file_sizes[DeviceType::DEVICE_TYPE_DISK] = 1 * (1024 * 1024 * 1024);
+  }
+  else {
+    file_sizes[DeviceType::DEVICE_TYPE_DRAM] = 1 * (1024 * 1024 * 1024);
+    file_sizes[DeviceType::DEVICE_TYPE_NVM] = 8 * (1024 * 1024 * 1024L);
+    file_sizes[DeviceType::DEVICE_TYPE_DISK] = 32 * (1024 * 1024 * 1024L);
+  }
 
   file_paths[DeviceType::DEVICE_TYPE_DRAM] = "/data1/database";
   file_paths[DeviceType::DEVICE_TYPE_NVM] = "/mnt/pmfs/database";

@@ -56,7 +56,7 @@ size_t GetReadLatency(std::vector<Device>& devices,
 
 void BootstrapDeviceMetrics(const configuration &state);
 
-void BootstrapFileSystemForEmulation();
+void BootstrapFileSystemForEmulation(const configuration &state);
 
 extern bool emulate;
 

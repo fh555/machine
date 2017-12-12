@@ -24,6 +24,7 @@ void Usage() {
       "   -r --size_ratio_type                :  size ratio type\n"
       "   -s --size_type                      :  size type\n"
       "   -v --verbose                        :  verbose\n"
+      "   -y --large_file_mode                :  large file mode\n"
       "   -z --summary_file                   :  summary file\n";
       exit(EXIT_FAILURE);
 }
@@ -40,6 +41,7 @@ static struct option opts[] = {
     {"size_ratio_type", optional_argument, NULL, 'r'},
     {"size_type", optional_argument, NULL, 's'},
     {"verbose", optional_argument, NULL, 'v'},
+    {"large_file_mode", optional_argument, NULL, 'y'},
     {"summary_file", optional_argument, NULL, 'z'},
     {NULL, 0, NULL, 0}
 };
@@ -134,6 +136,10 @@ static void ValidateOperationCount(const configuration &state){
   if(state.operation_count > 0) {
     printf("%30s : %lu\n", "operation_count", state.operation_count);
   }
+}
+
+static void ValidateLargeFileMode(const configuration &state){
+  printf("%30s : %d\n", "large_file_mode", state.large_file_mode);
 }
 
 void SetupNVMLatency(configuration &state){
@@ -240,12 +246,13 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
   state.file_name = "";
   state.operation_count = 0;
   state.emulate = false;
+  state.large_file_mode = false;
 
   // Parse args
   while (1) {
     int idx = 0;
     int c = getopt_long(argc, argv,
-                        "a:c:d:e:f:m:l:o:r:s:vz:h",
+                        "a:c:d:e:f:m:l:o:r:s:vy:z:h",
                         opts, &idx);
 
     if (c == -1) break;
@@ -283,6 +290,9 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
         break;
       case 'v':
         state.verbose = atoi(optarg);
+        break;
+      case 'y':
+        state.large_file_mode = atoi(optarg);
         break;
       case 'z':
         state.summary_file = optarg;
@@ -322,6 +332,7 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
   ValidateNVMReadLatency(state);
   ValidateNVMWriteLatency(state);
   ValidateOperationCount(state);
+  ValidateLargeFileMode(state);
 
   printf("//===----------------------------------------------------------------------===//\n");
 
