@@ -197,7 +197,7 @@ std::string GetPattern(bool is_sequential){
 
 // GET READ & WRITE LATENCY
 
-size_t sync_frequency = 100;
+size_t sync_frequency = 1;
 
 size_t GetWriteLatency(std::vector<Device>& devices,
                        DeviceType device_type,
