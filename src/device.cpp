@@ -16,6 +16,8 @@ std::map<DeviceType, double> rnd_write_latency;
 // Machine stats
 Stats machine_stats;
 
+Timer<std::ratio<1, 1000 * 1000 * 1000>> physical_timer;
+
 void BootstrapDeviceMetrics(const configuration &state){
 
   // LATENCIES (ns)
@@ -205,7 +207,11 @@ size_t GetWriteLatency(std::vector<Device>& devices,
     // Seek
     auto max_size = file_sizes[device_type];
     auto location = (block_id * BLOCK_SIZE) % max_size;
+
+    physical_timer.Start();
     auto status = fseek(file_pointers[device_type], location, SEEK_SET);
+    physical_timer.Stop();
+
     if(status != 0){
       perror("seek");
       exit(EXIT_FAILURE);
@@ -224,7 +230,11 @@ size_t GetWriteLatency(std::vector<Device>& devices,
 
     // Flush if needed
     if(flush_block == true){
+
+      physical_timer.Start();
       status = fflush(file_pointers[device_type]);
+      physical_timer.Stop();
+
       if(status != 0){
         perror("fflush");
         exit(EXIT_FAILURE);
@@ -233,7 +243,11 @@ size_t GetWriteLatency(std::vector<Device>& devices,
       // Sync if needed
       auto sync = rand() % sync_frequency;
       if(sync == 0){
+
+        physical_timer.Start();
         status = fsync(fileno(file_pointers[device_type]));
+        physical_timer.Stop();
+
         if(status != 0){
           perror("fsync");
           exit(EXIT_FAILURE);
@@ -288,15 +302,21 @@ size_t GetReadLatency(std::vector<Device>& devices,
     // Seek
     auto max_size = file_sizes[device_type];
     auto location = (block_id * BLOCK_SIZE) % max_size;
+
+    physical_timer.Start();
     auto status = fseek(file_pointers[device_type], location, SEEK_SET);
+    physical_timer.Stop();
+
     if(status != 0){
       perror("seek");
       exit(EXIT_FAILURE);
     }
 
     // Read
-    auto read_size = fread(read_buffer, BLOCK_SIZE, 1,
-                           file_pointers[device_type]);
+    physical_timer.Start();
+    auto read_size = fread(read_buffer, BLOCK_SIZE, 1, file_pointers[device_type]);
+    physical_timer.Stop();
+
     if(read_size != 1){
       std::cout << "Reading error: " << file_pointers[device_type];
       std::cout << " "  << file_paths[device_type];

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "storage_cache.h"
+#include "timer.h"
 
 namespace machine {
 
@@ -40,6 +41,9 @@ struct Device {
   StorageCache cache;
 
 };
+
+// Physical Timer
+extern Timer<std::ratio<1, 1000 * 1000 * 1000>> physical_timer;
 
 size_t GetWriteLatency(std::vector<Device>& devices,
                        DeviceType device_type,
