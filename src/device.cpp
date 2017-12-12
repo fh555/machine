@@ -218,8 +218,11 @@ size_t GetWriteLatency(std::vector<Device>& devices,
     }
 
     // Write
+    physical_timer.Start();
     auto write_size = fwrite(write_buffer.c_str(), write_buffer.size(), 1,
                              file_pointers[device_type]);
+    physical_timer.Stop();
+
     if(write_size == 0){
       std::cout << "Writing error: " << file_paths[device_type];
       std::cout << " "  << file_paths[device_type];
