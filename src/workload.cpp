@@ -248,8 +248,6 @@ void BringBlockToMemory(const size_t& block_id){
 
   if(memory_device_type == DeviceType::DEVICE_TYPE_DRAM ||
       memory_device_type == DeviceType::DEVICE_TYPE_NVM){
-    bool migrate_upwards = (rand() % state.migration_frequency == 0);
-    if(migrate_upwards == true){
       Copy(state.devices,
            DeviceType::DEVICE_TYPE_CACHE,
            memory_device_type,
@@ -257,7 +255,6 @@ void BringBlockToMemory(const size_t& block_id){
            CLEAN_BLOCK,
            flush_block,
            logical_ns);
-    }
   }
 
 
@@ -576,7 +573,7 @@ void MachineHelper() {
       flush_operation_itr = 0;
 
       // Print machine caches
-      PrintMachine();
+      //PrintMachine();
 
       // Reset stats
       machine_stats.Reset();

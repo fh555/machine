@@ -448,8 +448,11 @@ DeviceType GetLowerDevice(std::vector<Device>& devices,
       if(dram_exists == true) {
         destination = DEVICE_TYPE_DRAM;
       }
-      else {
+      else if(nvm_exists == true) {
         destination = DEVICE_TYPE_NVM;
+      }
+      else{
+        destination = DEVICE_TYPE_DISK;
       }
       break;
     }
@@ -512,6 +515,9 @@ void Copy(std::vector<Device>& devices,
       << DeviceTypeToString(source) << " " \
       << "---> " << DeviceTypeToString(destination) << " " \
       << CleanStatus(block_status) << "\n";
+
+  // Increment stats
+  machine_stats.IncrementOpCount(source, destination);
 
   // Write to destination device
   auto device_offset = GetDeviceOffset(devices, destination);
