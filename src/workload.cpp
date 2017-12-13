@@ -29,6 +29,8 @@ bool emulate = false;
 // Stats
 extern Stats machine_stats;
 
+configuration state;
+
 static void WriteOutput(double stat) {
 
   std::string OUTPUT_FILE = state.summary_file;

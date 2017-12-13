@@ -482,7 +482,7 @@ DeviceType GetLowerDevice(std::vector<Device>& devices,
   return destination;
 }
 
-std::string CleanStatus(const size_t& block_status){
+std::string CleanStatus(const size_t& block_status, const bool& check_block){
   if(block_status == CLEAN_BLOCK){
     return "";
   }
@@ -490,8 +490,13 @@ std::string CleanStatus(const size_t& block_status){
     return "●";
   }
   else {
-    std::cout << "Invalid block type: " << block_status;
-    exit(EXIT_FAILURE);
+    if(check_block == true){
+      std::cout << "Invalid block type: " << block_status;
+      exit(EXIT_FAILURE);
+    }
+    else {
+      return "";
+    }
   }
 }
 
@@ -514,7 +519,7 @@ void Copy(std::vector<Device>& devices,
   DLOG(INFO) << "COPY : " << block_id << " " << " " \
       << DeviceTypeToString(source) << " " \
       << "---> " << DeviceTypeToString(destination) << " " \
-      << CleanStatus(block_status) << "\n";
+      << CleanStatus(block_status, true) << "\n";
 
   // Increment stats
   machine_stats.IncrementOpCount(source, destination);
@@ -576,7 +581,7 @@ void MoveVictim(std::vector<Device>& devices,
   if(victim_exists == true) {
     DLOG(INFO) << "Move victim   : " << block_id << " :: ";
     DLOG(INFO) << "Memory device : " << DeviceTypeToString(source) << " :: ";
-    DLOG(INFO) << CleanStatus(block_status) << "\n";
+    DLOG(INFO) << CleanStatus(block_status, true) << "\n";
   }
 
   if(victim_exists){

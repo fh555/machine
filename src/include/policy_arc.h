@@ -5,6 +5,7 @@
 #include <deque>
 #include <vector>
 #include <algorithm>
+#include <iostream>
 
 #include <glog/logging.h>
 
@@ -32,17 +33,17 @@ class ARCCachePolicy : public ICachePolicy<Key> {
     DLOG(INFO) << "ARC INSERT : " << key << "\n";
 
     if(Contains(B1, key)){
-      DLOG(INFO) << "B1 contains key";
+      DLOG(INFO) << "B1 contains key\n";
       size_t size_ratio = B2.size()/B1.size();
       size_t b_ratio = MAX(size_ratio, 1);
       p = std::min(capacity, p + b_ratio);
       Replace(key);
       DequeErase(B1, key);
       T2.push_front(key);
-      DLOG(INFO) << "Moved it to T2";
+      DLOG(INFO) << "Moved it to T2\n";
     }
     else if(Contains(B2, key)){
-      DLOG(INFO) << "B2 contains key";
+      DLOG(INFO) << "B2 contains key\n";
       size_t size_ratio = B1.size()/B2.size();
       size_t b_ratio = MAX(size_ratio, 1);
       if(p >= b_ratio) {
@@ -51,10 +52,10 @@ class ARCCachePolicy : public ICachePolicy<Key> {
       Replace(key);
       DequeErase(B2, key);
       T2.push_front(key);
-      DLOG(INFO) << "Moved it to T2";
+      DLOG(INFO) << "Moved it to T2\n";
     }
     else {
-      DLOG(INFO) << "Miss in L1 and L2";
+      DLOG(INFO) << "Completely new\n";
 
       auto l1 = T1.size() + B1.size();
       auto l1_plus_l2 = T1.size() + T2.size() + B1.size() + B2.size();
@@ -63,27 +64,27 @@ class ARCCachePolicy : public ICachePolicy<Key> {
         if(T1.size() < capacity){
           B1.pop_back();
           Replace(key);
-          DLOG(INFO) << "Make space in B1";
+          DLOG(INFO) << "Make space in B1\n";
         }
         else {
           T1.pop_back();
-          DLOG(INFO) << "Make space in T1";
+          DLOG(INFO) << "Make space in T1\n";
         }
       }
       else if(l1 < capacity && l1_plus_l2 >= capacity) {
         if(l1_plus_l2 == 2 * capacity){
           B2.pop_back();
-          DLOG(INFO) << "Make space in B2";
+          DLOG(INFO) << "Make space in B2\n";
         }
         Replace(key);
       }
 
       T1.push_front(key);
-      DLOG(INFO) << "Moved it to T1";
+      DLOG(INFO) << "Moved it to T1\n";
 
     }
 
-    //Check();
+    Check();
 
   }
 
@@ -92,19 +93,19 @@ class ARCCachePolicy : public ICachePolicy<Key> {
     DLOG(INFO) << "ARC TOUCH : " << key << "\n";
 
     if (Contains(T1, key)) {
-      DLOG(INFO) << "T1 contains key";
+      DLOG(INFO) << "T1 contains key\n";
       DequeErase(T1, key);
       T2.push_front(key);
-      DLOG(INFO) << "Moved it to T2";
+      DLOG(INFO) << "Moved it to T2\n";
     }
     else if (Contains(T2, key)){
-      DLOG(INFO) << "T2 contains key";
+      DLOG(INFO) << "T2 contains key\n";
       DequeErase(T2, key);
       T2.push_front(key);
-      DLOG(INFO) << "Moved it to T2";
+      DLOG(INFO) << "Moved it to T2\n";
     }
 
-    //Check();
+    Check();
 
   }
 
@@ -118,19 +119,19 @@ class ARCCachePolicy : public ICachePolicy<Key> {
     bool len_T1_gt_P = (T1.size() > p);
 
     if(T1_not_empty && ((in_B2 && len_T1_eq_P) || len_T1_gt_P)){
-      DLOG(INFO) << "Evict from T1 to B1";
+      DLOG(INFO) << "Evict from T1 to B1\n";
       auto victim = T1.back();
       T1.pop_back();
       B1.push_front(victim);
     }
     else {
-      DLOG(INFO) << "Evict from T2 to B2";
+      DLOG(INFO) << "Evict from T2 to B2\n";
       auto victim = T2.back();
       T2.pop_back();
       B2.push_front(victim);
     }
 
-    //Check();
+    Check();
 
   }
 
@@ -139,9 +140,7 @@ class ARCCachePolicy : public ICachePolicy<Key> {
   }
 
   // return a key of a displacement candidate
-  const Key& Victim(const Key& key) const override {
-
-    DLOG(INFO) << "ARC VICTIM : " << key << "\n";
+  const Key& Victim(UNUSED_ATTRIBUTE const Key& key) const override {
 
     bool T1_not_empty = (T1.empty() == false);
     bool in_B2 = Contains(B2, key);
@@ -149,21 +148,31 @@ class ARCCachePolicy : public ICachePolicy<Key> {
     bool len_T1_gt_P = (T1.size() > p);
 
     if(T1_not_empty && ((in_B2 && len_T1_eq_P) || len_T1_gt_P)){
+      DLOG(INFO) << "ARC VICTIM : " << T1.back() << "\n";
+      if(T1.back() == 748){
+        Print("T1", T1);
+      }
       return T1.back();
     }
     else {
+      DLOG(INFO) << "ARC VICTIM : " << T2.back() << "\n";
+      if(T2.back() == 748){
+        Print("T2", T2);
+      }
       return T2.back();
     }
 
   }
 
-  void Check(){
+  void Check() const{
 
     // Print
+    //DLOG(INFO) << "\n+++++++++++++++++++++++++++++++++++++\n";
     //Print("T1", T1);
     //Print("B1",B1);
     //Print("T2",T2);
     //Print("B2",B2);
+    //DLOG(INFO) << "+++++++++++++++++++++++++++++++++++++\n";
 
     if(p > capacity || p < 0){
       LOG(INFO) << "p exceeds capacity \n";
@@ -182,14 +191,14 @@ class ARCCachePolicy : public ICachePolicy<Key> {
 
   }
 
-  void Print(std::string deque_name, const std::deque<Key>& deque){
+  void Print(std::string deque_name, const std::deque<Key>& deque) const{
     std::stringstream str;
     str << deque_name << " :: ";
     for(auto entry : deque){
       str << entry << " ";
     }
     str << "\n";
-    DLOG(INFO) << str.str();
+    std::cout << str.str();
   }
 
   bool Contains(const std::deque<Key>& deque, const Key& key) const {

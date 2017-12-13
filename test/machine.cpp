@@ -9,7 +9,7 @@
 
 namespace machine {
 
-configuration state;
+extern configuration state;
 
 // Main Entry Point
 void RunBenchmark() {

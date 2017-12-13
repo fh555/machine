@@ -8,6 +8,7 @@
 
 #include "policy_arc.h"
 #include "cache.h"
+#include "configuration.h"
 
 namespace machine {
 
@@ -72,7 +73,7 @@ TEST(ARCCache, CheckPointerMoveT2) {
   cache.Put(3, 7);
   cache.Put(3, 7);
 
-  // T2 list is bigger now and key1 have lower reference count
+  // T2 list is bigger now and key2 have lower reference count
   cache.Put(1, 7);
 
   cache.Put(4, 4);
