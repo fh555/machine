@@ -40,7 +40,8 @@ void PrintCapacity(const size_t block_count){
 CACHE_TEMPLATE_ARGUMENT
 CACHE_TEMPLATE_TYPE::Cache(size_t capacity)
 : cache_policy_(Policy(capacity)),
-  capacity_{capacity} {
+  capacity_{capacity},
+  current_block_{0} {
 
   PL_ASSERT(capacity_ > 0);
 
@@ -49,138 +50,23 @@ CACHE_TEMPLATE_TYPE::Cache(size_t capacity)
 CACHE_TEMPLATE_ARGUMENT
 Block CACHE_TEMPLATE_TYPE::Put(const Key& key,
                                const Value& value) {
-
-  auto entry_location = LocateEntry(key);
-  Block victim;
-  Key victim_key = INVALID_KEY;
-  Value victim_value = CLEAN_BLOCK;
-
-  if (entry_location == cache_items_map.end()) {
-
-    // add new element to the cache
-    if (CurrentCapacity() + 1 > capacity_) {
-      victim_key = cache_policy_.Victim(key);
-      DLOG(INFO) << "Victim: " << victim_key;
-
-      try{
-        victim_value = Get(victim_key, false);
-        Erase(victim_key);
-      }
-      catch(const std::range_error& not_found){
-        std::cout << "Did not find the victim: " << (int)victim_key << "\n";
-        // Nothing to do here!
-      }
-    }
-
-    Insert(key, value);
-
-    if (CurrentCapacity() > 1.01 * capacity_) {
-      LOG(INFO) << "Capacity exceeded";
-      exit(EXIT_FAILURE);
-    }
-
-  }
-  else {
-
-    // update previous value
-    Update(key, value);
-
-  }
-
-  // return victim
-  victim.block_id = victim_key;
-  victim.block_type = victim_value;
-  return victim;
+  return cache_policy_.Put(key, value);
 }
 
 CACHE_TEMPLATE_ARGUMENT
-const Value& CACHE_TEMPLATE_TYPE::Get(const Key& key,
-                                      bool touch) const {
-
-  auto elem_it = LocateEntry(key);
-
-  if (elem_it == cache_items_map.end()) {
-    throw std::range_error{"No such element in the cache"};
-  }
-
-  if(touch == true){
-    cache_policy_.Touch(key);
-  }
-
-  return elem_it->second;
+Value CACHE_TEMPLATE_TYPE::Get(const Key& key) const {
+  return cache_policy_.Get(key);
 }
 
 CACHE_TEMPLATE_ARGUMENT
-size_t CACHE_TEMPLATE_TYPE::CurrentCapacity() const {
-
-  double currently_occupied_slots = cache_items_map.size();
-
-  return currently_occupied_slots;
+size_t CACHE_TEMPLATE_TYPE::GetSize() const {
+  return cache_policy_.GetSize();
 }
 
-CACHE_TEMPLATE_ARGUMENT
-double CACHE_TEMPLATE_TYPE::GetOccupiedFraction() const {
-
-  double currently_occupied_slots = cache_items_map.size();
-  double full_capacity = capacity_;
-  double occupied_fraction = currently_occupied_slots/full_capacity;
-
-  return occupied_fraction;
-}
-
-CACHE_TEMPLATE_ARGUMENT
-void CACHE_TEMPLATE_TYPE::Insert(const Key& key,
-                                 const Value& value) {
-
-  cache_policy_.Insert(key);
-  cache_items_map.emplace(std::make_pair(key, value));
-
-}
-
-CACHE_TEMPLATE_ARGUMENT
-void CACHE_TEMPLATE_TYPE::Erase(const Key& key) {
-
-  cache_policy_.Erase(key);
-  cache_items_map.erase(key);
-
-}
-
-CACHE_TEMPLATE_ARGUMENT
-void CACHE_TEMPLATE_TYPE::Update(const Key& key,
-                                 const Value& value) {
-
-  cache_policy_.Touch(key);
-  cache_items_map[key] = value;
-
-}
-
-CACHE_TEMPLATE_ARGUMENT
-typename CACHE_TEMPLATE_TYPE::const_iterator
-CACHE_TEMPLATE_TYPE::LocateEntry(const Key& key) const {
-
-  return cache_items_map.find(key);
-
-}
 
 CACHE_TEMPLATE_ARGUMENT
 void CACHE_TEMPLATE_TYPE::Print() const {
-
-  auto current_size = cache_items_map.size();
-  std::cout << "OCCUPIED: " << (current_size * 100)/capacity_ << " %\n";
-
-  size_t block_itr = 0;
-  size_t print_block_count = 100;
-  for(auto& cache_item : cache_items_map){
-    if(block_itr++ >= print_block_count){
-      break;
-    }
-    std::cout << cache_item.first << CleanStatus(cache_item.second, false) << " ";
-  }
-
-  if(print_block_count > 0) {
-    std::cout << "-------------------------------\n";
-  }
-
+  cache_policy_.Print();
 }
 
 CACHE_TEMPLATE_ARGUMENT
@@ -203,17 +89,8 @@ bool CACHE_TEMPLATE_TYPE::IsSequential(const size_t& next) {
 
 // Instantiations
 
-// LRU
-template class Cache<int, int, LRUCachePolicy<int>>;
-
-// LFU
-template class Cache<int, int, LFUCachePolicy<int>>;
-
 // FIFO
-template class Cache<int, int, FIFOCachePolicy<int>>;
-
-// ARC
-template class Cache<int, int, ARCCachePolicy<int>>;
+template class Cache<int, int, FIFOCachePolicy<int, int>>;
 
 }  // End machine namespace
 

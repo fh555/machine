@@ -2,6 +2,9 @@
 
 #pragma once
 
+#include <iostream>
+#include <algorithm>
+
 #include "storage_cache.h"
 #include "timer.h"
 

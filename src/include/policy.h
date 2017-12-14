@@ -8,23 +8,24 @@
 
 namespace machine {
 
-template <typename Key>
+struct Block{
+  size_t block_id;
+  size_t block_type;
+};
+
+template <typename Key, typename Value>
 class ICachePolicy {
  public:
 
   virtual ~ICachePolicy() {}
 
-  // handle element insertion in a cache
-  virtual void Insert(const Key& key) = 0;
+  virtual Block Put(const Key& key, const Value& value) = 0;
 
-  // handle request to the key-element in a cache
-  virtual void Touch(const Key& key) = 0;
+  virtual Value Get(const Key& key) const = 0;
 
-  // handle element deletion from a cache
-  virtual void Erase(const Key& key) = 0;
+  virtual size_t GetSize() const = 0;
 
-  // return a key of a replacement candidate
-  virtual const Key& Victim(const Key& key) const = 0;
+  virtual void Print() const = 0;
 
 };
 

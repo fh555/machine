@@ -52,7 +52,7 @@ size_t GetMachineSize(){
 
   size_t machine_size = 0;
   for(auto device: state.devices){
-    auto device_size = device.cache.CurrentCapacity();
+    auto device_size = device.cache.GetSize();
     machine_size += device_size;
   }
 
@@ -384,7 +384,7 @@ void FlushBlock(const size_t& block_id) {
     auto device_cache = state.devices[device_offset].cache;
     // Check device cache
     try{
-      auto block_status = device_cache.Get(block_id, true);
+      auto block_status = device_cache.Get(block_id);
       if(block_status != CLEAN_BLOCK){
         BringBlockToStorage(block_id, block_status);
       }
@@ -404,7 +404,9 @@ void BootstrapBlock(const size_t& block_id) {
     auto device_offset = GetDeviceOffset(state.devices, DeviceType::DEVICE_TYPE_NVM);
     auto device_cache = state.devices[device_offset].cache;
 
-    auto occupied_fraction = device_cache.GetOccupiedFraction();
+    double size = device_cache.GetSize();
+    double capacity = device_cache.GetCapacity();
+    double occupied_fraction = size/capacity;
     if(occupied_fraction > 0.5){
       // Bootstrap on last device
       auto last_device_cache = state.devices.back().cache;

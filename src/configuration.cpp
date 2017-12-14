@@ -240,7 +240,7 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
   state.disk_mode_type = DISK_MODE_TYPE_SSD;
   state.size_type = SIZE_TYPE_1;
   state.size_ratio_type = SIZE_RATIO_TYPE_1;
-  state.caching_type = CACHING_TYPE_LRU;
+  state.caching_type = CACHING_TYPE_FIFO;
   state.latency_type = LATENCY_TYPE_1;
   state.migration_frequency = 3;
   state.file_name = "";

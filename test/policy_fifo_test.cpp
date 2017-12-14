@@ -12,7 +12,7 @@
 namespace machine {
 
 template <typename Key, typename Value>
-using fifo_cache_t = Cache<Key, Value, FIFOCachePolicy<Key>>;
+using fifo_cache_t = Cache<Key, Value, FIFOCachePolicy<Key, Value>>;
 
 TEST(FIFOCache, Simple_Test) {
   size_t cache_capacity = 2;
@@ -21,12 +21,12 @@ TEST(FIFOCache, Simple_Test) {
   fc.Put(1, 10);
   fc.Put(2, 20);
 
-  EXPECT_EQ(fc.CurrentCapacity(), 2);
+  EXPECT_EQ(fc.GetSize(), 2);
   EXPECT_EQ(fc.Get(1), 10);
   EXPECT_EQ(fc.Get(2), 20);
 
   fc.Put(1, 30);
-  EXPECT_EQ(fc.CurrentCapacity(), 2);
+  EXPECT_EQ(fc.GetSize(), 2);
   EXPECT_EQ(fc.Get(1), 30);
 
   fc.Put(3, 30);
@@ -41,7 +41,7 @@ TEST(FIFOCache, Missing_Value) {
 
   fc.Put(1, 10);
 
-  EXPECT_EQ(fc.CurrentCapacity(), 1);
+  EXPECT_EQ(fc.GetSize(), 1);
   EXPECT_EQ(fc.Get(1), 10);
   EXPECT_THROW(fc.Get(2), std::range_error);
 }
@@ -54,7 +54,7 @@ TEST(FIFOCache, Sequence_Test) {
     fc.Put(i, i);
   }
 
-  EXPECT_EQ(fc.CurrentCapacity(), TEST_SIZE);
+  EXPECT_EQ(fc.GetSize(), TEST_SIZE);
 
   for (size_t i = 0; i < TEST_SIZE; ++i) {
     EXPECT_EQ(fc.Get(i), i);
@@ -65,7 +65,7 @@ TEST(FIFOCache, Sequence_Test) {
     fc.Put(i + TEST_SIZE, i);
   }
 
-  EXPECT_EQ(fc.CurrentCapacity(), TEST_SIZE);
+  EXPECT_EQ(fc.GetSize(), TEST_SIZE);
 
   for (size_t i = 0; i < TEST_SIZE / 2; ++i) {
     EXPECT_THROW(fc.Get(i), std::range_error);
@@ -89,7 +89,7 @@ TEST(FIFOCache, CheckVictim) {
   cache.Put(3, 3);
   cache.Put(4, 4);
 
-  EXPECT_EQ(cache.CurrentCapacity(), 3);
+  EXPECT_EQ(cache.GetSize(), 3);
 
 }
 

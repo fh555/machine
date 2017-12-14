@@ -17,13 +17,13 @@ class StorageCache {
 
   Block Put(const int& key, const int& value);
 
-  const int& Get(const int& key, bool touch = true) const;
+  int Get(const int& key) const;
 
-  void Erase(const int& key);
+  size_t GetSize() const;
 
-  size_t CurrentCapacity() const;
-
-  double GetOccupiedFraction() const;
+  size_t GetCapacity() const{
+    return capacity_;
+  }
 
   bool IsSequential(const size_t& next);
 
@@ -34,13 +34,7 @@ class StorageCache {
 
   CachingType caching_type_ = CachingType::CACHING_TYPE_INVALID;
 
-  Cache<int, int, FIFOCachePolicy<int>>* fifo_cache = nullptr;
-
-  Cache<int, int, LRUCachePolicy<int>>* lru_cache = nullptr;
-
-  Cache<int, int, LFUCachePolicy<int>>* lfu_cache = nullptr;
-
-  Cache<int, int, ARCCachePolicy<int>>* arc_cache = nullptr;
+  Cache<int, int, FIFOCachePolicy<int, int>>* fifo_cache = nullptr;
 
   // current block accessed
   size_t current_ = 0;

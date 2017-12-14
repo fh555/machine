@@ -370,7 +370,7 @@ bool LocateInDevice(Device device,
 
   // Check device cache
   try{
-    device.cache.Get(block_id, true);
+    device.cache.Get(block_id);
     return true;
   }
   catch(const std::range_error& not_found){
