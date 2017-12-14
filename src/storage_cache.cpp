@@ -9,9 +9,9 @@ namespace machine {
 StorageCache::StorageCache(DeviceType device_type,
                            CachingType caching_type,
                            size_t capacity) :
-                           device_type_(device_type),
-                           caching_type_(caching_type),
-                           capacity_(capacity){
+                               device_type_(device_type),
+                               caching_type_(caching_type),
+                               capacity_(capacity){
 
   //std::cout << "STORAGE CACHE CAPACITY: " << capacity << "\n";
 
@@ -19,6 +19,14 @@ StorageCache::StorageCache(DeviceType device_type,
 
     case CACHING_TYPE_FIFO:
       fifo_cache = new Cache<int, int, FIFOCachePolicy<int, int>>(capacity);
+      break;
+
+    case CACHING_TYPE_LFU:
+      lfu_cache = new Cache<int, int, LFUCachePolicy<int, int>>(capacity);
+      break;
+
+    case CACHING_TYPE_LRU:
+      lru_cache = new Cache<int, int, LRUCachePolicy<int, int>>(capacity);
       break;
 
     case CACHING_TYPE_INVALID:
@@ -36,6 +44,14 @@ Block StorageCache::Put(const int& key, const int& value){
 
     case CACHING_TYPE_FIFO:
       victim = fifo_cache->Put(key, value);
+      break;
+
+    case CACHING_TYPE_LFU:
+      victim = lfu_cache->Put(key, value);
+      break;
+
+    case CACHING_TYPE_LRU:
+      victim = lru_cache->Put(key, value);
       break;
 
     case CACHING_TYPE_INVALID:
@@ -64,6 +80,12 @@ int StorageCache::Get(const int& key) const{
     case CACHING_TYPE_FIFO:
       return fifo_cache->Get(key);
 
+    case CACHING_TYPE_LFU:
+      return lfu_cache->Get(key);
+
+    case CACHING_TYPE_LRU:
+      return lru_cache->Get(key);
+
     case CACHING_TYPE_INVALID:
     default:
       exit(EXIT_FAILURE);
@@ -77,6 +99,12 @@ size_t StorageCache::GetSize() const{
 
     case CACHING_TYPE_FIFO:
       return fifo_cache->GetSize();
+
+    case CACHING_TYPE_LFU:
+      return lfu_cache->GetSize();
+
+    case CACHING_TYPE_LRU:
+      return lru_cache->GetSize();
 
     case CACHING_TYPE_INVALID:
     default:
@@ -100,6 +128,14 @@ std::ostream& operator<< (std::ostream& stream,
       cache.fifo_cache->Print();
       return stream;
 
+    case CACHING_TYPE_LFU:
+      cache.lfu_cache->Print();
+      return stream;
+
+    case CACHING_TYPE_LRU:
+      cache.lru_cache->Print();
+      return stream;
+
     case CACHING_TYPE_INVALID:
     default:
       exit(EXIT_FAILURE);
@@ -113,6 +149,12 @@ bool StorageCache::IsSequential(const size_t& next){
 
     case CACHING_TYPE_FIFO:
       return fifo_cache->IsSequential(next);
+
+    case CACHING_TYPE_LFU:
+      return lfu_cache->IsSequential(next);
+
+    case CACHING_TYPE_LRU:
+      return lru_cache->IsSequential(next);
 
     case CACHING_TYPE_INVALID:
     default:

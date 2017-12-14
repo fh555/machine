@@ -30,6 +30,7 @@ TEST(FIFOCache, Simple_Test) {
   EXPECT_EQ(fc.Get(1), 30);
 
   fc.Put(3, 30);
+
   EXPECT_THROW(fc.Get(1), std::range_error);
   EXPECT_EQ(fc.Get(2), 20);
   EXPECT_EQ(fc.Get(3), 30);

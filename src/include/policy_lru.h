@@ -1,10 +1,9 @@
-// FIFO HEADER
+// LRU HEADER
 
 #pragma once
 
 #include <list>
 #include <unordered_map>
-#include <algorithm>
 
 #include "macros.h"
 #include "policy.h"
@@ -12,15 +11,16 @@
 namespace machine {
 
 template <typename Key, typename Value>
-class FIFOCachePolicy : public ICachePolicy<Key, Value> {
+class LRUCachePolicy : public ICachePolicy<Key, Value> {
  public:
+  using lru_iterator = typename std::list<Key>::iterator;
 
-  FIFOCachePolicy(const size_t& capacity)
- : capacity_(capacity){
+  LRUCachePolicy(const size_t& capacity)
+  : capacity_(capacity){
     // Nothing to do here!
   }
 
-  ~FIFOCachePolicy() = default;
+  ~LRUCachePolicy() = default;
 
   void Check(){
 
@@ -28,6 +28,21 @@ class FIFOCachePolicy : public ICachePolicy<Key, Value> {
       std::cout << "Capacity exceeded \n";
       exit(EXIT_FAILURE);
     }
+
+  }
+
+  void Touch(const Key& key) {
+
+    // check if key exists
+    if(key_finder.count(key) == 0){
+      std::cout << "KEY NOT FOUND: " << key << "\n";
+      exit(EXIT_FAILURE);
+    }
+
+    // move the touched element at the beginning of the lru_queue
+    lru_queue.erase(key_finder[key]);
+    lru_queue.emplace_front(key);
+    key_finder[key] = lru_queue.begin();
 
   }
 
@@ -42,23 +57,28 @@ class FIFOCachePolicy : public ICachePolicy<Key, Value> {
 
       // check capacity
       if (GetSize() + 1 > capacity_) {
-        victim_key = fifo_queue.back();
+        victim_key = lru_queue.back();
         victim_value = cache_items_map[victim_key];
         //std::cout << "Victim: " << victim_key << "\n";
 
         // evict victim
-        fifo_queue.pop_back();
+        key_finder.erase(victim_key);
+        lru_queue.pop_back();
         cache_items_map.erase(victim_key);
       }
 
       // insert new element
-      fifo_queue.emplace_front(key);
+      lru_queue.emplace_front(key);
+      key_finder[key] = lru_queue.begin();
       cache_items_map[key] = value;
     }
     else {
 
       // update previous value of element
       cache_items_map[key] = value;
+
+      // Touch element
+      Touch(key);
 
     }
 
@@ -77,6 +97,9 @@ class FIFOCachePolicy : public ICachePolicy<Key, Value> {
     if (elem_it == cache_items_map.end()) {
       throw std::range_error{"No such element in the cache"};
     }
+
+    // Touch element
+    Touch(key);
 
     return elem_it->second;
   }
@@ -107,7 +130,9 @@ class FIFOCachePolicy : public ICachePolicy<Key, Value> {
 
  private:
 
-  std::list<Key> fifo_queue;
+  std::list<Key> lru_queue;
+
+  std::unordered_map<Key, lru_iterator> key_finder;
 
   std::unordered_map<Key, Value> cache_items_map;
 

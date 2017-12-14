@@ -1,10 +1,11 @@
-// FIFO HEADER
+// LFU HEADER
 
 #pragma once
 
-#include <list>
+#include <cstddef>
 #include <unordered_map>
-#include <algorithm>
+#include <map>
+#include <iostream>
 
 #include "macros.h"
 #include "policy.h"
@@ -12,15 +13,16 @@
 namespace machine {
 
 template <typename Key, typename Value>
-class FIFOCachePolicy : public ICachePolicy<Key, Value> {
+class LFUCachePolicy : public ICachePolicy<Key, Value> {
  public:
+  using lfu_iterator = typename std::multimap<std::size_t, Key>::iterator;
 
-  FIFOCachePolicy(const size_t& capacity)
- : capacity_(capacity){
+  LFUCachePolicy(const size_t& capacity)
+  : capacity_(capacity){
     // Nothing to do here!
   }
 
-  ~FIFOCachePolicy() = default;
+  ~LFUCachePolicy() override = default;
 
   void Check(){
 
@@ -28,6 +30,26 @@ class FIFOCachePolicy : public ICachePolicy<Key, Value> {
       std::cout << "Capacity exceeded \n";
       exit(EXIT_FAILURE);
     }
+
+  }
+
+  void Touch(const Key& key){
+
+    // check if key exists
+    if(lfu_storage.count(key) == 0){
+      std::cout << "KEY NOT FOUND: " << key << "\n";
+      exit(EXIT_FAILURE);
+    }
+
+    // get the previous frequency value of a key
+    auto elem_for_update = lfu_storage[key];
+    auto updated_elem = std::make_pair(elem_for_update->first + 1,
+                                       elem_for_update->second);
+
+    // update the previous value
+    frequency_storage.erase(elem_for_update);
+    lfu_storage[key] = frequency_storage.emplace_hint(frequency_storage.cend(),
+                                                      std::move(updated_elem));
 
   }
 
@@ -42,23 +64,31 @@ class FIFOCachePolicy : public ICachePolicy<Key, Value> {
 
       // check capacity
       if (GetSize() + 1 > capacity_) {
-        victim_key = fifo_queue.back();
+        victim_key = frequency_storage.cbegin()->second;
         victim_value = cache_items_map[victim_key];
         //std::cout << "Victim: " << victim_key << "\n";
 
         // evict victim
-        fifo_queue.pop_back();
+        frequency_storage.erase(lfu_storage[victim_key]);
+        lfu_storage.erase(victim_key);
         cache_items_map.erase(victim_key);
       }
 
       // insert new element
-      fifo_queue.emplace_front(key);
+      constexpr std::size_t INIT_FREQUENCY = 1;
+      lfu_storage[key] = frequency_storage.emplace_hint(frequency_storage.cbegin(),
+                                                        INIT_FREQUENCY,
+                                                        key);
       cache_items_map[key] = value;
+
     }
     else {
 
       // update previous value of element
       cache_items_map[key] = value;
+
+      // Touch element
+      Touch(key);
 
     }
 
@@ -77,6 +107,9 @@ class FIFOCachePolicy : public ICachePolicy<Key, Value> {
     if (elem_it == cache_items_map.end()) {
       throw std::range_error{"No such element in the cache"};
     }
+
+    // Touch element
+    Touch(key);
 
     return elem_it->second;
   }
@@ -107,7 +140,9 @@ class FIFOCachePolicy : public ICachePolicy<Key, Value> {
 
  private:
 
-  std::list<Key> fifo_queue;
+  std::multimap<std::size_t, Key> frequency_storage;
+
+  std::unordered_map<Key, lfu_iterator> lfu_storage;
 
   std::unordered_map<Key, Value> cache_items_map;
 

@@ -8,6 +8,8 @@
 #include "policy.h"
 
 #include "policy_fifo.h"
+#include "policy_lfu.h"
+#include "policy_lru.h"
 
 namespace machine {
 

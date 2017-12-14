@@ -64,8 +64,10 @@ enum CachingType {
   CACHING_TYPE_INVALID = 0,
 
   CACHING_TYPE_FIFO = 1,
+  CACHING_TYPE_LFU = 2,
+  CACHING_TYPE_LRU = 3,
 
-  CACHING_TYPE_MAX = 1
+  CACHING_TYPE_MAX = 3
 };
 
 enum DeviceType {

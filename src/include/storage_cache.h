@@ -36,6 +36,10 @@ class StorageCache {
 
   Cache<int, int, FIFOCachePolicy<int, int>>* fifo_cache = nullptr;
 
+  Cache<int, int, LFUCachePolicy<int, int>>* lfu_cache = nullptr;
+
+  Cache<int, int, LRUCachePolicy<int, int>>* lru_cache = nullptr;
+
   // current block accessed
   size_t current_ = 0;
 

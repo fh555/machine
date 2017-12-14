@@ -21,7 +21,7 @@ class ICachePolicy {
 
   virtual Block Put(const Key& key, const Value& value) = 0;
 
-  virtual Value Get(const Key& key) const = 0;
+  virtual Value Get(const Key& key) = 0;
 
   virtual size_t GetSize() const = 0;
 

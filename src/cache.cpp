@@ -92,5 +92,11 @@ bool CACHE_TEMPLATE_TYPE::IsSequential(const size_t& next) {
 // FIFO
 template class Cache<int, int, FIFOCachePolicy<int, int>>;
 
+// LFU
+template class Cache<int, int, LFUCachePolicy<int, int>>;
+
+// LRU
+template class Cache<int, int, LRUCachePolicy<int, int>>;
+
 }  // End machine namespace
 
