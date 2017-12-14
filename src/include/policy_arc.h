@@ -149,22 +149,19 @@ class ARCCachePolicy : public ICachePolicy<Key> {
 
     if(T1_not_empty && ((in_B2 && len_T1_eq_P) || len_T1_gt_P)){
       DLOG(INFO) << "ARC VICTIM : " << T1.back() << "\n";
-      if(T1.back() == 748){
-        Print("T1", T1);
-      }
       return T1.back();
     }
     else {
       DLOG(INFO) << "ARC VICTIM : " << T2.back() << "\n";
-      if(T2.back() == 748){
-        Print("T2", T2);
-      }
       return T2.back();
     }
 
   }
 
   void Check() const{
+
+    // Disable checks for now
+    return;
 
     // Print
     //DLOG(INFO) << "\n+++++++++++++++++++++++++++++++++++++\n";

@@ -53,7 +53,7 @@ Block CACHE_TEMPLATE_TYPE::Put(const Key& key,
   auto entry_location = LocateEntry(key);
   Block victim;
   Key victim_key = INVALID_KEY;
-  Value victim_value = INVALID_KEY;
+  Value victim_value = CLEAN_BLOCK;
 
   if (entry_location == cache_items_map.end()) {
 
@@ -67,14 +67,14 @@ Block CACHE_TEMPLATE_TYPE::Put(const Key& key,
         Erase(victim_key);
       }
       catch(const std::range_error& not_found){
-        std::cout << "Did not find the victim: " << (int)victim_key;
+        std::cout << "Did not find the victim: " << (int)victim_key << "\n";
         // Nothing to do here!
       }
     }
 
     Insert(key, value);
 
-    if (CurrentCapacity() > capacity_) {
+    if (CurrentCapacity() > 1.01 * capacity_) {
       LOG(INFO) << "Capacity exceeded";
       exit(EXIT_FAILURE);
     }
