@@ -57,10 +57,10 @@ class ARCCachePolicy : public ICachePolicy<Key, Value> {
 
     // Print
     DLOG(INFO) << "\n+++++++++++++++++++++++++++++++++++++\n";
-    DequePrint("T1", T1);
-    DequePrint("B1",B1);
-    DequePrint("T2",T2);
-    DequePrint("B2",B2);
+    //DequePrint("T1", T1);
+    //DequePrint("B1",B1);
+    //DequePrint("T2",T2);
+    //DequePrint("B2",B2);
     DLOG(INFO) << "+++++++++++++++++++++++++++++++++++++\n";
 
     if (GetSize() > capacity_) {

@@ -559,7 +559,7 @@ void MachineHelper() {
     if(warmed_up == false &&
         operation_itr == warm_up_operation_count){
 
-      if(operation_itr % 1000 == 0){
+      if(operation_itr % 100000 == 0){
         std::cout << "Operation " << operation_itr << " :: " <<
             operation_type << " " << global_block_number << " "
             << fork_number << " " << block_number << " :: "
@@ -592,7 +592,7 @@ void MachineHelper() {
     auto logical_s = logical_ns/(1000 * 1000 * 1000);
     auto physical_ns = physical_timer.GetDuration();
     auto physical_s = physical_ns/(1000 * 1000 * 1000);
-    if(operation_itr % 1000 == 0){
+    if(operation_itr % 100000 == 0){
       std::cout << "Operation " << operation_itr << " :: " <<
           operation_type << " " << global_block_number << " "
           << fork_number << " " << block_number << " :: "
