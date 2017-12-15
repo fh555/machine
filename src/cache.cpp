@@ -101,6 +101,9 @@ template class Cache<int, int, LRUCachePolicy<int, int>>;
 // ARC
 template class Cache<int, int, ARCCachePolicy<int, int>>;
 
+// HARC
+template class Cache<int, int, HARCCachePolicy<int, int>>;
+
 
 }  // End machine namespace
 

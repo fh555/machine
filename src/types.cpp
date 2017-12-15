@@ -15,6 +15,8 @@ std::string CachingTypeToString(const CachingType& caching_type){
       return "LRU";
     case CACHING_TYPE_ARC:
       return "ARC";
+    case CACHING_TYPE_HARC:
+      return "HARC";
     default:
       return "INVALID";
   }
