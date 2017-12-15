@@ -369,15 +369,12 @@ bool LocateInDevice(Device device,
                     const size_t& block_id){
 
   // Check device cache
-  try{
-    device.cache.Get(block_id);
-    return true;
-  }
-  catch(const std::range_error& not_found){
-    // Nothing to do here!
+  auto value = device.cache.Get(block_id);
+  if(value == INVALID_VALUE){
+    return false;
   }
 
-  return false;
+  return true;
 }
 
 DeviceType LocateInDevices(std::vector<Device> devices,

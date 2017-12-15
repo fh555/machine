@@ -95,7 +95,7 @@ class LRUCachePolicy : public ICachePolicy<Key, Value> {
 
     auto elem_it = cache_items_map.find(key);
     if (elem_it == cache_items_map.end()) {
-      throw std::range_error{"No such element in the cache"};
+      return INVALID_VALUE;
     }
 
     // Touch element

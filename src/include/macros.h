@@ -35,6 +35,7 @@ namespace machine {
 
 
 const size_t INVALID_KEY = INT32_MAX;
+const size_t INVALID_VALUE = INT32_MAX - 1;
 
 const size_t CLEAN_BLOCK = 100;
 const size_t DIRTY_BLOCK = 101;

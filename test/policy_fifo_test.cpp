@@ -31,7 +31,7 @@ TEST(FIFOCache, Simple_Test) {
 
   fc.Put(3, 30);
 
-  EXPECT_THROW(fc.Get(1), std::range_error);
+  EXPECT_EQ(fc.Get(1), INVALID_VALUE);
   EXPECT_EQ(fc.Get(2), 20);
   EXPECT_EQ(fc.Get(3), 30);
 }
@@ -44,7 +44,7 @@ TEST(FIFOCache, Missing_Value) {
 
   EXPECT_EQ(fc.GetSize(), 1);
   EXPECT_EQ(fc.Get(1), 10);
-  EXPECT_THROW(fc.Get(2), std::range_error);
+  EXPECT_EQ(fc.Get(2), INVALID_VALUE);
 }
 
 TEST(FIFOCache, Sequence_Test) {
@@ -69,7 +69,7 @@ TEST(FIFOCache, Sequence_Test) {
   EXPECT_EQ(fc.GetSize(), TEST_SIZE);
 
   for (size_t i = 0; i < TEST_SIZE / 2; ++i) {
-    EXPECT_THROW(fc.Get(i), std::range_error);
+    EXPECT_EQ(fc.Get(i), INVALID_VALUE);
   }
 
   for (size_t i = 0; i < TEST_SIZE / 2; ++i) {
@@ -110,7 +110,7 @@ TEST(FIFOCache, FIFOCheck){
   cache.Put(4, 4);
 
   EXPECT_EQ(cache.GetSize(), 3);
-  EXPECT_THROW(cache.Get(1), std::range_error);
+  EXPECT_EQ(cache.Get(1), INVALID_VALUE);
   cache.Print();
 }
 

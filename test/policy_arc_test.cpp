@@ -30,7 +30,7 @@ TEST(ARCCache, MissingValue) {
   size_t cache_capacity = 1;
   arc_cache_t<int, int> cache(cache_capacity);
 
-  EXPECT_THROW(cache.Get(1), std::range_error);
+  EXPECT_EQ(cache.Get(1), INVALID_VALUE);
 }
 
 TEST(ARCCache, CheckVictim) {
@@ -58,7 +58,7 @@ TEST(ARCCache, CheckPointerMove) {
   // T1 still bigger list and lru entry is key1;
   cache.Put(4,  4);
 
-  EXPECT_THROW(cache.Get(1), std::range_error);
+  EXPECT_EQ(cache.Get(1), INVALID_VALUE);
 }
 
 
@@ -78,7 +78,7 @@ TEST(ARCCache, CheckPointerMoveT2) {
 
   cache.Put(4, 4);
 
-  EXPECT_THROW(cache.Get(2), std::range_error);
+  EXPECT_EQ(cache.Get(2), INVALID_VALUE);
 }
 
 
@@ -94,7 +94,7 @@ TEST(ARCCache, CheckPointerSaveB1) {
   cache.Put(1, 5);
 
   //key1 is restored from B1 and key2 moved to B1 (out of cache)
-  EXPECT_THROW(cache.Get(2), std::range_error);
+  EXPECT_EQ(cache.Get(2), INVALID_VALUE);
 }
 
 TEST(ARCCache, CheckPointerSaveB2) {
@@ -118,7 +118,7 @@ TEST(ARCCache, CheckPointerSaveB2) {
   cache.Put(1, 3);
 
   //key1 is restored from B1 and key2 moved to B1 (out of cache)
-  EXPECT_THROW(cache.Get(5), std::range_error);
+  EXPECT_EQ(cache.Get(5), INVALID_VALUE);
 }
 
 TEST(ARCCache, KeepsAllValuesWithinCapacity) {
@@ -131,7 +131,7 @@ TEST(ARCCache, KeepsAllValuesWithinCapacity) {
   }
 
   for (int i = 0; i < TEST_RECORDS - CACHE_CAPACITY; ++i) {
-    EXPECT_THROW(cache.Get(i), std::range_error);
+    EXPECT_EQ(cache.Get(i), INVALID_VALUE);
   }
 
   for (int i = TEST_RECORDS - CACHE_CAPACITY; i < TEST_RECORDS; ++i) {
@@ -155,7 +155,7 @@ TEST(ARCCache, RecencyCheck) {
   cache.Put(4, 4);
 
   EXPECT_EQ(cache.GetSize(), 3);
-  EXPECT_THROW(cache.Get(1), std::range_error);
+  EXPECT_EQ(cache.Get(1), INVALID_VALUE);
 }
 
 TEST(ARCCache, FrequencyCheck) {
@@ -173,7 +173,7 @@ TEST(ARCCache, FrequencyCheck) {
   cache.Put(4, 4);
 
   EXPECT_EQ(cache.GetSize(), 3);
-  EXPECT_THROW(cache.Get(2), std::range_error);
+  EXPECT_EQ(cache.Get(2), INVALID_VALUE);
 }
 
 

@@ -38,7 +38,7 @@ class FIFOCachePolicy : public ICachePolicy<Key, Value> {
   Block Put(const Key& key, const Value& value){
     Block victim;
     Key victim_key = INVALID_KEY;
-    Value victim_value = INVALID_KEY;
+    Value victim_value = INVALID_VALUE;
 
     auto entry_location = cache_items_map.find(key);
     if (entry_location == cache_items_map.end()) {
@@ -82,7 +82,7 @@ class FIFOCachePolicy : public ICachePolicy<Key, Value> {
 
     auto elem_it = cache_items_map.find(key);
     if (elem_it == cache_items_map.end()) {
-      throw std::range_error{"No such element in the cache"};
+      return INVALID_VALUE;
     }
 
     // Touch element

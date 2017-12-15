@@ -27,7 +27,7 @@ TEST(LRUCache, MissingValue) {
   size_t cache_capacity = 1;
   lru_cache_t<int, int> cache(cache_capacity);
 
-  EXPECT_THROW(cache.Get(0), std::range_error);
+  EXPECT_EQ(cache.Get(0), INVALID_VALUE);
 }
 
 TEST(LRUCache, KeepsAllValuesWithinCapacity) {
@@ -40,7 +40,7 @@ TEST(LRUCache, KeepsAllValuesWithinCapacity) {
   }
 
   for (int i = 0; i < TEST_RECORDS - CACHE_CAPACITY; ++i) {
-    EXPECT_THROW(cache.Get(i), std::range_error);
+    EXPECT_EQ(cache.Get(i), INVALID_VALUE);
   }
 
   for (int i = TEST_RECORDS - CACHE_CAPACITY; i < TEST_RECORDS; ++i) {
@@ -78,7 +78,7 @@ TEST(LRUCache, RecencyCheck){
   cache.Put(4, 4);
 
   EXPECT_EQ(cache.GetSize(), 3);
-  EXPECT_THROW(cache.Get(1), std::range_error);
+  EXPECT_EQ(cache.Get(1), INVALID_VALUE);
   cache.Print();
 }
 

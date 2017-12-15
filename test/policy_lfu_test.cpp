@@ -42,7 +42,7 @@ TEST(LFUCache, Simple_Test) {
   EXPECT_EQ(cache.Get(2), 2);
   EXPECT_EQ(cache.Get(3), 3);
   EXPECT_EQ(cache.Get(4), 4);
-  EXPECT_THROW(cache.Get(1), std::range_error);
+  EXPECT_EQ(cache.Get(1), INVALID_VALUE);
 }
 
 TEST(LFUCache, Single_Slot) {
@@ -60,7 +60,7 @@ TEST(LFUCache, Single_Slot) {
 
   cache.Put(2, 20);
 
-  EXPECT_THROW(cache.Get(1), std::range_error);
+  EXPECT_EQ(cache.Get(1), INVALID_VALUE);
   EXPECT_EQ(cache.Get(2), 20);
 }
 
@@ -84,8 +84,8 @@ TEST(LFUCache, FrequencyIssue) {
   EXPECT_EQ(cache.Get(1), 10);
   EXPECT_EQ(cache.Get(2), 1);
   EXPECT_EQ(cache.Get(5), 4);
-  EXPECT_THROW(cache.Get(3), std::range_error);
-  EXPECT_THROW(cache.Get(4), std::range_error);
+  EXPECT_EQ(cache.Get(3), INVALID_VALUE);
+  EXPECT_EQ(cache.Get(4), INVALID_VALUE);
 
   cache.Put(6, 5);
   cache.Put(7, 6);
@@ -93,8 +93,8 @@ TEST(LFUCache, FrequencyIssue) {
   EXPECT_EQ(cache.Get(1), 10);
   EXPECT_EQ(cache.Get(5), 4);
   EXPECT_EQ(cache.Get(7), 6);
-  EXPECT_THROW(cache.Get(3), std::range_error);
-  EXPECT_THROW(cache.Get(6), std::range_error);
+  EXPECT_EQ(cache.Get(3), INVALID_VALUE);
+  EXPECT_EQ(cache.Get(6), INVALID_VALUE);
 }
 
 TEST(LFUCache, CheckVictim) {
@@ -126,7 +126,7 @@ TEST(LFUCache, FrequencyCheck){
   cache.Put(4, 4);
 
   EXPECT_EQ(cache.GetSize(), 3);
-  EXPECT_THROW(cache.Get(2), std::range_error);
+  EXPECT_EQ(cache.Get(2), INVALID_VALUE);
   cache.Print();
 }
 

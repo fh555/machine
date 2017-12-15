@@ -250,13 +250,13 @@ void BringBlockToMemory(const size_t& block_id){
 
   if(memory_device_type == DeviceType::DEVICE_TYPE_DRAM ||
       memory_device_type == DeviceType::DEVICE_TYPE_NVM){
-      Copy(state.devices,
-           DeviceType::DEVICE_TYPE_CACHE,
-           memory_device_type,
-           block_id,
-           CLEAN_BLOCK,
-           flush_block,
-           logical_ns);
+    Copy(state.devices,
+         DeviceType::DEVICE_TYPE_CACHE,
+         memory_device_type,
+         block_id,
+         CLEAN_BLOCK,
+         flush_block,
+         logical_ns);
   }
 
 
@@ -383,16 +383,15 @@ void FlushBlock(const size_t& block_id) {
     auto device_offset = GetDeviceOffset(state.devices, memory_device_type);
     auto device_cache = state.devices[device_offset].cache;
     // Check device cache
-    try{
-      auto block_status = device_cache.Get(block_id);
-      if(block_status != CLEAN_BLOCK){
-        BringBlockToStorage(block_id, block_status);
-      }
-    }
-    catch(const std::range_error& not_found){
+    auto block_status = device_cache.Get(block_id);
+    if(block_status == INVALID_VALUE){
       std::cout << "Did not find the to be flushed block: " << block_id;
-      // Nothing to do here!
+      exit(EXIT_FAILURE);
     }
+    if(block_status != CLEAN_BLOCK){
+      BringBlockToStorage(block_id, block_status);
+    }
+
   }
 
 }
