@@ -20,7 +20,8 @@ template <typename Key, typename Value>
 class ARCCachePolicy : public ICachePolicy<Key, Value> {
  public:
 
-  ARCCachePolicy(const size_t& capacity)
+  ARCCachePolicy(const size_t& capacity,
+                 UNUSED_ATTRIBUTE const double& clean_fraction)
  : capacity_(capacity),
    p(0){
     // Nothing to do here!

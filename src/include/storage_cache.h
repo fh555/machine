@@ -13,7 +13,8 @@ class StorageCache {
 
   StorageCache(DeviceType device_type,
                CachingType caching_type,
-               size_t capacity);
+               size_t capacity,
+               double clean_fraction = 0);
 
   Block Put(const int& key, const int& value);
 
@@ -49,6 +50,9 @@ class StorageCache {
 
   // capacity
   size_t capacity_ = 0;
+
+  // clean fraction
+  double clean_fraction_ = 0;
 
 };
 

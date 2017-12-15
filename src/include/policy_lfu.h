@@ -17,7 +17,8 @@ class LFUCachePolicy : public ICachePolicy<Key, Value> {
  public:
   using lfu_iterator = typename std::multimap<std::size_t, Key>::iterator;
 
-  LFUCachePolicy(const size_t& capacity)
+  LFUCachePolicy(const size_t& capacity,
+                 UNUSED_ATTRIBUTE const double& clean_fraction)
   : capacity_(capacity){
     // Nothing to do here!
   }

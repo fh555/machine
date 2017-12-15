@@ -15,7 +15,8 @@ template <typename Key, typename Value>
 class FIFOCachePolicy : public ICachePolicy<Key, Value> {
  public:
 
-  FIFOCachePolicy(const size_t& capacity)
+  FIFOCachePolicy(const size_t& capacity,
+                  UNUSED_ATTRIBUTE const double& clean_fraction)
  : capacity_(capacity){
     // Nothing to do here!
   }

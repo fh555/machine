@@ -176,5 +176,35 @@ TEST(HARCCache, FrequencyCheck) {
   EXPECT_EQ(cache.Get(2), INVALID_VALUE);
 }
 
+TEST(HARCCache, DirtyPageTest1) {
+  size_t cache_capacity = 4;
+  double clean_search_fraction = 0;
+  harc_cache_t<int, int> cache(cache_capacity, clean_search_fraction);
+
+  cache.Put(1, DIRTY_BLOCK);
+  cache.Put(2, CLEAN_BLOCK);
+  cache.Put(3, CLEAN_BLOCK);
+  cache.Put(4, CLEAN_BLOCK);
+  cache.Put(5, CLEAN_BLOCK);
+
+  EXPECT_EQ(cache.GetSize(), cache_capacity);
+  EXPECT_EQ(cache.Get(1), INVALID_VALUE);
+}
+
+TEST(HARCCache, DirtyPageTest2) {
+  size_t cache_capacity = 4;
+  double clean_search_fraction = 0.5;
+  harc_cache_t<int, int> cache(cache_capacity, clean_search_fraction);
+
+  cache.Put(1, DIRTY_BLOCK);
+  cache.Put(2, CLEAN_BLOCK);
+  cache.Put(3, CLEAN_BLOCK);
+  cache.Put(4, CLEAN_BLOCK);
+  cache.Put(5, CLEAN_BLOCK);
+
+  EXPECT_EQ(cache.GetSize(), cache_capacity);
+  EXPECT_EQ(cache.Get(2), INVALID_VALUE);
+}
+
 
 }  // End machine namespace

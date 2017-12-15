@@ -15,7 +15,8 @@ class LRUCachePolicy : public ICachePolicy<Key, Value> {
  public:
   using lru_iterator = typename std::list<Key>::iterator;
 
-  LRUCachePolicy(const size_t& capacity)
+  LRUCachePolicy(const size_t& capacity,
+                 UNUSED_ATTRIBUTE const double& clean_fraction)
   : capacity_(capacity){
     // Nothing to do here!
   }

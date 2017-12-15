@@ -38,8 +38,8 @@ void PrintCapacity(const size_t block_count){
     Cache<Key, Value, Policy>
 
 CACHE_TEMPLATE_ARGUMENT
-CACHE_TEMPLATE_TYPE::Cache(size_t capacity)
-: cache_policy_(Policy(capacity)),
+CACHE_TEMPLATE_TYPE::Cache(size_t capacity, double clean_fraction)
+: cache_policy_(Policy(capacity, clean_fraction)),
   capacity_{capacity},
   current_block_{0} {
 

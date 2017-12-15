@@ -658,9 +658,14 @@ Device DeviceFactory::GetDevice(const DeviceType& device_type,
       if(last_device_type == device_type){
         size = 1024 * 1024;
       }
+
+      // Setup clean fraction
+      double clean_fraction = 0;
+
       return Device(device_type,
                     state.caching_type,
-                    size * scale_factor
+                    size * scale_factor,
+                    clean_fraction
       );
     }
 

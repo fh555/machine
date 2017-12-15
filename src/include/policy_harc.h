@@ -20,8 +20,10 @@ template <typename Key, typename Value>
 class HARCCachePolicy : public ICachePolicy<Key, Value> {
  public:
 
-  HARCCachePolicy(const size_t& capacity)
+  HARCCachePolicy(const size_t& capacity,
+                  const double& clean_fraction)
  : capacity_(capacity),
+   clean_fraction_(clean_fraction),
    p(0){
     // Nothing to do here!
   }
@@ -64,22 +66,22 @@ class HARCCachePolicy : public ICachePolicy<Key, Value> {
     DLOG(INFO) << "+++++++++++++++++++++++++++++++++++++\n";
 
     if (GetSize() > capacity_) {
-      DLOG(INFO) << "Capacity exceeded \n";
+      std::cout << "Capacity exceeded \n";
       exit(EXIT_FAILURE);
     }
 
     if(p > capacity_ || p < 0){
-      DLOG(INFO) << "p exceeds capacity \n";
+      std::cout << "p exceeds capacity \n";
       exit(EXIT_FAILURE);
     }
 
     if(T1.size() + B1.size() > capacity_){
-      DLOG(INFO) << "L1 exceeds capacity \n";
+      std::cout << "L1 exceeds capacity \n";
       exit(EXIT_FAILURE);
     }
 
     if(T1.size() + B1.size() + T2.size() + B2.size() > 2 * capacity_){
-      DLOG(INFO) << "L1 + L2 exceeds 2 * capacity \n";
+      std::cout << "L1 + L2 exceeds 2 * capacity \n";
       exit(EXIT_FAILURE);
     }
 
@@ -112,6 +114,44 @@ class HARCCachePolicy : public ICachePolicy<Key, Value> {
 
   }
 
+  Key DirtyPageRetainer(std::deque<Key>& list){
+    Key victim_key = INVALID_KEY;
+    Value victim_value = INVALID_VALUE;
+    std::deque<int>::reverse_iterator rit = list.rbegin();
+    std::deque<int>::iterator victim_iterator;
+
+    std::cout << "CLEAN FRACTION: " << clean_fraction_ << "\n";
+    size_t iteration_count = clean_fraction_ * capacity_;
+    size_t iterator = 0;
+    bool found_clean_victim_page = false;
+
+    for (rit = list.rbegin(); rit!= list.rend(); ++rit) {
+      // Check victim
+      victim_key = *rit;
+      victim_value = cache_items_map[victim_key];
+      if(victim_value == CLEAN_BLOCK){
+        found_clean_victim_page = true;
+        //std::cout << "FOUND CLEAN VICTIM: " << victim_key << "\n";
+        break;
+      }
+
+      // Check iterations
+      if(iterator++ > iteration_count){
+        break;
+      }
+    }
+
+    // Pick normal victim if we found no clean victim page
+    if(found_clean_victim_page == false){
+      victim_key = list.back();
+    }
+
+    // Erase victim from list
+    victim_iterator = std::find(list.begin(), list.end(), victim_key);
+    list.erase(victim_iterator);
+    return victim_key;
+  }
+
   Key Replace(const Key& key) {
     DLOG(INFO) << "HARC REPLACE : " << key << "\n";
 
@@ -123,14 +163,12 @@ class HARCCachePolicy : public ICachePolicy<Key, Value> {
 
     if(T1_not_empty && ((len_T1_eq_P && in_B2) || len_T1_gt_P)){
       DLOG(INFO) << "Evict from T1 to B1\n";
-      victim_key = T1.back();
-      T1.pop_back();
+      victim_key = DirtyPageRetainer(T1);
       B1.push_front(victim_key);
     }
     else {
       DLOG(INFO) << "Evict from T2 to B2\n";
-      victim_key = T2.back();
-      T2.pop_back();
+      victim_key = DirtyPageRetainer(T2);
       B2.push_front(victim_key);
     }
 
@@ -246,9 +284,6 @@ class HARCCachePolicy : public ICachePolicy<Key, Value> {
       return INVALID_VALUE;
     }
 
-    // Touch element
-    Touch(key);
-
     // Run integrity checks
     //Check();
 
@@ -290,6 +325,8 @@ class HARCCachePolicy : public ICachePolicy<Key, Value> {
   std::unordered_map<Key, Value> cache_items_map;
 
   size_t capacity_;
+
+  double clean_fraction_;
 
   // marker
   size_t p;

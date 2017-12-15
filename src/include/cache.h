@@ -24,7 +24,7 @@ template <typename Key, typename Value, typename Policy>
 class Cache {
  public:
 
-  Cache(size_t capacity);
+  Cache(size_t capacity, double clean_fraction = 0);
 
   Block Put(const Key& key, const Value& value);
 

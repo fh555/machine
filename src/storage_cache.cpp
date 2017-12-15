@@ -8,33 +8,35 @@ namespace machine {
 
 StorageCache::StorageCache(DeviceType device_type,
                            CachingType caching_type,
-                           size_t capacity) :
-                               device_type_(device_type),
-                               caching_type_(caching_type),
-                               capacity_(capacity){
+                           size_t capacity,
+                           double clean_fraction) :
+                           device_type_(device_type),
+                           caching_type_(caching_type),
+                           capacity_(capacity),
+                           clean_fraction_(clean_fraction){
 
   //std::cout << "STORAGE CACHE CAPACITY: " << capacity << "\n";
 
   switch(caching_type_){
 
     case CACHING_TYPE_FIFO:
-      fifo_cache = new Cache<int, int, FIFOCachePolicy<int, int>>(capacity);
+      fifo_cache = new Cache<int, int, FIFOCachePolicy<int, int>>(capacity, clean_fraction);
       break;
 
     case CACHING_TYPE_LFU:
-      lfu_cache = new Cache<int, int, LFUCachePolicy<int, int>>(capacity);
+      lfu_cache = new Cache<int, int, LFUCachePolicy<int, int>>(capacity, clean_fraction);
       break;
 
     case CACHING_TYPE_LRU:
-      lru_cache = new Cache<int, int, LRUCachePolicy<int, int>>(capacity);
+      lru_cache = new Cache<int, int, LRUCachePolicy<int, int>>(capacity, clean_fraction);
       break;
 
     case CACHING_TYPE_ARC:
-      arc_cache = new Cache<int, int, ARCCachePolicy<int, int>>(capacity);
+      arc_cache = new Cache<int, int, ARCCachePolicy<int, int>>(capacity, clean_fraction);
       break;
 
     case CACHING_TYPE_HARC:
-      harc_cache = new Cache<int, int, HARCCachePolicy<int, int>>(capacity);
+      harc_cache = new Cache<int, int, HARCCachePolicy<int, int>>(capacity, clean_fraction);
       break;
 
     case CACHING_TYPE_INVALID:
