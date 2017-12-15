@@ -40,6 +40,8 @@ class StorageCache {
 
   Cache<int, int, LRUCachePolicy<int, int>>* lru_cache = nullptr;
 
+  Cache<int, int, ARCCachePolicy<int, int>>* arc_cache = nullptr;
+
   // current block accessed
   size_t current_ = 0;
 

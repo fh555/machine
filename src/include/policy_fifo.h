@@ -31,6 +31,10 @@ class FIFOCachePolicy : public ICachePolicy<Key, Value> {
 
   }
 
+  void Touch(UNUSED_ATTRIBUTE const Key& key){
+    // Nothing to do here in case of FIFO!
+  }
+
   Block Put(const Key& key, const Value& value){
     Block victim;
     Key victim_key = INVALID_KEY;
@@ -60,6 +64,9 @@ class FIFOCachePolicy : public ICachePolicy<Key, Value> {
       // update previous value of element
       cache_items_map[key] = value;
 
+      // Touch element
+      Touch(key);
+
     }
 
     // Run integrity checks
@@ -77,6 +84,9 @@ class FIFOCachePolicy : public ICachePolicy<Key, Value> {
     if (elem_it == cache_items_map.end()) {
       throw std::range_error{"No such element in the cache"};
     }
+
+    // Touch element
+    Touch(key);
 
     return elem_it->second;
   }

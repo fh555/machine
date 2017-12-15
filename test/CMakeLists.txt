@@ -29,6 +29,15 @@ ${CMAKE_THREAD_LIBS_INIT}
 )
 add_test(NAME LFUTest COMMAND policy_lfu_test)
 
+# ---[ ARC TEST
+add_executable(policy_arc_test policy_arc_test.cpp)
+target_link_libraries(policy_arc_test machine_library 
+${GTEST_BOTH_LIBRARIES} 
+${GLOG_LIBRARIES} 
+${CMAKE_THREAD_LIBS_INIT}
+)
+add_test(NAME ARCTest COMMAND policy_arc_test)
+
 # ---[ DISTRIBUTION TEST
 add_executable(distribution_test distribution_test.cpp)
 target_link_libraries(distribution_test machine_library

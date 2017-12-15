@@ -10,6 +10,7 @@
 #include "policy_fifo.h"
 #include "policy_lfu.h"
 #include "policy_lru.h"
+#include "policy_arc.h"
 
 namespace machine {
 

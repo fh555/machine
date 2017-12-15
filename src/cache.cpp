@@ -98,5 +98,9 @@ template class Cache<int, int, LFUCachePolicy<int, int>>;
 // LRU
 template class Cache<int, int, LRUCachePolicy<int, int>>;
 
+// ARC
+template class Cache<int, int, ARCCachePolicy<int, int>>;
+
+
 }  // End machine namespace
 
