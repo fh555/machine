@@ -35,10 +35,6 @@ StorageCache::StorageCache(DeviceType device_type,
       arc_cache = new Cache<int, int, ARCCachePolicy<int, int>>(capacity, clean_fraction);
       break;
 
-    case CACHING_TYPE_HARC:
-      harc_cache = new Cache<int, int, HARCCachePolicy<int, int>>(capacity, clean_fraction);
-      break;
-
     case CACHING_TYPE_INVALID:
     default:
       exit(EXIT_FAILURE);
@@ -66,10 +62,6 @@ Block StorageCache::Put(const int& key, const int& value){
 
     case CACHING_TYPE_ARC:
       victim = arc_cache->Put(key, value);
-      break;
-
-    case CACHING_TYPE_HARC:
-      victim = harc_cache->Put(key, value);
       break;
 
     case CACHING_TYPE_INVALID:
@@ -107,9 +99,6 @@ int StorageCache::Get(const int& key) const{
     case CACHING_TYPE_ARC:
       return arc_cache->Get(key);
 
-    case CACHING_TYPE_HARC:
-      return harc_cache->Get(key);
-
     case CACHING_TYPE_INVALID:
     default:
       exit(EXIT_FAILURE);
@@ -132,9 +121,6 @@ size_t StorageCache::GetSize() const{
 
     case CACHING_TYPE_ARC:
       return arc_cache->GetSize();
-
-    case CACHING_TYPE_HARC:
-      return harc_cache->GetSize();
 
     case CACHING_TYPE_INVALID:
     default:
@@ -170,10 +156,6 @@ std::ostream& operator<< (std::ostream& stream,
       cache.arc_cache->Print();
       return stream;
 
-    case CACHING_TYPE_HARC:
-      cache.harc_cache->Print();
-      return stream;
-
     case CACHING_TYPE_INVALID:
     default:
       exit(EXIT_FAILURE);
@@ -196,9 +178,6 @@ bool StorageCache::IsSequential(const size_t& next){
 
     case CACHING_TYPE_ARC:
       return arc_cache->IsSequential(next);
-
-    case CACHING_TYPE_HARC:
-      return harc_cache->IsSequential(next);
 
     case CACHING_TYPE_INVALID:
     default:

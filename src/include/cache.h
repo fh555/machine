@@ -11,7 +11,6 @@
 #include "policy_lfu.h"
 #include "policy_lru.h"
 #include "policy_arc.h"
-#include "policy_harc.h"
 
 namespace machine {
 

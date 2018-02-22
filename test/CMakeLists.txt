@@ -38,16 +38,6 @@ ${CMAKE_THREAD_LIBS_INIT}
 )
 add_test(NAME ARCTest COMMAND policy_arc_test)
 
-# ---[ HARC TEST
-add_executable(policy_harc_test policy_harc_test.cpp)
-target_link_libraries(policy_harc_test machine_library 
-${GTEST_BOTH_LIBRARIES} 
-${GLOG_LIBRARIES} 
-${CMAKE_THREAD_LIBS_INIT}
-)
-add_test(NAME HARCTest COMMAND policy_harc_test)
-
-
 # ---[ DISTRIBUTION TEST
 add_executable(distribution_test distribution_test.cpp)
 target_link_libraries(distribution_test machine_library
