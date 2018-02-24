@@ -18,6 +18,9 @@ import numpy as np
 import re
 import shutil
 import datetime
+import uuid
+import multiprocessing
+import itertools
 
 matplotlib.use('Agg')
 import pylab
@@ -135,6 +138,7 @@ BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 BUILD_DIR = BASE_DIR + "/../build/test/"
 BENCHMARK_DIR = BASE_DIR + "/../traces/"
 PROGRAM_NAME = BUILD_DIR + "machine"
+JOBS = []
 
 ## HIERARCHY TYPES
 HIERARCHY_TYPE_NVM = 1
@@ -265,7 +269,7 @@ BENCHMARK_TYPES_DIRS = {
 }
 
 BENCHMARK_TYPES = [
-#     BENCHMARK_TYPE_EXAMPLE,
+#    BENCHMARK_TYPE_EXAMPLE,
     BENCHMARK_TYPE_TPCC,
     BENCHMARK_TYPE_VOTER,
     BENCHMARK_TYPE_YCSB_READ,
@@ -292,7 +296,7 @@ DEFAULT_DISK_MODE_TYPE = DISK_MODE_TYPE_SSD
 DEFAULT_BENCHMARK_TYPE = BENCHMARK_TYPE_TPCC
 DEFAULT_MIGRATION_FREQUENCY = 3
 DEFAULT_OPERATION_COUNT = 100000 * SCALE_FACTOR
-DEFAULT_SUMMARY_FILE = "outputfile.summary"
+DEFAULT_SUMMARY_FILE = "outputfile.txt"
 
 ## EXPERIMENTS
 LATENCY_EXPERIMENT = 1
@@ -302,11 +306,11 @@ SIZE_RATIO_EXPERIMENT = 4
 HARD_DISK_EXPERIMENT = 5
 
 ## SUMMARY FILES
-LATENCY_EXPERIMENT_SUMMARY = "latency.summary"
-SIZE_EXPERIMENT_SUMMARY = "size.summary"
-CACHE_EXPERIMENT_SUMMARY = "cache.summary"
-SIZE_RATIO_EXPERIMENT_SUMMARY = "size_ratio.summary"
-HARD_DISK_EXPERIMENT_SUMMARY = "hard_disk.summary"
+LATENCY_EXPERIMENT_SUMMARY = "latency.txt"
+SIZE_EXPERIMENT_SUMMARY = "size.txt"
+CACHE_EXPERIMENT_SUMMARY = "cache.txt"
+SIZE_RATIO_EXPERIMENT_SUMMARY = "size_ratio.txt"
+HARD_DISK_EXPERIMENT_SUMMARY = "hard_disk.txt"
 
 ## EVAL DIRS
 LATENCY_DIR = BASE_DIR + "/results/latency"
@@ -778,15 +782,22 @@ def latency_plot():
                 datasets = []
                 for hierarchy_type in LATENCY_EXP_HIERARCHY_TYPES:
 
-                    # Get result file
-                    result_dir_list = [BENCHMARK_TYPES_STRINGS[trace_type],
-                                       CACHING_TYPES_STRINGS[caching_type],
-                                       str(size_type),
-                                       HIERARCHY_TYPES_STRINGS[hierarchy_type]]
-                    result_file = get_result_file(LATENCY_DIR, result_dir_list, LATENCY_CSV)
+                    group_dataset = []
+                    for latency_type in LATENCY_EXP_LATENCY_TYPES:
 
-                    dataset = loadDataFile(result_file)
-                    datasets.append(dataset)
+                        # Get result file
+                        result_dir_list = [BENCHMARK_TYPES_STRINGS[trace_type],
+                                           CACHING_TYPES_STRINGS[caching_type],
+                                           str(size_type),
+                                           HIERARCHY_TYPES_STRINGS[hierarchy_type],
+                                           LATENCY_TYPES_STRINGS[latency_type]]
+                        result_file = get_result_file(LATENCY_DIR, result_dir_list, LATENCY_CSV)
+
+                        local_dataset = loadDataFile(result_file)
+                        group_dataset.append(local_dataset)
+
+                    merged_group_dataset = list(itertools.chain(*group_dataset))
+                    datasets.append(merged_group_dataset)
 
                 fig = create_latency_line_chart(datasets, 0)
 
@@ -1031,20 +1042,20 @@ def latency_eval():
                         result_dir_list = [BENCHMARK_TYPES_STRINGS[trace_type],
                                            CACHING_TYPES_STRINGS[caching_type],
                                            str(size_type),
-                                           HIERARCHY_TYPES_STRINGS[hierarchy_type]]
+                                           HIERARCHY_TYPES_STRINGS[hierarchy_type],
+                                           LATENCY_TYPES_STRINGS[latency_type]]
                         result_file = get_result_file(LATENCY_DIR, result_dir_list, LATENCY_CSV)
 
                         # Run experiment
-                        stat = run_experiment(stat_offset=THROUGHPUT_OFFSET,
+                        stat = run_experiment(result_file,
+                                              latency_type,
+                                              stat_offset=THROUGHPUT_OFFSET,
                                               trace_type=trace_type,
                                               hierarchy_type=hierarchy_type,
                                               latency_type=latency_type,
                                               size_type=size_type,
                                               caching_type=caching_type,
                                               summary_file=LATENCY_EXPERIMENT_SUMMARY)
-
-                        # Write stat
-                        write_stat(result_file, latency_type, stat)
 
 # SIZE -- EVAL
 def size_eval():
@@ -1258,11 +1269,9 @@ def hard_disk_eval():
                                               size_type=size_type,
                                               caching_type=caching_type,
                                               disk_mode_type=HARD_DISK_EXPERIMENT_DISK_MODE_TYPE,
-                                              summary_file=HARD_DISK_EXPERIMENT_SUMMARY)
-
-                        # Write stat
-                        write_stat(result_file, latency_type, stat)
-
+                                              summary_file=HARD_DISK_EXPERIMENT_SUMMARY,
+                                              result_file=result_file,
+                                              independent_variable=latency_type)
 
 
 ###################################################################################
@@ -1303,6 +1312,8 @@ def clean_up_dir(result_directory):
 
 # RUN EXPERIMENT
 def run_experiment(
+    result_file,
+    independent_variable,
     program=PROGRAM_NAME,
     stat_offset=THROUGHPUT_OFFSET,
     hierarchy_type=DEFAULT_HIERARCHY_TYPE,
@@ -1316,8 +1327,6 @@ def run_experiment(
     summary_file=DEFAULT_SUMMARY_FILE):
 
     # subprocess.call(["rm -f " + OUTPUT_FILE], shell=True)
-    PROGRAM_OUTPUT_FILE_NAME = "machine.txt"
-    PROGRAM_OUTPUT_FILE = open(PROGRAM_OUTPUT_FILE_NAME, "w")
     arg_list = [program,
                     "-a", str(hierarchy_type),
                     "-d", str(disk_mode_type),
@@ -1328,8 +1337,36 @@ def run_experiment(
                     "-f", BENCHMARK_TYPES_DIRS[trace_type],
                     "-m", str(migration_frequency),
                     "-o", str(DEFAULT_OPERATION_COUNT),
-                    "-z", str(summary_file)
                 ]
+
+    p = multiprocessing.Process(target=worker, args=(program,
+                                                     arg_list,
+                                                     result_file,
+                                                     summary_file,
+                                                     independent_variable,
+                                                     stat_offset,
+                                                     ))
+
+    JOBS.append(p)
+    p.start()
+
+
+# WORKER PROCESS
+def worker(program,
+           arg_list,
+           result_file,
+           summary_file,
+           independent_variable,
+           stat_offset):
+
+    RANDOM_FILE_NAME_STRING = uuid.uuid4().hex[:16].upper()
+    SUMMARY_FILE_NAME = RANDOM_FILE_NAME_STRING + "_" + summary_file
+    PROGRAM_OUTPUT_FILE_NAME = RANDOM_FILE_NAME_STRING + "_" + "output.txt"
+    PROGRAM_OUTPUT_FILE = open(PROGRAM_OUTPUT_FILE_NAME, "w")
+
+    # Set up arglist
+    arg_list.append("-z");
+    arg_list.append(str(SUMMARY_FILE_NAME))
     arg_string = ' '.join(arg_list[0:])
     LOG.info(arg_string)
 
@@ -1354,8 +1391,16 @@ def run_experiment(
               run_status = False
 
     # Collect stat
-    stat = collect_stat(summary_file, stat_offset)
-    return stat
+    stat = collect_stat(SUMMARY_FILE_NAME, stat_offset)
+
+    # Write stat
+    write_stat(result_file, independent_variable, stat)
+
+    # Clean up output file
+    os.remove(PROGRAM_OUTPUT_FILE_NAME)
+    os.remove(SUMMARY_FILE_NAME)
+
+    return
 
 
 ## ==============================================
