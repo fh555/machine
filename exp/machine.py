@@ -790,7 +790,7 @@ def latency_plot():
                                            CACHING_TYPES_STRINGS[caching_type],
                                            str(size_type),
                                            HIERARCHY_TYPES_STRINGS[hierarchy_type],
-                                           LATENCY_TYPES_STRINGS[latency_type]]
+                                           str(latency_type)]
                         result_file = get_result_file(LATENCY_DIR, result_dir_list, LATENCY_CSV)
 
                         local_dataset = loadDataFile(result_file)
@@ -825,15 +825,22 @@ def size_plot():
                 datasets = []
                 for hierarchy_type in SIZE_EXP_HIERARCHY_TYPES:
 
-                    # Get result file
-                    result_dir_list = [BENCHMARK_TYPES_STRINGS[trace_type],
-                                       CACHING_TYPES_STRINGS[caching_type],
-                                       str(latency_type),
-                                       HIERARCHY_TYPES_STRINGS[hierarchy_type]]
-                    result_file = get_result_file(SIZE_DIR, result_dir_list, SIZE_CSV)
+                    group_dataset = []
+                    for size_type in SIZE_EXP_SIZE_TYPES:
 
-                    dataset = loadDataFile(result_file)
-                    datasets.append(dataset)
+                        # Get result file
+                        result_dir_list = [BENCHMARK_TYPES_STRINGS[trace_type],
+                                           CACHING_TYPES_STRINGS[caching_type],
+                                           str(latency_type),
+                                           HIERARCHY_TYPES_STRINGS[hierarchy_type],
+                                           str(size_type)]
+                        result_file = get_result_file(SIZE_DIR, result_dir_list, SIZE_CSV)
+    
+                        local_dataset = loadDataFile(result_file)
+                        group_dataset.append(local_dataset)
+
+                    merged_group_dataset = list(itertools.chain(*group_dataset))
+                    datasets.append(merged_group_dataset)
 
                 fig = create_size_bar_chart(datasets, 0)
 
@@ -861,15 +868,22 @@ def cache_plot():
                 datasets = []
                 for hierarchy_type in CACHE_EXP_HIERARCHY_TYPES:
 
-                    # Get result file
-                    result_dir_list = [BENCHMARK_TYPES_STRINGS[trace_type],
-                                       str(size_type),
-                                       str(latency_type),
-                                       HIERARCHY_TYPES_STRINGS[hierarchy_type]]
-                    result_file = get_result_file(CACHE_DIR, result_dir_list, CACHE_CSV)
+                    group_dataset = []
+                    for caching_type in CACHE_EXP_CACHING_TYPES:
 
-                    dataset = loadDataFile(result_file)
-                    datasets.append(dataset)
+                        # Get result file
+                        result_dir_list = [BENCHMARK_TYPES_STRINGS[trace_type],
+                                           str(size_type),
+                                           str(latency_type),
+                                           HIERARCHY_TYPES_STRINGS[hierarchy_type],
+                                           CACHING_TYPES_STRINGS[caching_type]]
+                        result_file = get_result_file(CACHE_DIR, result_dir_list, CACHE_CSV)
+    
+                        local_dataset = loadDataFile(result_file)
+                        group_dataset.append(local_dataset)
+
+                    merged_group_dataset = list(itertools.chain(*group_dataset))
+                    datasets.append(merged_group_dataset)
 
                 fig = create_cache_line_chart(datasets, 0)
 
@@ -898,15 +912,22 @@ def size_ratio_plot():
                 datasets = []
                 for hierarchy_type in SIZE_RATIO_EXP_HIERARCHY_TYPES:
 
-                    # Get result file
-                    result_dir_list = [BENCHMARK_TYPES_STRINGS[trace_type],
-                                       CACHING_TYPES_STRINGS[caching_type],
-                                       str(latency_type),
-                                       HIERARCHY_TYPES_STRINGS[hierarchy_type]]
-                    result_file = get_result_file(SIZE_RATIO_DIR, result_dir_list, SIZE_RATIO_CSV)
+                    group_dataset = []
+                    for size_ratio_type in SIZE_RATIO_EXP_SIZE_RATIO_TYPES:
+                        
+                        # Get result file
+                        result_dir_list = [BENCHMARK_TYPES_STRINGS[trace_type],
+                                           CACHING_TYPES_STRINGS[caching_type],
+                                           str(latency_type),
+                                           HIERARCHY_TYPES_STRINGS[hierarchy_type],
+                                           str(size_ratio_type)]
+                        result_file = get_result_file(SIZE_RATIO_DIR, result_dir_list, SIZE_RATIO_CSV)
+    
+                        local_dataset = loadDataFile(result_file)
+                        group_dataset.append(local_dataset)
 
-                    dataset = loadDataFile(result_file)
-                    datasets.append(dataset)
+                    merged_group_dataset = list(itertools.chain(*group_dataset))
+                    datasets.append(merged_group_dataset)
 
                 fig = create_size_ratio_bar_chart(datasets, 0)
 
@@ -935,16 +956,23 @@ def hard_disk_plot():
                 datasets = []
                 for hierarchy_type in HARD_DISK_EXP_HIERARCHY_TYPES:
 
-                    # Get result file
-                    result_dir_list = [BENCHMARK_TYPES_STRINGS[trace_type],
-                                       CACHING_TYPES_STRINGS[caching_type],
-                                       str(size_type),
-                                       HIERARCHY_TYPES_STRINGS[hierarchy_type]]
-                    result_file = get_result_file(HARD_DISK_DIR, result_dir_list, HARD_DISK_CSV)
+                    group_dataset = []
+                    for latency_type in HARD_DISK_EXP_LATENCY_TYPES:
 
-                    dataset = loadDataFile(result_file)
-                    datasets.append(dataset)
+                        # Get result file
+                        result_dir_list = [BENCHMARK_TYPES_STRINGS[trace_type],
+                                           CACHING_TYPES_STRINGS[caching_type],
+                                           str(size_type),
+                                           HIERARCHY_TYPES_STRINGS[hierarchy_type],
+                                           str(latency_type)]
+                        result_file = get_result_file(HARD_DISK_DIR, result_dir_list, HARD_DISK_CSV)
+    
+                        local_dataset = loadDataFile(result_file)
+                        group_dataset.append(local_dataset)
 
+                    merged_group_dataset = list(itertools.chain(*group_dataset))
+                    datasets.append(merged_group_dataset)
+                    
                 fig = create_latency_line_chart(datasets, 0)
 
                 file_name = HARD_DISK_PLOT_DIR + "hard-disk" + "-" + \
@@ -1043,7 +1071,7 @@ def latency_eval():
                                            CACHING_TYPES_STRINGS[caching_type],
                                            str(size_type),
                                            HIERARCHY_TYPES_STRINGS[hierarchy_type],
-                                           LATENCY_TYPES_STRINGS[latency_type]]
+                                           str(latency_type)]
                         result_file = get_result_file(LATENCY_DIR, result_dir_list, LATENCY_CSV)
 
                         # Run experiment
@@ -1096,11 +1124,14 @@ def size_eval():
                         result_dir_list = [BENCHMARK_TYPES_STRINGS[trace_type],
                                            CACHING_TYPES_STRINGS[caching_type],
                                            str(latency_type),
-                                           HIERARCHY_TYPES_STRINGS[hierarchy_type]]
+                                           HIERARCHY_TYPES_STRINGS[hierarchy_type],
+                                           str(size_type)]
                         result_file = get_result_file(SIZE_DIR, result_dir_list, SIZE_CSV)
 
                         # Run experiment
-                        stat = run_experiment(stat_offset=THROUGHPUT_OFFSET,
+                        stat = run_experiment(result_file,
+                                              size_type,
+                                              stat_offset=THROUGHPUT_OFFSET,
                                               trace_type=trace_type,
                                               hierarchy_type=hierarchy_type,
                                               latency_type=latency_type,
@@ -1108,8 +1139,6 @@ def size_eval():
                                               caching_type=caching_type,
                                               summary_file=SIZE_EXPERIMENT_SUMMARY)
 
-                        # Write stat
-                        write_stat(result_file, size_type, stat)
 
 # CACHE -- EVAL
 def cache_eval():
@@ -1150,11 +1179,14 @@ def cache_eval():
                         result_dir_list = [BENCHMARK_TYPES_STRINGS[trace_type],
                                            str(size_type),
                                            str(latency_type),
-                                           HIERARCHY_TYPES_STRINGS[hierarchy_type]]
+                                           HIERARCHY_TYPES_STRINGS[hierarchy_type],
+                                           CACHING_TYPES_STRINGS[caching_type]]
                         result_file = get_result_file(CACHE_DIR, result_dir_list, CACHE_CSV)
 
                         # Run experiment
-                        stat = run_experiment(stat_offset=THROUGHPUT_OFFSET,
+                        stat = run_experiment(result_file,
+                                              caching_type,
+                                              stat_offset=THROUGHPUT_OFFSET,
                                               trace_type=trace_type,
                                               hierarchy_type=hierarchy_type,
                                               latency_type=latency_type,
@@ -1162,8 +1194,6 @@ def cache_eval():
                                               caching_type=caching_type,
                                               summary_file=CACHE_EXPERIMENT_SUMMARY)
 
-                        # Write stat
-                        write_stat(result_file, caching_type, stat)
 
 # SIZE RATIO -- EVAL
 def size_ratio_eval():
@@ -1204,11 +1234,14 @@ def size_ratio_eval():
                         result_dir_list = [BENCHMARK_TYPES_STRINGS[trace_type],
                                            CACHING_TYPES_STRINGS[caching_type],
                                            str(latency_type),
-                                           HIERARCHY_TYPES_STRINGS[hierarchy_type]]
+                                           HIERARCHY_TYPES_STRINGS[hierarchy_type],
+                                           str(size_ratio_type)]
                         result_file = get_result_file(SIZE_RATIO_DIR, result_dir_list, SIZE_RATIO_CSV)
 
                         # Run experiment
-                        stat = run_experiment(stat_offset=THROUGHPUT_OFFSET,
+                        stat = run_experiment(result_file,
+                                              size_ratio_type,
+                                              stat_offset=THROUGHPUT_OFFSET,
                                               trace_type=trace_type,
                                               hierarchy_type=hierarchy_type,
                                               latency_type=latency_type,
@@ -1216,8 +1249,6 @@ def size_ratio_eval():
                                               caching_type=caching_type,
                                               summary_file=SIZE_RATIO_EXPERIMENT_SUMMARY)
 
-                        # Write stat
-                        write_stat(result_file, size_ratio_type, stat)
 
 # HARD DISK -- EVAL
 def hard_disk_eval():
@@ -1258,21 +1289,22 @@ def hard_disk_eval():
                         result_dir_list = [BENCHMARK_TYPES_STRINGS[trace_type],
                                            CACHING_TYPES_STRINGS[caching_type],
                                            str(size_type),
-                                           HIERARCHY_TYPES_STRINGS[hierarchy_type]]
+                                           HIERARCHY_TYPES_STRINGS[hierarchy_type],
+                                           str(latency_type)]
                         result_file = get_result_file(HARD_DISK_DIR, result_dir_list, HARD_DISK_CSV)
 
                         # Run experiment
-                        stat = run_experiment(stat_offset=THROUGHPUT_OFFSET,
+                        stat = run_experiment(result_file,
+                                              latency_type,
+                                              stat_offset=THROUGHPUT_OFFSET,
                                               trace_type=trace_type,
                                               hierarchy_type=hierarchy_type,
                                               latency_type=latency_type,
                                               size_type=size_type,
                                               caching_type=caching_type,
                                               disk_mode_type=HARD_DISK_EXPERIMENT_DISK_MODE_TYPE,
-                                              summary_file=HARD_DISK_EXPERIMENT_SUMMARY,
-                                              result_file=result_file,
-                                              independent_variable=latency_type)
-
+                                              summary_file=HARD_DISK_EXPERIMENT_SUMMARY)
+                        
 
 ###################################################################################
 # TEST
