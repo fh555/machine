@@ -68,7 +68,7 @@ PATTERNS_1 = ([ "////", "o", "\\\\" , ".", "\\\\\\"])
 PATTERNS_2 = ([ "\\\\" , ".", "////", "o", "\\\\\\"])
 PATTERNS_3 = ([ "////", "o", "\\\\" , ".", "\\\\\\"])
 
-PATTERNS = (PATTERNS_1, PATTERNS_2, PATTERNS_3) 
+PATTERNS = (PATTERNS_1, PATTERNS_2, PATTERNS_3)
 
 OPT_STACK_COLORS = ('#2b3742', '#c9b385', '#610606', '#1f1501')
 OPT_LINE_STYLES= ('-', ':', '--', '-.')
@@ -205,22 +205,25 @@ LATENCY_TYPES_STRINGS = {
 CACHING_TYPE_FIFO = 1
 CACHING_TYPE_LRU = 2
 CACHING_TYPE_LFU = 3
+CACHING_TYPE_ARC = 4
 
 CACHING_TYPES_STRINGS = {
     1 : "fifo",
     2 : "lru",
     3 : "lfu",
+    4 : "arc"
 }
 
 CACHING_TYPES = [
     CACHING_TYPE_FIFO,
     CACHING_TYPE_LRU,
-    CACHING_TYPE_LFU
+    CACHING_TYPE_LFU,
+    CACHING_TYPE_ARC
 ]
 
 ## DISK MODE TYPES
 DISK_MODE_TYPE_SSD = 1
-DISK_MODE_TYPE_HDD = 2 
+DISK_MODE_TYPE_HDD = 2
 
 ## BENCHMARK TYPES
 BENCHMARK_TYPE_EXAMPLE = 0
@@ -234,7 +237,7 @@ BENCHMARK_TYPE_AUCTIONMARK = 7
 BENCHMARK_TYPE_SMALLBANK = 8
 
 BENCHMARK_TYPES_STRINGS = {
-    0 : "example",                
+    0 : "example",
     1 : "tpcc",
     2 : "ycsb",
     3 : "voter",
@@ -246,7 +249,7 @@ BENCHMARK_TYPES_STRINGS = {
 }
 
 BENCHMARK_TYPES_DIRS = {
-    0 : BENCHMARK_DIR + BENCHMARK_TYPES_STRINGS[0] + ".txt",                        
+    0 : BENCHMARK_DIR + BENCHMARK_TYPES_STRINGS[0] + ".txt",
     1 : BENCHMARK_DIR + BENCHMARK_TYPES_STRINGS[1] + ".txt",
     2 : BENCHMARK_DIR + BENCHMARK_TYPES_STRINGS[2] + ".txt",
     3 : BENCHMARK_DIR + BENCHMARK_TYPES_STRINGS[3] + ".txt",
@@ -258,11 +261,11 @@ BENCHMARK_TYPES_DIRS = {
 }
 
 BENCHMARK_TYPES = [
-#     BENCHMARK_TYPE_EXAMPLE,
-    BENCHMARK_TYPE_TPCC,
-    BENCHMARK_TYPE_VOTER,
-    BENCHMARK_TYPE_YCSB,
-    BENCHMARK_TYPE_CHBENCHMARK
+     BENCHMARK_TYPE_EXAMPLE,
+#    BENCHMARK_TYPE_TPCC,
+#    BENCHMARK_TYPE_VOTER,
+#    BENCHMARK_TYPE_YCSB,
+#    BENCHMARK_TYPE_CHBENCHMARK
 ]
 
 ## OUTPUT
@@ -271,7 +274,7 @@ THROUGHPUT_OFFSET = 0
 
 ## DEFAULTS
 
-SCALE_FACTOR = 50
+SCALE_FACTOR = 1
 
 DEFAULT_DURATION = 10
 DEFAULT_HIERARCHY_TYPE = HIERARCHY_TYPE_NVM
@@ -446,7 +449,7 @@ def get_result_file(base_result_dir, result_dir_list, result_file_name):
 def create_legend_hierarchy_type_line(color_mode):
     fig = pylab.figure()
     ax1 = fig.add_subplot(111)
-    
+
     LOG.info("Creating hierarchy type line");
 
     LEGEND_VALUES = HIERARCHY_TYPES
@@ -478,8 +481,8 @@ def create_legend_hierarchy_type_line(color_mode):
                      frameon=False, borderaxespad=0.0,
                      handleheight=1, handlelength=3)
 
-    figlegend.savefig(LEGEND_PLOT_DIR + 'legend_hierarchy_type_line_' 
-                      + str(color_mode) + '.pdf')  
+    figlegend.savefig(LEGEND_PLOT_DIR + 'legend_hierarchy_type_line_'
+                      + str(color_mode) + '.pdf')
 
 
 def create_legend_hierarchy_type_bar(color_mode):
@@ -515,7 +518,7 @@ def create_legend_hierarchy_type_bar(color_mode):
                               hatch=PATTERNS[color_mode][idx - 1],
                               linewidth=BAR_LINEWIDTH)
         idx = idx + 1
-    
+
     # LEGEND
     figlegend.legend(bars, LABELS, prop=LEGEND_FP,
                      loc=1, ncol=4,
@@ -523,8 +526,8 @@ def create_legend_hierarchy_type_bar(color_mode):
                      frameon=False, borderaxespad=0.0,
                      handleheight=1, handlelength=3)
 
-    figlegend.savefig(LEGEND_PLOT_DIR + 'legend_hierarchy_type_bar_' 
-                      + str(color_mode) + '.pdf')  
+    figlegend.savefig(LEGEND_PLOT_DIR + 'legend_hierarchy_type_bar_'
+                      + str(color_mode) + '.pdf')
 
 ###################################################################################
 # PLOT
@@ -621,7 +624,7 @@ def create_size_bar_chart(datasets, color_mode):
 
     # Y-AXIS
     YAXIS_MIN = 1
-    YAXIS_MAX = 10**5    
+    YAXIS_MAX = 10**5
     ax1.yaxis.set_major_locator(LinearLocator(YAXIS_TICKS))
     ax1.minorticks_off()
     ax1.set_ylabel(get_label('Throughput (ops)'), fontproperties=LABEL_FP)
@@ -1392,7 +1395,7 @@ if __name__ == '__main__':
         hard_disk_eval()
 
     ## PLOTTING GROUP
-    
+
     if args.latency_plot:
         latency_plot()
 
@@ -1410,5 +1413,5 @@ if __name__ == '__main__':
 
     ## LEGEND GROUP
 
-    create_legend_hierarchy_type_line(0)
-    create_legend_hierarchy_type_bar(0)
+    #create_legend_hierarchy_type_line(0)
+    #create_legend_hierarchy_type_bar(0)
