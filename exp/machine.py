@@ -80,8 +80,8 @@ OPT_LINE_STYLES= ('-', ':', '--', '-.')
 OPT_STYLE = 'bmh'
 
 OPT_LABEL_WEIGHT = 'bold'
-OPT_LINE_WIDTH = 6.0
-OPT_MARKER_SIZE = 10.0
+OPT_LINE_WIDTH = 3.0
+OPT_MARKER_SIZE = 5.0
 
 AXIS_LINEWIDTH = 1.3
 BAR_LINEWIDTH = 1.2
@@ -267,9 +267,11 @@ BENCHMARK_TYPES_DIRS = {
 BENCHMARK_TYPES = [
 #     BENCHMARK_TYPE_EXAMPLE,
     BENCHMARK_TYPE_TPCC,
-#    BENCHMARK_TYPE_VOTER,
-#    BENCHMARK_TYPE_YCSB,
-#    BENCHMARK_TYPE_CHBENCHMARK
+    BENCHMARK_TYPE_VOTER,
+    BENCHMARK_TYPE_YCSB_READ,
+    BENCHMARK_TYPE_YCSB_INSERT,
+    BENCHMARK_TYPE_CHBENCHMARK,
+    BENCHMARK_TYPE_SMALLBANK
 ]
 
 ## OUTPUT
@@ -571,13 +573,13 @@ def create_latency_line_chart(datasets, color_mode):
     makeGrid(ax1)
 
     # Y-AXIS
-    YAXIS_MIN = 1
-    YAXIS_MAX = 10**5
+    #YAXIS_MIN = 1
+    #YAXIS_MAX = 10**7
     ax1.yaxis.set_major_locator(LinearLocator(YAXIS_TICKS))
     ax1.minorticks_off()
     ax1.set_ylabel(get_label('Throughput (ops)'), fontproperties=LABEL_FP)
-    ax1.set_ylim(bottom=YAXIS_MIN, top=YAXIS_MAX)
-    ax1.set_yscale('log', nonposy='clip')
+    #ax1.set_ylim(bottom=YAXIS_MIN, top=YAXIS_MAX)
+    #ax1.set_yscale('log', nonposy='clip')
 
     # X-AXIS
     XAXIS_MIN = 0.25
