@@ -271,10 +271,12 @@ BENCHMARK_TYPES_DIRS = {
 BENCHMARK_TYPES = [
 #    BENCHMARK_TYPE_EXAMPLE,
     BENCHMARK_TYPE_TPCC,
+    BENCHMARK_TYPE_YCSB,
     BENCHMARK_TYPE_VOTER,
     BENCHMARK_TYPE_YCSB_READ,
     BENCHMARK_TYPE_YCSB_INSERT,
     BENCHMARK_TYPE_CHBENCHMARK,
+    BENCHMARK_TYPE_AUCTIONMARK,
     BENCHMARK_TYPE_SMALLBANK
 ]
 
@@ -835,7 +837,7 @@ def size_plot():
                                            HIERARCHY_TYPES_STRINGS[hierarchy_type],
                                            str(size_type)]
                         result_file = get_result_file(SIZE_DIR, result_dir_list, SIZE_CSV)
-    
+
                         local_dataset = loadDataFile(result_file)
                         group_dataset.append(local_dataset)
 
@@ -878,7 +880,7 @@ def cache_plot():
                                            HIERARCHY_TYPES_STRINGS[hierarchy_type],
                                            CACHING_TYPES_STRINGS[caching_type]]
                         result_file = get_result_file(CACHE_DIR, result_dir_list, CACHE_CSV)
-    
+
                         local_dataset = loadDataFile(result_file)
                         group_dataset.append(local_dataset)
 
@@ -914,7 +916,7 @@ def size_ratio_plot():
 
                     group_dataset = []
                     for size_ratio_type in SIZE_RATIO_EXP_SIZE_RATIO_TYPES:
-                        
+
                         # Get result file
                         result_dir_list = [BENCHMARK_TYPES_STRINGS[trace_type],
                                            CACHING_TYPES_STRINGS[caching_type],
@@ -922,7 +924,7 @@ def size_ratio_plot():
                                            HIERARCHY_TYPES_STRINGS[hierarchy_type],
                                            str(size_ratio_type)]
                         result_file = get_result_file(SIZE_RATIO_DIR, result_dir_list, SIZE_RATIO_CSV)
-    
+
                         local_dataset = loadDataFile(result_file)
                         group_dataset.append(local_dataset)
 
@@ -966,13 +968,13 @@ def hard_disk_plot():
                                            HIERARCHY_TYPES_STRINGS[hierarchy_type],
                                            str(latency_type)]
                         result_file = get_result_file(HARD_DISK_DIR, result_dir_list, HARD_DISK_CSV)
-    
+
                         local_dataset = loadDataFile(result_file)
                         group_dataset.append(local_dataset)
 
                     merged_group_dataset = list(itertools.chain(*group_dataset))
                     datasets.append(merged_group_dataset)
-                    
+
                 fig = create_latency_line_chart(datasets, 0)
 
                 file_name = HARD_DISK_PLOT_DIR + "hard-disk" + "-" + \
@@ -1304,7 +1306,7 @@ def hard_disk_eval():
                                               caching_type=caching_type,
                                               disk_mode_type=HARD_DISK_EXPERIMENT_DISK_MODE_TYPE,
                                               summary_file=HARD_DISK_EXPERIMENT_SUMMARY)
-                        
+
 
 ###################################################################################
 # TEST
