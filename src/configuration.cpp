@@ -153,19 +153,43 @@ void SetupNVMLatency(configuration &state){
 
     case LATENCY_TYPE_2: {
       state.nvm_read_latency = 2;
-      state.nvm_write_latency = 4;
+      state.nvm_write_latency = 2;
       break;
     }
 
     case LATENCY_TYPE_3: {
-      state.nvm_read_latency = 4;
-      state.nvm_write_latency = 10;
+      state.nvm_read_latency = 2;
+      state.nvm_write_latency = 4;
       break;
     }
 
     case LATENCY_TYPE_4: {
+      state.nvm_read_latency = 2;
+      state.nvm_write_latency = 8;
+      break;
+    }
+
+    case LATENCY_TYPE_5: {
+      state.nvm_read_latency = 4;
+      state.nvm_write_latency = 4;
+      break;
+    }
+
+    case LATENCY_TYPE_6: {
+      state.nvm_read_latency = 4;
+      state.nvm_write_latency = 8;
+      break;
+    }
+
+    case LATENCY_TYPE_7: {
       state.nvm_read_latency = 10;
       state.nvm_write_latency = 20;
+      break;
+    }
+
+    case LATENCY_TYPE_8: {
+      state.nvm_read_latency = 20;
+      state.nvm_write_latency = 40;
       break;
     }
 

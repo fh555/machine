@@ -194,19 +194,31 @@ LATENCY_TYPE_1 = 1
 LATENCY_TYPE_2 = 2
 LATENCY_TYPE_3 = 3
 LATENCY_TYPE_4 = 4
+LATENCY_TYPE_5 = 5
+LATENCY_TYPE_6 = 6
+LATENCY_TYPE_7 = 7
+LATENCY_TYPE_8 = 8
 
 LATENCY_TYPES = [
     LATENCY_TYPE_1,
     LATENCY_TYPE_2,
     LATENCY_TYPE_3,
-    LATENCY_TYPE_4
+    LATENCY_TYPE_4,
+    LATENCY_TYPE_5,
+    LATENCY_TYPE_6,
+    LATENCY_TYPE_7,
+    LATENCY_TYPE_8
 ]
 
 LATENCY_TYPES_STRINGS = {
     1 : "1x-1x",
-    2 : "2x-4x",
-    3 : "4x-10x",
-    4 : "10x-20x"
+    2 : "2x-2x",
+    3 : "2x-4x",
+    4 : "2x-8x",
+    5 : "4x-4x",
+    6 : "4x-8x",
+    7 : "10x-20x",
+    8 : "20x-40x"
 }
 
 ## CACHING TYPES
