@@ -223,21 +223,21 @@ LATENCY_TYPES_STRINGS = {
 
 ## CACHING TYPES
 CACHING_TYPE_FIFO = 1
-CACHING_TYPE_LRU = 2
-CACHING_TYPE_LFU = 3
+CACHING_TYPE_LFU = 2
+CACHING_TYPE_LRU = 3
 CACHING_TYPE_ARC = 4
 
 CACHING_TYPES_STRINGS = {
     1 : "fifo",
-    2 : "lru",
-    3 : "lfu",
+    2 : "lfu",
+    3 : "lru",
     4 : "arc"
 }
 
 CACHING_TYPES = [
     CACHING_TYPE_FIFO,
-    CACHING_TYPE_LRU,
     CACHING_TYPE_LFU,
+    CACHING_TYPE_LRU,
     CACHING_TYPE_ARC
 ]
 
@@ -357,7 +357,7 @@ SIZE_EXP_CACHING_TYPES = [DEFAULT_CACHING_TYPE]
 ## CACHE EXPERIMENT
 
 CACHE_EXP_BENCHMARK_TYPES = BENCHMARK_TYPES
-CACHE_EXP_HIERARCHY_TYPES = HIERARCHY_TYPES
+CACHE_EXP_HIERARCHY_TYPES = [HIERARCHY_TYPE_DRAM_NVM_DISK]
 CACHE_EXP_SIZE_TYPES = [DEFAULT_SIZE_TYPE]
 CACHE_EXP_LATENCY_TYPES = [DEFAULT_LATENCY_TYPE]
 CACHE_EXP_CACHING_TYPES = CACHING_TYPES
@@ -695,17 +695,17 @@ def create_cache_line_chart(datasets, color_mode):
     makeGrid(ax1)
 
     # Y-AXIS
-    YAXIS_MIN = 1
-    YAXIS_MAX = 10**5
+    #YAXIS_MIN = 1
+    #YAXIS_MAX = 10**5
     ax1.yaxis.set_major_locator(LinearLocator(YAXIS_TICKS))
     ax1.minorticks_off()
     ax1.set_ylabel(get_label('Throughput (ops)'), fontproperties=LABEL_FP)
-    ax1.set_ylim(bottom=YAXIS_MIN, top=YAXIS_MAX)
-    ax1.set_yscale('log', nonposy='clip')
+    #ax1.set_ylim(bottom=YAXIS_MIN, top=YAXIS_MAX)
+    #ax1.set_yscale('log', nonposy='clip')
 
     # X-AXIS
     XAXIS_MIN = 0.25
-    XAXIS_MAX = 2.75
+    XAXIS_MAX = 3.75
     ax1.set_xticks(ind + 0.5)
     ax1.set_xlabel(get_label('Caching Algorithm Types'), fontproperties=LABEL_FP)
     ax1.set_xticklabels(x_values)
