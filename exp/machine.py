@@ -283,13 +283,10 @@ BENCHMARK_TYPES_DIRS = {
 BENCHMARK_TYPES = [
 #    BENCHMARK_TYPE_EXAMPLE,
     BENCHMARK_TYPE_TPCC,
-    BENCHMARK_TYPE_YCSB,
     BENCHMARK_TYPE_VOTER,
-    BENCHMARK_TYPE_YCSB_READ,
-    BENCHMARK_TYPE_YCSB_INSERT,
+    BENCHMARK_TYPE_YCSB,
     BENCHMARK_TYPE_CHBENCHMARK,
-    BENCHMARK_TYPE_AUCTIONMARK,
-    BENCHMARK_TYPE_SMALLBANK
+    BENCHMARK_TYPE_AUCTIONMARK
 ]
 
 ## OUTPUT
@@ -601,7 +598,7 @@ def create_latency_line_chart(datasets, color_mode):
 
     # X-AXIS
     XAXIS_MIN = 0.25
-    XAXIS_MAX = 3.75
+    XAXIS_MAX = 7.75
     ax1.set_xticks(ind + 0.5)
     ax1.set_xlabel(get_label('Latency Types'), fontproperties=LABEL_FP)
     ax1.set_xticklabels(x_values)
